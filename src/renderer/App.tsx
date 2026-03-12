@@ -3,9 +3,10 @@ import { Sidebar } from './components/Sidebar';
 import { MainContent } from './components/MainContent';
 import { Dashboard } from './components/Dashboard';
 import { CreateProjectModal } from './components/CreateProjectModal';
+import { Settings } from './components/Settings';
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'projects'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'projects' | 'settings'>('dashboard');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -13,9 +14,10 @@ export default function App() {
       <Sidebar 
         currentView={currentView} 
         onViewChange={setCurrentView} 
-        onCreateProject={() => setIsModalOpen(true)}
       />
-      {currentView === 'dashboard' ? <Dashboard /> : <MainContent onCreateProject={() => setIsModalOpen(true)} />}
+      {currentView === 'dashboard' && <Dashboard />}
+      {currentView === 'projects' && <MainContent onCreateProject={() => setIsModalOpen(true)} />}
+      {currentView === 'settings' && <Settings />}
       <CreateProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
