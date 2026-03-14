@@ -1,3 +1,10 @@
+// Type definition for the window extension
+declare global {
+  interface Window {
+    kanbanApi: any;
+  }
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -27,37 +34,31 @@ const mockProjects: Project[] = [
     dueDate: 'Oct 15, 2023',
     tasksCount: 12,
   },
-  {
-    id: '3',
-    name: 'API V2 Migration',
-    description: 'Migrating legacy endpoints to the new GraphQL architecture.',
-    progress: 30,
-    status: 'In Progress',
-    dueDate: 'Dec 10, 2023',
-    tasksCount: 45,
-  },
-  {
-    id: '4',
-    name: 'Brand Refresh',
-    description: 'Updating company brand guidelines and marketing assets.',
-    progress: 0,
-    status: 'Planning',
-    dueDate: 'Jan 15, 2024',
-    tasksCount: 8,
-  }
 ];
 
 export async function getProjects(): Promise<Project[]> {
-  // Simulate network delay
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockProjects), 100);
-  });
+  try {
+    if (window.kanbanApi && window.kanbanApi.getProjects) {
+      const dbProjects = await window.kanbanApi.getProjects();
+      // Map SQLite snake_case back to frontend camelCase if necessary
+      return dbProjects.map((p: any) => ({
+        ...p,
+        dueDate: p.due_date,
+        // Calculate a dummy progress for now or default it
+        progress: 0,
+        tasksCount: p.tasksCount || 0
+      }));
+    }
+  } catch (error) {
+    console.error("IPC not available or failed, falling back to mocks", error);
+  }
+  // Fallback if running outside of Electron or prior to ContextBridge loading
+  return mockProjects;
 }
 
 export async function getProjectById(id: string): Promise<Project | undefined> {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(mockProjects.find(p => p.id === id)), 50);
-  });
+  const projects = await getProjects();
+  return projects.find(p => p.id === id);
 }
 
 export async function getAvailableTags(): Promise<string[]> {
