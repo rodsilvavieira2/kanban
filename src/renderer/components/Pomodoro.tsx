@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { usePomodoroStore } from '../stores/pomodoroStore';
-import * as Icons from '@geist-ui/icons';
+import { RotateCcw, Pause, Play, Layers, Coffee, RefreshCw, Clock, MessageSquare, Paperclip } from 'lucide-react';
 
 export function Pomodoro() {
   const { 
@@ -109,7 +109,7 @@ export function Pomodoro() {
             <div className="rounds-container">
               <span className="rounds-label mono">ROUND {roundsCompleted + 1} / {totalRounds}</span>
               <button className="reset-rounds-btn" onClick={resetRounds} title="Reset Rounds">
-                <Icons.RotateCcw size={12} strokeWidth={2} />
+                <RotateCcw size={12} strokeWidth={2} />
               </button>
             </div>
             <h2>{isBreak ? 'Break' : 'Focus Session'}</h2>
@@ -157,29 +157,29 @@ export function Pomodoro() {
             <button className="btn-primary start-btn" onClick={toggleTimer}>
               {isActive ? (
                 <>
-                  <Icons.Pause size={18} strokeWidth={2} />
+                  <Pause size={18} strokeWidth={2} />
                   Pause {isBreak ? 'Break' : 'Focus'}
                 </>
               ) : (
                 <>
-                  <Icons.Play size={18} fill="currentColor" />
+                  <Play size={18} fill="currentColor" />
                   Start {isBreak ? 'Break' : 'Focus'}
                 </>
               )}
             </button>
             <div className="secondary-controls">
               <button className="btn-secondary" onClick={resetCurrentSession}>
-                <Icons.RotateCcw size={16} strokeWidth={2} />
+                <RotateCcw size={16} strokeWidth={2} />
                 Reset
               </button>
               {isBreak ? (
                 <button className="btn-secondary" onClick={() => startFocus()}>
-                  <Icons.Layers size={16} strokeWidth={2} />
+                  <Layers size={16} strokeWidth={2} />
                   Focus
                 </button>
               ) : (
                 <button className="btn-secondary" onClick={() => startBreak()}>
-                  <Icons.Coffee size={16} strokeWidth={2} />
+                  <Coffee size={16} strokeWidth={2} />
                   Break
                 </button>
               )}
@@ -191,7 +191,7 @@ export function Pomodoro() {
           <div className="tasks-panel-header">
             <h3>Kanban Tasks</h3>
             <button className="icon-button">
-              <Icons.RefreshCw size={18} strokeWidth={2} />
+              <RefreshCw size={18} strokeWidth={2} />
             </button>
           </div>
 
@@ -205,8 +205,8 @@ export function Pomodoro() {
               <p className="task-desc">Update the primary color palette and component library to match new brand guidelines.</p>
               <div className="task-meta">
                 <div className="task-meta-left">
-                  <span className="meta-item"><Icons.Clock size={12} strokeWidth={2} /> 25m</span>
-                  <span className="meta-item"><Icons.MessageSquare size={12} strokeWidth={2} /> 12</span>
+                  <span className="meta-item"><Clock size={12} strokeWidth={2} /> 25m</span>
+                  <span className="meta-item"><MessageSquare size={12} strokeWidth={2} /> 12</span>
                 </div>
                 <span className="status-badge in-progress">ACTIVE</span>
               </div>
@@ -221,7 +221,7 @@ export function Pomodoro() {
               <p className="task-desc">Connect the backend dashboard to the production Stripe API endpoints.</p>
               <div className="task-meta">
                 <div className="task-meta-left">
-                  <span className="meta-item"><Icons.Clock size={12} strokeWidth={2} /> 50m</span>
+                  <span className="meta-item"><Clock size={12} strokeWidth={2} /> 50m</span>
                 </div>
               </div>
             </div>
@@ -235,7 +235,7 @@ export function Pomodoro() {
               <p className="task-desc">Minor adjustments to the landing page footer links and spacing.</p>
               <div className="task-meta">
                 <div className="task-meta-left">
-                  <span className="meta-item"><Icons.Clock size={12} strokeWidth={2} /> 25m</span>
+                  <span className="meta-item"><Clock size={12} strokeWidth={2} /> 25m</span>
                 </div>
               </div>
             </div>
@@ -249,7 +249,7 @@ export function Pomodoro() {
               <p className="task-desc">Schedule and conduct feedback sessions with top 5 enterprise clients.</p>
               <div className="task-meta">
                 <div className="task-meta-left">
-                  <span className="meta-item"><Icons.Paperclip size={12} strokeWidth={2} /> 3</span>
+                  <span className="meta-item"><Paperclip size={12} strokeWidth={2} /> 3</span>
                 </div>
               </div>
             </div>

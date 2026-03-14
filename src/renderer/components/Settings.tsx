@@ -1,6 +1,6 @@
 import React from 'react';
 import { usePomodoroStore } from '../stores/pomodoroStore';
-import * as Icons from '@geist-ui/icons';
+import { Sliders, Clock, Layout, Database, Download, Upload, AlertTriangle, Info, Box } from 'lucide-react';
 
 export function Settings() {
   const { 
@@ -28,7 +28,7 @@ export function Settings() {
           {/* Section - General Settings */}
           <div className="settings-section">
             <div className="settings-section-header">
-              <Icons.Sliders size={20} color="var(--accent-color)" strokeWidth={2} />
+              <Sliders size={20} color="var(--accent-color)" strokeWidth={2} />
               <h3>General Settings</h3>
             </div>
             <div className="settings-card">
@@ -65,7 +65,7 @@ export function Settings() {
           {/* Section - Pomodoro Configuration */}
           <div className="settings-section">
             <div className="settings-section-header">
-              <Icons.Clock size={20} color="var(--accent-color)" strokeWidth={2} />
+              <Clock size={20} color="var(--accent-color)" strokeWidth={2} />
               <h3>Pomodoro Configuration</h3>
             </div>
             <div className="settings-card">
@@ -145,7 +145,7 @@ export function Settings() {
           {/* Section - Board Management */}
           <div className="settings-section">
             <div className="settings-section-header">
-              <Icons.Layout size={20} color="var(--accent-color)" strokeWidth={2} />
+              <Layout size={20} color="var(--accent-color)" strokeWidth={2} />
               <h3>Board Management</h3>
             </div>
             <div className="settings-card">
@@ -167,7 +167,7 @@ export function Settings() {
           {/* Section - Data Management */}
           <div className="settings-section">
             <div className="settings-section-header">
-              <Icons.Database size={20} color="var(--accent-color)" strokeWidth={2} />
+              <Database size={20} color="var(--accent-color)" strokeWidth={2} />
               <h3>Data Management</h3>
             </div>
 
@@ -179,11 +179,11 @@ export function Settings() {
                 </div>
                 <div className="settings-actions-row" style={{ marginTop: '16px' }}>
                   <button className="btn-secondary">
-                    <Icons.Download size={16} strokeWidth={2} />
+                    <Download size={16} strokeWidth={2} />
                     Export Data
                   </button>
                   <button className="btn-secondary">
-                    <Icons.Upload size={16} strokeWidth={2} />
+                    <Upload size={16} strokeWidth={2} />
                     Import Data
                   </button>
                 </div>
@@ -194,7 +194,7 @@ export function Settings() {
               <div className="settings-card-block danger-block">
                 <div className="danger-header">
                   <div className="danger-icon">
-                    <Icons.AlertTriangle size={20} strokeWidth={2} />
+                    <AlertTriangle size={20} strokeWidth={2} />
                   </div>
                   <div className="danger-info">
                     <h4>Danger Zone</h4>
@@ -211,14 +211,14 @@ export function Settings() {
           {/* About Section */}
           <div className="settings-section">
             <div className="settings-section-header">
-              <Icons.Info size={20} color="var(--accent-color)" strokeWidth={2} />
+              <Info size={20} color="var(--accent-color)" strokeWidth={2} />
               <h3>About</h3>
             </div>
             
             <div className="settings-card about-card">
               <div className="about-hero">
                 <div className="about-logo-wrapper">
-                   <Icons.Box size={32} strokeWidth={2} />
+                   <Box size={32} strokeWidth={2} />
                 </div>
                 <h4>Kanban Desktop Pro</h4>
                 <p>Version 1.2.0 (Build 2024.10.24)</p>
