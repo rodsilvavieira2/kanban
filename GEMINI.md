@@ -44,27 +44,43 @@ The project is built using Vite and Electron Forge. Ensure you have run `npm ins
 *(Note: Specific testing commands/frameworks are to be defined, but end-to-end testing between Manual UI and AI Agent interactions is a planned phase).*
 
 ## Design System
-The application follows a high-contrast, minimalist design inspired by the Vercel (Geist) design system.
+The application strictly follows the **Vercel Geist** design system, characterized by high contrast, minimalist geometric precision, and a "pure" dark theme.
 
-**Core Palette:**
-*   **Background (Main):** `#000000` (Pure Black)
-*   **Background (Secondary):** `#111111`
-*   **Borders:** `#333333` (Default), `#444444` (Hover)
-*   **Text (Primary):** `#FFFFFF` (Pure White)
-*   **Text (Secondary):** `#888888`
-*   **Text (Tertiary):** `#666666`
-*   **Accent/Action:** `#0070F3` (Vercel Blue)
-*   **Success:** `#0070F3`
-*   **Warning:** `#F5A623`
-*   **Error:** `#EE0000`
+### **1. Color Palette (Dark Mode)**
+Hierarchy is defined by scale-based grayscale values and specific semantic accents.
+*   **Backgrounds:**
+    *   `Background 1` (Main): `#000000` (Pure Black)
+    *   `Background 2` (Secondary): `#111111`
+*   **Accents (Grayscale Scale):**
+    *   `Accents 2` (Borders): `#333333`
+    *   `Accents 3` (Hover Borders): `#444444`
+    *   `Accents 4` (Tertiary Text/Icons): `#666666`
+    *   `Accents 5` (Secondary Text): `#888888`
+    *   `Accents 8` (Primary Text): `#FFFFFF`
+*   **Semantic Accents:**
+    *   `Blue/Success`: `#0070F3` (Vercel Blue)
+    *   `Warning`: `#F5A623`
+    *   `Error`: `#EE0000`
 
-**Typography:**
-*   **Primary Font:** `Inter` (Sans-serif)
-*   **Characteristics:** Optimized for readability with tight letter-spacing and varied weights (400 to 700).
+### **2. Typography**
+*   **Fonts:** `Geist Sans` (UI/Body) and `Geist Mono` (Data/Technical labels). Fallback to `Inter` if Geist is unavailable.
+*   **Sizing:** 
+    *   `Label 14`: 14px (Standard UI/Buttons).
+    *   `Copy 16`: 16px (Body text).
+*   **Weights:** Regular (400) for body, Medium (500) for labels/icons, Bold (700) for headers.
+*   **Principles:** 
+    *   Tight tracking (`-0.02em` to `-0.05em`) for headings.
+    *   `tabular-nums` for all numeric data (timers, counters) to prevent jumping.
 
-**Layout & Components:**
-*   **Border Radius:** `8px` (`var(--radius)`) for most components.
-*   **Aesthetics:** Clean lines, generous padding, and subtle interactive feedback (e.g., border color shifts on hover).
+### **3. Icons**
+*   **Style:** Minimalist, geometric, outline-based.
+*   **Specifications:** 24x24px grid, `stroke-width` of 1.5px to 2px.
+*   **Implementation:** Standardize on `@geist-ui/icons` or equivalent SVG specs using `stroke="currentColor"`.
+
+### **4. Elevation & Borders**
+*   Avoid heavy drop shadows. Define depth using incremental border colors (`Accents 2` -> `Accents 3`).
+*   Standard Border Radius: `8px` (`var(--radius)`).
+
 
 ## Development Conventions
 *   **Security & IPC:** The React frontend has no direct access to Node.js APIs. All communication with SQLite and the MCP server must go through the `window.api` bridge defined in `preload.ts`.
