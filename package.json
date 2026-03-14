@@ -41,6 +41,8 @@
     "vite-plugin-native": "^2.2.2"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@types/better-sqlite3": "^7.6.13",
     "better-sqlite3": "^12.8.0",
     "chart.js": "^4.5.1",

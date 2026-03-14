@@ -6,10 +6,12 @@ interface PomodoroSettings {
   breakTime: number; // minutes
   totalRounds: number;
   notificationsEnabled: boolean;
+  selectedTaskId: string | null;
   setFocusTime: (time: number) => void;
   setBreakTime: (time: number) => void;
   setTotalRounds: (rounds: number) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
+  setSelectedTaskId: (id: string | null) => void;
 }
 
 export const usePomodoroStore = create<PomodoroSettings>()(
@@ -19,10 +21,12 @@ export const usePomodoroStore = create<PomodoroSettings>()(
       breakTime: 5,
       totalRounds: 4,
       notificationsEnabled: true,
+      selectedTaskId: null,
       setFocusTime: (time) => set({ focusTime: time }),
       setBreakTime: (time) => set({ breakTime: time }),
       setTotalRounds: (rounds) => set({ totalRounds: rounds }),
       setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
+      setSelectedTaskId: (id) => set({ selectedTaskId: id }),
     }),
     {
       name: 'pomodoro-settings',

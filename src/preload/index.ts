@@ -8,6 +8,10 @@ const kanbanApi = {
   getProjects: () => ipcRenderer.invoke('get-projects'),
   createProject: (data: any) => ipcRenderer.invoke('create-project', data),
   deleteProject: (id: string) => ipcRenderer.invoke('delete-project', id),
+  getProjectData: (projectId: string) => ipcRenderer.invoke('get-project-data', projectId),
+  createTask: (data: any) => ipcRenderer.invoke('create-task', data),
+  moveTask: (request: any) => ipcRenderer.invoke('move-task', request),
+  updateTaskTime: (taskId: string, minutes: number) => ipcRenderer.invoke('update-task-time', { taskId, minutes }),
 };
 
 // Use contextBridge to expose safety limited APIs to the Renderer Process

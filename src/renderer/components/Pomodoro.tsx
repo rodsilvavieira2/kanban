@@ -1,20 +1,34 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { usePomodoroStore } from '../stores/pomodoroStore';
-import { RotateCcw, Pause, Play, Layers, Coffee, RefreshCw, Clock, MessageSquare, Paperclip } from 'lucide-react';
+import { useKanbanStore } from '../stores/kanbanStore';
+import { RotateCcw, Pause, Play, Layers, Coffee, RefreshCw, Clock, CheckCircle2 } from 'lucide-react';
 
 export function Pomodoro() {
   const { 
     focusTime, 
     breakTime, 
     totalRounds, 
-    notificationsEnabled 
+    notificationsEnabled,
+    selectedTaskId,
+    setSelectedTaskId
   } = usePomodoroStore();
+
+  const { tasks, isLoading, loadAllTasks, updateTaskTime } = useKanbanStore();
 
   const [timeLeft, setTimeLeft] = useState(focusTime * 60);
   const [totalTime, setTotalTime] = useState(focusTime * 60);
   const [isActive, setIsActive] = useState(false);
   const [roundsCompleted, setRoundsCompleted] = useState(0);
   const [isBreak, setIsBreak] = useState(false);
+
+  useEffect(() => {
+    loadAllTasks();
+  }, [loadAllTasks]);
+
+  const selectedTask = useMemo(() => 
+    tasks.find(t => t.id === selectedTaskId), 
+    [tasks, selectedTaskId]
+  );
 
   // Update timer if settings change while not active
   useEffect(() => {
@@ -65,7 +79,12 @@ export function Pomodoro() {
       }, 1000);
     } else if (timeLeft === 0) {
       setIsActive(false);
+      
       if (!isBreak) {
+        // Focus session finished - Update task time
+        if (selectedTaskId) {
+          updateTaskTime(selectedTaskId, focusTime);
+        }
         startBreak(false);
       } else {
         startFocus(false);
@@ -73,7 +92,7 @@ export function Pomodoro() {
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, isBreak, startBreak, startFocus]);
+  }, [isActive, timeLeft, isBreak, startBreak, startFocus, selectedTaskId, focusTime, updateTaskTime]);
 
   const toggleTimer = () => {
     setIsActive(!isActive);
@@ -96,7 +115,6 @@ export function Pomodoro() {
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  // Calculate SVG circle progress
   const radius = 180;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (timeLeft / totalTime) * circumference;
@@ -113,7 +131,7 @@ export function Pomodoro() {
               </button>
             </div>
             <h2>{isBreak ? 'Break' : 'Focus Session'}</h2>
-            <p>Deep work on "Design System Update"</p>
+            <p>{selectedTask ? `Working on: ${selectedTask.title}` : 'Select a task to start focused work'}</p>
           </div>
 
           <div className="timer-container">
@@ -154,7 +172,7 @@ export function Pomodoro() {
           </div>
 
           <div className="timer-controls">
-            <button className="btn-primary start-btn" onClick={toggleTimer}>
+            <button className="btn-primary start-btn" onClick={toggleTimer} disabled={!selectedTaskId && !isBreak}>
               {isActive ? (
                 <>
                   <Pause size={18} strokeWidth={2} />
@@ -190,79 +208,40 @@ export function Pomodoro() {
         <div className="tasks-panel">
           <div className="tasks-panel-header">
             <h3>Kanban Tasks</h3>
-            <button className="icon-button">
-              <RefreshCw size={18} strokeWidth={2} />
+            <button className="icon-button" onClick={() => loadAllTasks()} disabled={isLoading}>
+              <RefreshCw size={18} strokeWidth={2} className={isLoading ? 'animate-spin' : ''} />
             </button>
           </div>
 
           <div className="tasks-list">
-            <div className="pomodoro-task-card active">
-              <div className="task-labels">
-                <span className="task-label">TO DO</span>
-                <span className="task-label priority-high">HIGH PRIORITY</span>
-              </div>
-              <h4 className="task-title">Design System Update</h4>
-              <p className="task-desc">Update the primary color palette and component library to match new brand guidelines.</p>
-              <div className="task-meta">
-                <div className="task-meta-left">
-                  <span className="meta-item"><Clock size={12} strokeWidth={2} /> 25m</span>
-                  <span className="meta-item"><MessageSquare size={12} strokeWidth={2} /> 12</span>
+            {tasks.length === 0 && !isLoading && (
+              <p className="text-center text-accents-5 py-8">No tasks found. Create some in a project first!</p>
+            )}
+            {tasks.map(task => (
+              <div 
+                key={task.id} 
+                className={`pomodoro-task-card ${selectedTaskId === task.id ? 'active' : ''}`}
+                onClick={() => !isActive && setSelectedTaskId(task.id)}
+                style={{ cursor: isActive ? 'not-allowed' : 'pointer' }}
+              >
+                <div className="task-labels">
+                  <span className="task-label">TASK</span>
+                  {task.timeSpentMinutes > 0 && (
+                    <span className="task-label priority-low">
+                      {task.timeSpentMinutes}m spent
+                    </span>
+                  )}
                 </div>
-                <span className="status-badge in-progress">ACTIVE</span>
-              </div>
-            </div>
-
-            <div className="pomodoro-task-card">
-              <div className="task-labels">
-                <span className="task-label">IN PROGRESS</span>
-                <span className="task-label priority-high">HIGH PRIORITY</span>
-              </div>
-              <h4 className="task-title">API Integration</h4>
-              <p className="task-desc">Connect the backend dashboard to the production Stripe API endpoints.</p>
-              <div className="task-meta">
-                <div className="task-meta-left">
-                  <span className="meta-item"><Clock size={12} strokeWidth={2} /> 50m</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pomodoro-task-card">
-              <div className="task-labels">
-                <span className="task-label">IN PROGRESS</span>
-                <span className="task-label priority-low">LOW PRIORITY</span>
-              </div>
-              <h4 className="task-title">Footer Redesign</h4>
-              <p className="task-desc">Minor adjustments to the landing page footer links and spacing.</p>
-              <div className="task-meta">
-                <div className="task-meta-left">
-                  <span className="meta-item"><Clock size={12} strokeWidth={2} /> 25m</span>
+                <h4 className="task-title">{task.title}</h4>
+                {task.description && <p className="task-desc line-clamp-2">{task.description}</p>}
+                <div className="task-meta">
+                  <div className="task-meta-left">
+                    <span className="meta-item"><Clock size={12} strokeWidth={2} /> {task.timeSpentMinutes}m</span>
+                  </div>
+                  {selectedTaskId === task.id && <span className="status-badge in-progress">SELECTED</span>}
                 </div>
               </div>
-            </div>
-
-            <div className="pomodoro-task-card">
-              <div className="task-labels">
-                <span className="task-label">TO DO</span>
-                <span className="task-label priority-medium">MEDIUM PRIORITY</span>
-              </div>
-              <h4 className="task-title">User Research Interview</h4>
-              <p className="task-desc">Schedule and conduct feedback sessions with top 5 enterprise clients.</p>
-              <div className="task-meta">
-                <div className="task-meta-left">
-                  <span className="meta-item"><Paperclip size={12} strokeWidth={2} /> 3</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="project-progress-footer">
-            <div className="progress-header">
-              <span>PROJECT ALPHA PROGRESS</span>
-              <span>45%</span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress fill" style={{ width: '45%', backgroundColor: 'var(--accent-color)' }}></div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
