@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { getAvailableTags } from '../services/projectService';
 import { useKanbanStore } from '../stores/kanbanStore';
 import { ArrowLeft, X, Plus } from 'lucide-react';
 
@@ -22,14 +21,6 @@ export function CreateTask() {
   const [tagInput, setTagInput] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const loadTags = async () => {
-      const tags = await getAvailableTags();
-      setAvailableTags(tags);
-    };
-    loadTags();
-  }, []);
 
   useEffect(() => {
     if (!columnId && columns.length > 0) {

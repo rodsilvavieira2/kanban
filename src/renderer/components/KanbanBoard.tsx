@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
-import { useLoaderData, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { useKanbanStore } from '../stores/kanbanStore';
-import { Project } from '../services/projectService';
+import { useProjectStore } from '../stores/projectStore';
 import { Plus, MoreHorizontal, Search, ArrowLeft } from 'lucide-react';
 
 export function KanbanBoard() {
-  const project = useLoaderData() as Project;
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   
+  const { projects, loadProjects } = useProjectStore();
   const { 
     columns, 
     tasks, 
@@ -21,10 +21,13 @@ export function KanbanBoard() {
 
   useEffect(() => {
     if (projectId) {
+      loadProjects();
       loadProjectData(projectId);
       initUpdateListener(projectId);
     }
-  }, [projectId, loadProjectData, initUpdateListener]);
+  }, [projectId, loadProjects, loadProjectData, initUpdateListener]);
+
+  const project = projects.find(p => p.id === projectId);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -47,8 +50,7 @@ export function KanbanBoard() {
     });
   };
 
-  if (!project) return <div className="p-8 text-center">Project not found</div>;
-  if (isLoading) return <div className="p-8 text-center text-accents-5">Loading board...</div>;
+  if (isLoading && columns.length === 0) return <div className="p-8 text-center text-accents-5">Loading board...</div>;
 
   return (
     <div className="kanban-view">
@@ -57,7 +59,7 @@ export function KanbanBoard() {
           <button className="icon-button back-button" onClick={() => navigate('/projects')}>
             <ArrowLeft size={20} />
           </button>
-          <h2>{project.name}</h2>
+          <h2>{project?.name || 'Project Board'}</h2>
         </div>
         <div className="kanban-header-right">
           <div className="search-bar">

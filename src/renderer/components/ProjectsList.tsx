@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useLoaderData, useNavigate, useOutletContext } from 'react-router-dom';
-import { Project } from '../services/projectService';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useProjectStore } from '../stores/projectStore';
 import { ConfirmDialog } from './ConfirmDialog';
 
 export function ProjectsList() {
-  const projects = useLoaderData() as Project[];
+  const { projects, isLoading, loadProjects } = useProjectStore();
   const navigate = useNavigate();
   const { openModal } = useOutletContext<{ openModal: () => void }>();
+  
+  const deleteProject = useProjectStore(state => state.deleteProject);
   
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [confirmConfig, setConfirmConfig] = useState<{
@@ -27,6 +29,10 @@ export function ProjectsList() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setOpenDropdownId(null);
@@ -43,29 +49,25 @@ export function ProjectsList() {
 
   const handleEdit = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    setConfirmConfig({
-      isOpen: true,
-      title: 'Edit Project',
-      message: 'Are you sure you want to edit this project? This will open the project configuration.',
-      confirmLabel: 'Edit',
-      onConfirm: () => {
-        console.log('Confirmed edit for project', id);
-        closeConfirm();
-      },
-      variant: 'primary'
-    });
+    // Navigate to the board for now (edit modal can be added later)
+    navigate(`/projects/${id}`);
     setOpenDropdownId(null);
   };
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
+    const project = projects.find(p => p.id === id);
     setConfirmConfig({
       isOpen: true,
       title: 'Delete Project',
-      message: 'Are you sure you want to delete this project? This action cannot be undone.',
+      message: `Are you sure you want to delete "${project?.name || 'this project'}"? This will permanently remove the project, its columns, and all tasks. This action cannot be undone.`,
       confirmLabel: 'Delete',
-      onConfirm: () => {
-        console.log('Confirmed delete for project', id);
+      onConfirm: async () => {
+        try {
+          await deleteProject(id);
+        } catch (err) {
+          console.error('Failed to delete project', err);
+        }
         closeConfirm();
       },
       variant: 'danger'
@@ -76,6 +78,24 @@ export function ProjectsList() {
   const closeConfirm = () => {
     setConfirmConfig(prev => ({ ...prev, isOpen: false }));
   };
+
+  // Computed stats from real data
+  const activeCount = projects.filter(p => p.status === 'In Progress' || p.status === 'Planning').length;
+  const completedCount = projects.filter(p => p.status === 'Completed').length;
+  const totalCount = projects.length;
+
+  if (isLoading && projects.length === 0) {
+    return (
+      <main className="main-content">
+        <div className="top-header">
+          <h1>Projects</h1>
+        </div>
+        <div className="empty-state">
+          <p style={{ color: 'var(--text-secondary)' }}>Loading projects…</p>
+        </div>
+      </main>
+    );
+  }
 
   if (projects.length === 0) {
     return (
@@ -144,7 +164,7 @@ export function ProjectsList() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             </div>
             <div className="summary-card-info">
-              <span className="summary-value">4</span>
+              <span className="summary-value">{activeCount}</span>
               <span className="summary-label">Active Projects</span>
             </div>
           </div>
@@ -153,7 +173,7 @@ export function ProjectsList() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
             </div>
             <div className="summary-card-info">
-              <span className="summary-value">12</span>
+              <span className="summary-value">{completedCount}</span>
               <span className="summary-label">Completed</span>
             </div>
           </div>
@@ -162,8 +182,8 @@ export function ProjectsList() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             </div>
             <div className="summary-card-info">
-              <span className="summary-value">2</span>
-              <span className="summary-label">At Risk / Overdue</span>
+              <span className="summary-value">{totalCount}</span>
+              <span className="summary-label">Total Projects</span>
             </div>
           </div>
         </div>
@@ -213,8 +233,8 @@ export function ProjectsList() {
                     </div>
                   </div>
                   <div className="table-cell col-status">
-                    <span className={`status-badge ${project.status.toLowerCase().replace(' ', '-')}`}>
-                      {project.status}
+                    <span className={`status-badge ${(project.status || 'planning').toLowerCase().replace(' ', '-')}`}>
+                      {project.status || 'Planning'}
                     </span>
                   </div>
                   <div className="table-cell col-progress">
@@ -226,7 +246,7 @@ export function ProjectsList() {
                     </div>
                   </div>
                   <div className="table-cell col-due">
-                    <span className="due-date-text">{project.dueDate}</span>
+                    <span className="due-date-text">{project.dueDate || '—'}</span>
                   </div>
                   <div className="table-cell col-tasks">
                     <span className="tasks-count">{project.tasksCount}</span>
