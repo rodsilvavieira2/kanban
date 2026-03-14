@@ -59,3 +59,11 @@ export async function getProjectById(id: string): Promise<Project | undefined> {
     setTimeout(() => resolve(mockProjects.find(p => p.id === id)), 50);
   });
 }
+
+export async function getAvailableTags(): Promise<string[]> {
+  // Mock tags based on the initial default tasks in KanbanBoard
+  const defaultTags = ['UI/UX', 'Design', 'Backend', 'Frontend', 'Security', 'Database', 'API', 'Finance', 'Architecture', 'DevOps'];
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(defaultTags), 100);
+  });
+}
