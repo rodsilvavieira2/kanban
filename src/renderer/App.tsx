@@ -1,45 +1,50 @@
-import React, { useState } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { MainContent } from './components/MainContent';
+import React from 'react';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
+import { RootLayout } from './layouts/RootLayout';
 import { Dashboard } from './components/Dashboard';
-import { CreateProjectModal } from './components/CreateProjectModal';
-import { Settings } from './components/Settings';
+import { ProjectsList } from './components/ProjectsList';
 import { KanbanBoard } from './components/KanbanBoard';
+import { Settings } from './components/Settings';
+import { getProjects, getProjectById } from './services/projectService';
+
+const router = createHashRouter([
+  {
+    path: '/',
+    element: <RootLayout />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: 'projects',
+        element: <ProjectsList />,
+        loader: async () => {
+          return getProjects();
+        },
+      },
+      {
+        path: 'projects/:projectId',
+        element: <KanbanBoard />,
+        loader: async ({ params }) => {
+          if (!params.projectId) {
+            throw new Response("Project ID Required", { status: 400 });
+          }
+          const project = await getProjectById(params.projectId);
+          if (!project) {
+            throw new Response("Not Found", { status: 404 });
+          }
+          return project;
+        },
+      },
+      {
+        path: 'settings',
+        element: <Settings />,
+      },
+    ],
+  },
+]);
 
 export default function App() {
-  const [currentView, setCurrentView] = useState<'dashboard' | 'projects' | 'settings'>('dashboard');
-  const [selectedProject, setSelectedProject] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleViewChange = (view: 'dashboard' | 'projects' | 'settings') => {
-    setCurrentView(view);
-    setSelectedProject(null); // Reset selected project when changing views from sidebar
-  };
-
-  return (
-    <>
-      <Sidebar 
-        currentView={currentView} 
-        onViewChange={handleViewChange} 
-      />
-      {currentView === 'dashboard' && <Dashboard />}
-      
-      {currentView === 'projects' && !selectedProject && (
-        <MainContent 
-          onCreateProject={() => setIsModalOpen(true)} 
-          onProjectSelect={setSelectedProject}
-        />
-      )}
-      
-      {currentView === 'projects' && selectedProject && (
-        <KanbanBoard 
-          projectTitle={selectedProject} 
-          onBack={() => setSelectedProject(null)} 
-        />
-      )}
-      
-      {currentView === 'settings' && <Settings />}
-      <CreateProjectModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }

@@ -1,61 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useLoaderData, useNavigate, useOutletContext } from 'react-router-dom';
+import { Project } from '../services/projectService';
 
-interface Project {
-  id: string;
-  name: string;
-  description: string;
-  progress: number;
-  status: 'In Progress' | 'Completed' | 'Planning';
-  dueDate: string;
-  tasksCount: number;
-}
-
-interface MainContentProps {
-  onCreateProject?: () => void;
-  onProjectSelect?: (projectName: string) => void;
-}
-
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    name: 'Mobile App Redesign',
-    description: 'Overhaul the UI/UX for the iOS and Android applications to improve user engagement.',
-    progress: 65,
-    status: 'In Progress',
-    dueDate: 'Nov 30, 2023',
-    tasksCount: 24,
-  },
-  {
-    id: '2',
-    name: 'Q4 Marketing Campaign',
-    description: 'Planning and execution of the end-of-year marketing initiatives.',
-    progress: 100,
-    status: 'Completed',
-    dueDate: 'Oct 15, 2023',
-    tasksCount: 12,
-  },
-  {
-    id: '3',
-    name: 'API V2 Migration',
-    description: 'Migrating legacy endpoints to the new GraphQL architecture.',
-    progress: 30,
-    status: 'In Progress',
-    dueDate: 'Dec 10, 2023',
-    tasksCount: 45,
-  },
-  {
-    id: '4',
-    name: 'Brand Refresh',
-    description: 'Updating company brand guidelines and marketing assets.',
-    progress: 0,
-    status: 'Planning',
-    dueDate: 'Jan 15, 2024',
-    tasksCount: 8,
-  }
-];
-
-export function MainContent({ onCreateProject, onProjectSelect }: MainContentProps) {
-  const [projects] = useState<Project[]>(mockProjects); // Set to empty array to test empty state
+export function ProjectsList() {
+  const projects = useLoaderData() as Project[];
+  const navigate = useNavigate();
+  const { openModal } = useOutletContext<{ openModal: () => void }>();
 
   if (projects.length === 0) {
     return (
@@ -74,7 +24,7 @@ export function MainContent({ onCreateProject, onProjectSelect }: MainContentPro
           </div>
           <h3>No projects yet</h3>
           <p>Organize your tasks and streamline your workflow by creating your first project container today.</p>
-          <button className="btn-primary" onClick={onCreateProject}>
+          <button className="btn-primary" onClick={openModal}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -107,7 +57,7 @@ export function MainContent({ onCreateProject, onProjectSelect }: MainContentPro
             </svg>
             <input type="text" placeholder="Search projects..." />
           </div>
-          <button className="btn-primary" onClick={onCreateProject}>
+          <button className="btn-primary" onClick={openModal}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -178,7 +128,7 @@ export function MainContent({ onCreateProject, onProjectSelect }: MainContentPro
                 <div 
                   className="projects-table-row" 
                   key={project.id}
-                  onClick={() => onProjectSelect?.(project.name)}
+                  onClick={() => navigate(`/projects/${project.id}`)}
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="table-cell col-name">
@@ -212,7 +162,7 @@ export function MainContent({ onCreateProject, onProjectSelect }: MainContentPro
                     <span className="tasks-count">{project.tasksCount}</span>
                   </div>
                   <div className="table-cell col-actions">
-                    <button className="icon-button">
+                    <button className="icon-button" onClick={(e) => e.stopPropagation()}>
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
                     </button>
                   </div>

@@ -43,6 +43,29 @@ The project is built using Vite and Electron Forge. Ensure you have run `npm ins
 
 *(Note: Specific testing commands/frameworks are to be defined, but end-to-end testing between Manual UI and AI Agent interactions is a planned phase).*
 
+## Design System
+The application follows a high-contrast, minimalist design inspired by the Vercel (Geist) design system.
+
+**Core Palette:**
+*   **Background (Main):** `#000000` (Pure Black)
+*   **Background (Secondary):** `#111111`
+*   **Borders:** `#333333` (Default), `#444444` (Hover)
+*   **Text (Primary):** `#FFFFFF` (Pure White)
+*   **Text (Secondary):** `#888888`
+*   **Text (Tertiary):** `#666666`
+*   **Accent/Action:** `#0070F3` (Vercel Blue)
+*   **Success:** `#0070F3`
+*   **Warning:** `#F5A623`
+*   **Error:** `#EE0000`
+
+**Typography:**
+*   **Primary Font:** `Inter` (Sans-serif)
+*   **Characteristics:** Optimized for readability with tight letter-spacing and varied weights (400 to 700).
+
+**Layout & Components:**
+*   **Border Radius:** `8px` (`var(--radius)`) for most components.
+*   **Aesthetics:** Clean lines, generous padding, and subtle interactive feedback (e.g., border color shifts on hover).
+
 ## Development Conventions
 *   **Security & IPC:** The React frontend has no direct access to Node.js APIs. All communication with SQLite and the MCP server must go through the `window.api` bridge defined in `preload.ts`.
 *   **Data Validation:** Zod schemas must be shared between the frontend and backend. Both the React UI (before sending IPC) and the Node.js backend (before executing SQLite/MCP requests) must validate payloads using the exact same schema.
