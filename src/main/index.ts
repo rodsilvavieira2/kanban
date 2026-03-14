@@ -7,6 +7,8 @@ import db, { initDatabase } from './data/database/DatabaseConnection';
 import { SQLiteProjectRepository } from './data/repositories/SQLiteProjectRepository';
 import { SQLiteColumnRepository } from './data/repositories/SQLiteColumnRepository';
 import { SQLiteTaskRepository } from './data/repositories/SQLiteTaskRepository';
+import { SQLiteActivityLogRepository } from './data/repositories/SQLiteActivityLogRepository';
+import { SQLiteSettingsRepository } from './data/repositories/SQLiteSettingsRepository';
 
 // Use Cases
 import { GetProjectsUseCase } from './core/useCases/project/GetProjectsUseCase';
@@ -17,6 +19,10 @@ import { InitializeProjectColumnsUseCase } from './core/useCases/column/Initiali
 import { CreateTaskUseCase } from './core/useCases/task/CreateTaskUseCase';
 import { MoveTaskUseCase } from './core/useCases/task/MoveTaskUseCase';
 import { UpdateTaskTimeUseCase } from './core/useCases/task/UpdateTaskTimeUseCase';
+import { GetRecentActivityUseCase } from './core/useCases/activity/GetRecentActivityUseCase';
+import { GetSettingsUseCase } from './core/useCases/settings/GetSettingsUseCase';
+import { UpdateSettingsUseCase } from './core/useCases/settings/UpdateSettingsUseCase';
+import { ExportDataUseCase } from './core/useCases/export/ExportDataUseCase';
 
 // Handlers & Servers
 import { setupKanbanIpcHandlers } from './presentation/ipc/KanbanIpcHandlers';
@@ -61,6 +67,8 @@ app.on('ready', async () => {
   const projectRepository = new SQLiteProjectRepository(db);
   const columnRepository = new SQLiteColumnRepository(db);
   const taskRepository = new SQLiteTaskRepository(db);
+  const activityLogRepository = new SQLiteActivityLogRepository(db);
+  const settingsRepository = new SQLiteSettingsRepository(db);
 
   // 3. Initialize Shared Use Cases
   const getProjectsUseCase = new GetProjectsUseCase(projectRepository);
@@ -68,9 +76,13 @@ app.on('ready', async () => {
   const createProjectUseCase = new CreateProjectUseCase(projectRepository, initializeColumnsUseCase);
   const deleteProjectUseCase = new DeleteProjectUseCase(projectRepository);
   const getProjectDataUseCase = new GetProjectDataUseCase(projectRepository, columnRepository, taskRepository);
-  const createTaskUseCase = new CreateTaskUseCase(taskRepository);
-  const moveTaskUseCase = new MoveTaskUseCase(taskRepository);
+  const createTaskUseCase = new CreateTaskUseCase(taskRepository, activityLogRepository);
+  const moveTaskUseCase = new MoveTaskUseCase(taskRepository, activityLogRepository);
   const updateTaskTimeUseCase = new UpdateTaskTimeUseCase(taskRepository);
+  const getRecentActivityUseCase = new GetRecentActivityUseCase(activityLogRepository);
+  const getSettingsUseCase = new GetSettingsUseCase(settingsRepository);
+  const updateSettingsUseCase = new UpdateSettingsUseCase(settingsRepository);
+  const exportDataUseCase = new ExportDataUseCase(projectRepository, columnRepository, taskRepository);
 
   // 4. Setup IPC Handlers (for UI)
   setupKanbanIpcHandlers(
@@ -80,7 +92,11 @@ app.on('ready', async () => {
     getProjectDataUseCase,
     createTaskUseCase,
     moveTaskUseCase,
-    updateTaskTimeUseCase
+    updateTaskTimeUseCase,
+    getRecentActivityUseCase,
+    getSettingsUseCase,
+    updateSettingsUseCase,
+    exportDataUseCase
   );
 
   // 5. Setup MCP Server (for AI)
@@ -89,7 +105,12 @@ app.on('ready', async () => {
     getProjectDataUseCase,
     createTaskUseCase,
     moveTaskUseCase,
-    updateTaskTimeUseCase
+    updateTaskTimeUseCase,
+    () => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('kanban-updated');
+      }
+    }
   );
   await mcpServer.start();
 

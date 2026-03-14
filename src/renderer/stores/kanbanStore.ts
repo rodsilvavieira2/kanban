@@ -19,6 +19,7 @@ interface KanbanState {
     destinationIndex: number;
   }) => Promise<void>;
   updateTaskTime: (taskId: string, minutes: number) => Promise<void>;
+  initUpdateListener: (projectId: string) => void;
 }
 
 export const useKanbanStore = create<KanbanState>((set, get) => ({
@@ -127,6 +128,14 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     } catch (error: any) {
       console.error('Failed to update task time:', error);
       set({ error: error.message || 'Failed to update task time' });
+    }
+  },
+
+  initUpdateListener: (projectId: string) => {
+    if (window.kanbanApi?.onKanbanUpdated) {
+      window.kanbanApi.onKanbanUpdated(() => {
+        get().loadProjectData(projectId);
+      });
     }
   }
 }));

@@ -53,3 +53,14 @@ export const SettingSchema = z.object({
 });
 
 export type Setting = z.infer<typeof SettingSchema>;
+
+export const ActivityLogSchema = z.object({
+  id: z.string().uuid(),
+  action: z.string(),
+  entityType: z.string(),
+  entityId: z.string(),
+  details: z.string().optional(),
+  createdAt: z.string().optional(),
+});
+
+export type ActivityLog = z.infer<typeof ActivityLogSchema>;

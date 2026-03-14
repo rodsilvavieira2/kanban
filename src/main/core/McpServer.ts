@@ -20,7 +20,8 @@ export class McpServer {
     private getProjectDataUseCase: GetProjectDataUseCase,
     private createTaskUseCase: CreateTaskUseCase,
     private moveTaskUseCase: MoveTaskUseCase,
-    private updateTaskTimeUseCase: UpdateTaskTimeUseCase
+    private updateTaskTimeUseCase: UpdateTaskTimeUseCase,
+    private onUpdateCallback?: () => void
   ) {
     this.server = new Server(
       {
@@ -136,6 +137,7 @@ export class McpServer {
         case 'create_task': {
           const { projectId, ...taskData } = request.params.arguments as any;
           const task = await this.createTaskUseCase.execute(taskData);
+          if (this.onUpdateCallback) this.onUpdateCallback();
           return {
             content: [{ type: 'text', text: `Task created successfully: ${task.id}` }],
           };
@@ -143,6 +145,7 @@ export class McpServer {
         case 'move_task': {
           const moveRequest = request.params.arguments as any;
           await this.moveTaskUseCase.execute(moveRequest);
+          if (this.onUpdateCallback) this.onUpdateCallback();
           return {
             content: [{ type: 'text', text: 'Task moved successfully' }],
           };
@@ -150,6 +153,7 @@ export class McpServer {
         case 'update_task_time': {
           const { taskId, minutes } = request.params.arguments as any;
           await this.updateTaskTimeUseCase.execute(taskId, minutes);
+          if (this.onUpdateCallback) this.onUpdateCallback();
           return {
             content: [{ type: 'text', text: `Successfully added ${minutes} minutes to task ${taskId}` }],
           };

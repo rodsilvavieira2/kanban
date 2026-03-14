@@ -15,14 +15,16 @@ export function KanbanBoard() {
     tasks, 
     isLoading, 
     loadProjectData, 
-    moveTask 
+    moveTask,
+    initUpdateListener
   } = useKanbanStore();
 
   useEffect(() => {
     if (projectId) {
       loadProjectData(projectId);
+      initUpdateListener(projectId);
     }
-  }, [projectId, loadProjectData]);
+  }, [projectId, loadProjectData, initUpdateListener]);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;

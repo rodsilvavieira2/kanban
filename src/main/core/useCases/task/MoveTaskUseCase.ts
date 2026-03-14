@@ -1,4 +1,5 @@
 import { ITaskRepository } from '../../domain/repositories/ITaskRepository';
+import { ActivityLogRepository } from '../repositories/ActivityLogRepository';
 
 export interface MoveTaskRequest {
   taskId: string;
@@ -9,7 +10,10 @@ export interface MoveTaskRequest {
 }
 
 export class MoveTaskUseCase {
-  constructor(private taskRepository: ITaskRepository) {}
+  constructor(
+    private taskRepository: ITaskRepository,
+    private activityLogRepository: ActivityLogRepository
+  ) {}
 
   async execute(request: MoveTaskRequest): Promise<void> {
     const { taskId, sourceColumnId, destinationColumnId, sourceIndex, destinationIndex } = request;
@@ -43,6 +47,17 @@ export class MoveTaskUseCase {
       await this.taskRepository.reorder(
         destinationTasks.map((task, index) => ({ id: task.id, order: index }))
       );
+    }
+    if (sourceColumnId !== destinationColumnId) {
+      const task = await this.taskRepository.findById(taskId);
+      if (task) {
+        await this.activityLogRepository.create({
+          action: 'Moved task',
+          entityType: 'Task',
+          entityId: taskId,
+          details: `Moved task "${task.title}" to a different column`,
+        });
+      }
     }
   }
 }

@@ -1,18 +1,65 @@
 import React from 'react';
 import { usePomodoroStore } from '../stores/pomodoroStore';
+import { useSettingsStore } from '../stores/settingsStore';
 import { Sliders, Clock, Layout, Database, Download, Upload, AlertTriangle, Info, Box } from 'lucide-react';
 
 export function Settings() {
   const { 
-    focusTime, 
-    breakTime, 
-    totalRounds, 
-    notificationsEnabled,
     setFocusTime,
     setBreakTime,
     setTotalRounds,
     setNotificationsEnabled
   } = usePomodoroStore();
+
+  const { settings, updateSetting } = useSettingsStore();
+
+  const [exportStatus, setExportStatus] = React.useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleExportData = async () => {
+    if (exportStatus === 'loading') return;
+    setExportStatus('loading');
+    try {
+      const payload = await (window as any).kanbanApi.exportData();
+      const content = JSON.stringify(payload, null, 2);
+      const timestamp = new Date().toISOString().slice(0, 10);
+      const result = await (window as any).kanbanApi.showSaveDialog(`kanban-export-${timestamp}.json`, content);
+      if (result?.success) {
+        setExportStatus('success');
+      } else {
+        setExportStatus('idle'); // Cancelled — no error
+      }
+    } catch (err) {
+      console.error('Export failed:', err);
+      setExportStatus('error');
+    } finally {
+      // Reset success/error state after 3 seconds
+      setTimeout(() => setExportStatus('idle'), 3000);
+    }
+  };
+
+  const handleFocusTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value) || 1;
+    setFocusTime(val);
+    updateSetting('focusTime', val.toString());
+  };
+
+  const handleBreakTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value) || 1;
+    setBreakTime(val);
+    updateSetting('shortBreakTime', val.toString());
+  };
+
+  const handleTotalRoundsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value) || 1;
+    setTotalRounds(val);
+    updateSetting('totalRounds', val.toString());
+  };
+
+  const handleNotificationsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setNotificationsEnabled(checked);
+    updateSetting('notificationsEnabled', checked.toString());
+  };
 
   return (
     <main className="settings-page">
@@ -38,10 +85,14 @@ export function Settings() {
                   <p>Choose between light and dark mode.</p>
                 </div>
                 <div className="settings-card-actions">
-                  <select className="form-input">
-                    <option>Dark Mode</option>
-                    <option>Light Mode</option>
-                    <option>System Default</option>
+                  <select 
+                    className="form-input"
+                    value={settings.theme || 'system'}
+                    onChange={(e) => updateSetting('theme', e.target.value)}
+                  >
+                    <option value="dark">Dark Mode</option>
+                    <option value="light">Light Mode</option>
+                    <option value="system">System Default</option>
                   </select>
                 </div>
               </div>
@@ -79,8 +130,8 @@ export function Settings() {
                     type="number" 
                     className="form-input" 
                     style={{ width: '80px' }} 
-                    value={focusTime}
-                    onChange={(e) => setFocusTime(parseInt(e.target.value) || 1)}
+                    value={settings.focusTime || '25'}
+                    onChange={handleFocusTimeChange}
                     min="1"
                     max="60"
                   />
@@ -97,8 +148,8 @@ export function Settings() {
                     type="number" 
                     className="form-input" 
                     style={{ width: '80px' }} 
-                    value={breakTime}
-                    onChange={(e) => setBreakTime(parseInt(e.target.value) || 1)}
+                    value={settings.shortBreakTime || '5'}
+                    onChange={handleBreakTimeChange}
                     min="1"
                     max="30"
                   />
@@ -115,8 +166,8 @@ export function Settings() {
                     type="number" 
                     className="form-input" 
                     style={{ width: '80px' }} 
-                    value={totalRounds}
-                    onChange={(e) => setTotalRounds(parseInt(e.target.value) || 1)}
+                    value={settings.totalRounds || '4'}
+                    onChange={handleTotalRoundsChange}
                     min="1"
                     max="12"
                   />
@@ -132,8 +183,8 @@ export function Settings() {
                   <label className="toggle-switch">
                     <input 
                       type="checkbox" 
-                      checked={notificationsEnabled}
-                      onChange={(e) => setNotificationsEnabled(e.target.checked)}
+                      checked={settings.notificationsEnabled === 'true'}
+                      onChange={handleNotificationsChange}
                     />
                     <span className="toggle-slider"></span>
                   </label>
@@ -178,11 +229,15 @@ export function Settings() {
                   <p>Download a copy of your workspace data as JSON.</p>
                 </div>
                 <div className="settings-actions-row" style={{ marginTop: '16px' }}>
-                  <button className="btn-secondary">
+                  <button 
+                    className={`btn-secondary ${exportStatus === 'success' ? 'btn-success' : exportStatus === 'error' ? 'btn-error' : ''}`}
+                    onClick={handleExportData}
+                    disabled={exportStatus === 'loading'}
+                  >
                     <Download size={16} strokeWidth={2} />
-                    Export Data
+                    {exportStatus === 'loading' ? 'Exporting…' : exportStatus === 'success' ? 'Exported!' : exportStatus === 'error' ? 'Export Failed' : 'Export Data'}
                   </button>
-                  <button className="btn-secondary">
+                  <button className="btn-secondary" disabled>
                     <Upload size={16} strokeWidth={2} />
                     Import Data
                   </button>

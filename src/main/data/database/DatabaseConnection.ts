@@ -96,8 +96,27 @@ export function initDatabase() {
       currentVersion = 1;
     }
     
-    // Future migrations would go here:
-    // if (currentVersion < 2) { ... }
+    // Migration 2: Activity Logs
+    if (currentVersion < 2) {
+      console.log('Running Migration 2: Activity Logs');
+      db.exec(`
+        BEGIN TRANSACTION;
+
+        CREATE TABLE IF NOT EXISTS activity_logs (
+          id TEXT PRIMARY KEY,
+          action TEXT NOT NULL,
+          entity_type TEXT NOT NULL,
+          entity_id TEXT NOT NULL,
+          details TEXT,
+          created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
+
+        PRAGMA user_version = 2;
+        
+        COMMIT;
+      `);
+      currentVersion = 2;
+    }
 
   } catch (err) {
     console.error('Migration failed:', err);

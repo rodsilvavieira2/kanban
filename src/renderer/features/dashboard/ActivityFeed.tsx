@@ -1,84 +1,116 @@
-type ActivityType = 'complete' | 'update' | 'create';
-
-interface Activity {
-  id: string;
-  type: ActivityType;
-  description: React.ReactNode;
-  time: string;
-}
-
-const ACTIVITIES: Activity[] = [
-  {
-    id: '1',
-    type: 'complete',
-    description: (
-      <>
-        Task <strong>"API Integration"</strong> moved to{' '}
-        <span className="status-keyword done">Done</span>
-      </>
-    ),
-    time: '2 hours ago',
-  },
-  {
-    id: '2',
-    type: 'update',
-    description: (
-      <>
-        Task <strong>"Design Mockups"</strong> was{' '}
-        <span className="status-keyword updated">Updated</span>
-      </>
-    ),
-    time: '5 hours ago',
-  },
-  {
-    id: '3',
-    type: 'create',
-    description: (
-      <>
-        New task <strong>"User Testing"</strong> added to{' '}
-        <span className="status-keyword backlog">Backlog</span>
-      </>
-    ),
-    time: 'Yesterday',
-  },
-];
-
-const ICONS: Record<ActivityType, React.ReactNode> = {
-  complete: (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  ),
-  update: (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-      <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-    </svg>
-  ),
-  create: (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  ),
-};
+import React, { useEffect, useState } from 'react';
+import { ActivityLog } from '../../../shared/schemas/models';
 
 export function ActivityFeed() {
+  const [activities, setActivities] = useState<ActivityLog[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetchActivities() {
+      try {
+        const data = await window.kanbanApi.getRecentActivity(10);
+        if (mounted) {
+          setActivities(data);
+        }
+      } catch (err) {
+        console.error('Failed to load activities', err);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    fetchActivities();
+    
+    // Refresh when kanban updates
+    if (window.kanbanApi?.onKanbanUpdated) {
+      window.kanbanApi.onKanbanUpdated(() => {
+        fetchActivities();
+      });
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const getRelativeTime = (isoString?: string) => {
+    if (!isoString) return 'Unknown time';
+    const date = new Date(isoString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+  };
+
+  const getIcon = (action: string) => {
+    if (action.includes('Created')) {
+      return (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      );
+    }
+    if (action.includes('Moved')) {
+       return (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      );
+    }
+    return (
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+        <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </svg>
+    );
+  };
+
+  const getActionClass = (action: string) => {
+    if (action.includes('Created')) return 'create';
+    if (action.includes('Moved')) return 'complete';
+    return 'update';
+  };
+
+  if (loading) {
+    return (
+      <div className="activity-feed">
+        <h3>Recent Activity</h3>
+        <p className="text-accents-5 text-sm">Loading activity...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="activity-feed">
       <h3>Recent Activity</h3>
-      <div className="activity-timeline">
-        {ACTIVITIES.map((activity) => (
-          <div key={activity.id} className="timeline-item">
-            <div className={`timeline-icon ${activity.type}`}>
-              {ICONS[activity.type]}
+      {activities.length === 0 ? (
+        <p className="text-accents-5 text-sm">No recent activity.</p>
+      ) : (
+        <div className="activity-timeline">
+          {activities.map((activity) => (
+            <div key={activity.id} className="timeline-item">
+              <div className={`timeline-icon ${getActionClass(activity.action)}`}>
+                {getIcon(activity.action)}
+              </div>
+              <div className="timeline-content">
+                <p>
+                  <strong>{activity.action}</strong>
+                  {activity.details && <span className="text-accents-5 d-block text-xs mt-1">{activity.details}</span>}
+                </p>
+                <span className="time">{getRelativeTime(activity.createdAt)}</span>
+              </div>
             </div>
-            <div className="timeline-content">
-              <p>{activity.description}</p>
-              <span className="time">{activity.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

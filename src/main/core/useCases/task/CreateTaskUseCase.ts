@@ -1,9 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Task } from '../../../../shared/schemas/models';
 import { ITaskRepository } from '../../domain/repositories/ITaskRepository';
+import { ActivityLogRepository } from '../repositories/ActivityLogRepository';
 
 export class CreateTaskUseCase {
-  constructor(private taskRepository: ITaskRepository) {}
+  constructor(
+    private taskRepository: ITaskRepository,
+    private activityLogRepository: ActivityLogRepository
+  ) {}
 
   async execute(taskData: Partial<Task>): Promise<Task> {
     if (!taskData.title || !taskData.columnId) {
@@ -25,6 +29,15 @@ export class CreateTaskUseCase {
       updatedAt: new Date().toISOString(),
     };
 
-    return this.taskRepository.save(task);
+    const savedTask = await this.taskRepository.save(task);
+
+    await this.activityLogRepository.create({
+      action: 'Created task',
+      entityType: 'Task',
+      entityId: savedTask.id,
+      details: `Created task "${savedTask.title}"`,
+    });
+
+    return savedTask;
   }
 }

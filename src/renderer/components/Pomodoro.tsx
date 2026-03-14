@@ -1,17 +1,20 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { usePomodoroStore } from '../stores/pomodoroStore';
 import { useKanbanStore } from '../stores/kanbanStore';
+import { useSettingsStore } from '../stores/settingsStore';
 import { RotateCcw, Pause, Play, Layers, Coffee, RefreshCw, Clock, CheckCircle2 } from 'lucide-react';
 
 export function Pomodoro() {
   const { 
-    focusTime, 
-    breakTime, 
-    totalRounds, 
-    notificationsEnabled,
     selectedTaskId,
     setSelectedTaskId
   } = usePomodoroStore();
+
+  const { settings } = useSettingsStore();
+  const focusTime = parseInt(settings.focusTime) || 25;
+  const breakTime = parseInt(settings.shortBreakTime) || 5;
+  const totalRounds = parseInt(settings.totalRounds) || 4;
+  const notificationsEnabled = settings.notificationsEnabled === 'true';
 
   const { tasks, isLoading, loadAllTasks, updateTaskTime } = useKanbanStore();
 

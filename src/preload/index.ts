@@ -12,6 +12,15 @@ const kanbanApi = {
   createTask: (data: any) => ipcRenderer.invoke('create-task', data),
   moveTask: (request: any) => ipcRenderer.invoke('move-task', request),
   updateTaskTime: (taskId: string, minutes: number) => ipcRenderer.invoke('update-task-time', { taskId, minutes }),
+  onKanbanUpdated: (callback: () => void) => {
+    ipcRenderer.removeAllListeners('kanban-updated');
+    ipcRenderer.on('kanban-updated', () => callback());
+  },
+  getRecentActivity: (limit?: number) => ipcRenderer.invoke('get-recent-activity', limit),
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  updateSettings: (settings: Record<string, string>) => ipcRenderer.invoke('update-settings', settings),
+  exportData: () => ipcRenderer.invoke('export-data'),
+  showSaveDialog: (defaultFilename: string, content: string) => ipcRenderer.invoke('show-save-dialog', { defaultFilename, content }),
 };
 
 // Use contextBridge to expose safety limited APIs to the Renderer Process

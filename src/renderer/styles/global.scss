@@ -258,6 +258,23 @@ code, .mono {
   background-color: var(--bg-secondary);
 }
 
+.btn-secondary:disabled,
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.btn-secondary.btn-success {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+.btn-secondary.btn-error {
+  border-color: var(--error);
+  color: var(--error);
+}
+
 /* Dashboard */
 .dashboard-content {
   padding: 0 48px 48px;
