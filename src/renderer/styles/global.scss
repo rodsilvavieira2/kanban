@@ -903,32 +903,6 @@ body {
   gap: 16px;
 }
 
-.kanban-tabs {
-  display: flex;
-  gap: 32px;
-  padding: 0 48px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.kanban-tab {
-  padding: 12px 0;
-  color: var(--text-secondary);
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
-}
-
-.kanban-tab:hover {
-  color: var(--text-primary);
-}
-
-.kanban-tab.active {
-  color: var(--accent-color);
-  border-bottom-color: var(--accent-color);
-}
-
 .kanban-columns-container {
   display: flex;
   padding: 32px 48px;

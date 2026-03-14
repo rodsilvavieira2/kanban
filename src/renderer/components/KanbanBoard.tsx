@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { useLoaderData, useNavigate } from 'react-router-dom';
+import { Project } from '../services/projectService';
 
-// Mock data types and items
 const mockColumns = [
   {
     id: 'col-todo',
     title: 'To Do',
-    color: '#30abe8', // var(--accent-color)
+    color: '#30abe8',
     tasks: [
       { id: 't1', title: 'Design System Update', labels: ['UI/UX', 'Design'], comments: 3, attachments: 2, date: 'Oct 24, 2023', daysLeft: 5 },
       { id: 't2', title: 'API Integration', labels: ['Backend', 'API'], comments: 5, attachments: 0, date: 'Oct 28, 2023', daysLeft: 9 },
@@ -14,7 +15,7 @@ const mockColumns = [
   {
     id: 'col-inprogress',
     title: 'In Progress',
-    color: '#f59e0b', // orange/amber
+    color: '#f59e0b',
     tasks: [
       { id: 't3', title: 'User Authentication', labels: ['Security', 'Frontend'], comments: 12, attachments: 1, date: 'Oct 20, 2023', daysLeft: 1 },
       { id: 't4', title: 'Database Migration', labels: ['Database', 'DevOps'], comments: 2, attachments: 4, date: 'Oct 22, 2023', daysLeft: 3 },
@@ -24,7 +25,7 @@ const mockColumns = [
   {
     id: 'col-done',
     title: 'Done',
-    color: '#10b981', // emerald/green
+    color: '#10b981',
     tasks: [
       { id: 't6', title: 'Initial Project Setup', labels: ['Architecture'], comments: 0, attachments: 0, date: 'Sep 15, 2023', daysLeft: 0 },
       { id: 't7', title: 'Landing Page v1', labels: ['Frontend', 'Design'], comments: 15, attachments: 5, date: 'Oct 01, 2023', daysLeft: 0 }
@@ -32,25 +33,24 @@ const mockColumns = [
   }
 ];
 
-interface KanbanBoardProps {
-  projectTitle: string;
-  onBack: () => void;
-}
-
-export function KanbanBoard({ projectTitle, onBack }: KanbanBoardProps) {
+export function KanbanBoard() {
+  const project = useLoaderData() as Project;
+  const navigate = useNavigate();
   const [columns] = useState(mockColumns);
+
+  if (!project) return <div>Project not found</div>;
 
   return (
     <div className="kanban-view">
       <div className="kanban-header">
         <div className="kanban-header-left">
-          <button className="icon-button back-button" onClick={onBack}>
+          <button className="icon-button back-button" onClick={() => navigate('/projects')}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="19" y1="12" x2="5" y2="12"></line>
               <polyline points="12 19 5 12 12 5"></polyline>
             </svg>
           </button>
-          <h2>{projectTitle}</h2>
+          <h2>{project.name}</h2>
         </div>
         <div className="kanban-header-right">
           <div className="search-bar">
@@ -60,22 +60,7 @@ export function KanbanBoard({ projectTitle, onBack }: KanbanBoardProps) {
             </svg>
             <input type="text" placeholder="Search tasks..." />
           </div>
-          <button className="btn-secondary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-            </svg>
-            Filter
-          </button>
-          <button className="icon-button">
-             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
-          </button>
         </div>
-      </div>
-
-      <div className="kanban-tabs">
-        <div className="kanban-tab active">Board</div>
-        <div className="kanban-tab">List</div>
-        <div className="kanban-tab">Timeline</div>
       </div>
 
       <div className="kanban-columns-container">
