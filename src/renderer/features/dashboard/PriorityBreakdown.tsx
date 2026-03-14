@@ -1,41 +1,60 @@
+import React from 'react';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
 interface Priority {
   label: string;
   value: number;
   color: string;
-  pct: number;
-  offset: number;
 }
 
 const PRIORITIES: Priority[] = [
-  { label: 'High',   value: 8,  color: '#E05C75', pct: 16.6, offset: 0     },
-  { label: 'Medium', value: 24, color: '#E8A838', pct: 50,   offset: -16.6 },
-  { label: 'Low',    value: 16, color: '#4BB5CE', pct: 33.4, offset: -66.6 },
+  { label: 'High',   value: 8,  color: '#E05C75' },
+  { label: 'Medium', value: 24, color: '#E8A838' },
+  { label: 'Low',    value: 16, color: '#4BB5CE' },
 ];
 
 const TOTAL = PRIORITIES.reduce((sum, p) => sum + p.value, 0);
-const RING_PATH = 'M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831';
 
 export function PriorityBreakdown() {
+  const chartData = {
+    labels: PRIORITIES.map(p => p.label),
+    datasets: [
+      {
+        data: PRIORITIES.map(p => p.value),
+        backgroundColor: PRIORITIES.map(p => p.color),
+        borderWidth: 0,
+        hoverOffset: 4,
+      },
+    ],
+  };
+
+  const chartOptions = {
+    cutout: '80%',
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: true,
+      },
+    },
+  };
+
   return (
     <div className="priority-breakdown">
       <h3>Priority Breakdown</h3>
       <div className="priority-chart-container">
         <div className="donut-chart">
-          <svg viewBox="0 0 36 36">
-            <path className="circle-bg" d={RING_PATH} />
-            {PRIORITIES.map(({ label, color, pct, offset }) => (
-              <path
-                key={label}
-                className="circle"
-                stroke={color}
-                strokeDasharray={`${pct}, 100`}
-                strokeDashoffset={offset !== 0 ? offset : undefined}
-                d={RING_PATH}
-              />
-            ))}
-            <text x="18" y="17.5" className="donut-number">{TOTAL}</text>
-            <text x="18" y="21.5" className="donut-label">TOTAL TASKS</text>
-          </svg>
+          <Doughnut data={chartData} options={chartOptions} />
+          <div className="donut-center-text">
+            <span className="donut-number">{TOTAL}</span>
+            <span className="donut-label">TOTAL TASKS</span>
+          </div>
         </div>
 
         <div className="priority-legend">
