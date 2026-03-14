@@ -39,7 +39,9 @@
     "vite": "^5.4.21"
   },
   "dependencies": {
+    "@geist-ui/icons": "^1.0.2",
     "electron-squirrel-startup": "^1.0.1",
+    "geist": "^1.7.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.1",
