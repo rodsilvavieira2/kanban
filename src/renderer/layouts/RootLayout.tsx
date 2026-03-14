@@ -9,8 +9,9 @@ export function RootLayout() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Determine current view for Sidebar highlighting
-  let currentView: 'dashboard' | 'projects' | 'settings' = 'dashboard';
+  let currentView: 'dashboard' | 'projects' | 'pomodoro' | 'settings' = 'dashboard';
   if (location.pathname === '/settings') currentView = 'settings';
+  else if (location.pathname === '/pomodoro') currentView = 'pomodoro';
   else if (location.pathname.startsWith('/projects')) currentView = 'projects';
 
   return (

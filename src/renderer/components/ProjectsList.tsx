@@ -21,7 +21,7 @@ export function ProjectsList() {
     title: '',
     message: '',
     confirmLabel: '',
-    onConfirm: () => {},
+    onConfirm: () => undefined,
     variant: 'primary'
   });
   const dropdownRef = useRef<HTMLDivElement>(null);

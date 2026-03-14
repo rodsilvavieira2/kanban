@@ -1,8 +1,8 @@
 import React from 'react';
 
 interface SidebarProps {
-  currentView: 'dashboard' | 'projects' | 'settings';
-  onViewChange: (view: 'dashboard' | 'projects' | 'settings') => void;
+  currentView: 'dashboard' | 'projects' | 'pomodoro' | 'settings';
+  onViewChange: (view: 'dashboard' | 'projects' | 'pomodoro' | 'settings') => void;
 }
 
 export function Sidebar({ currentView, onViewChange }: SidebarProps) {
@@ -31,6 +31,13 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
           Projects
+        </a>
+        <a 
+          className={`nav-item ${currentView === 'pomodoro' ? 'active' : ''}`}
+          onClick={() => onViewChange('pomodoro')}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          Pomodoro
         </a>
       </nav>
 

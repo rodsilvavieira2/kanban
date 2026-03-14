@@ -1,6 +1,18 @@
 import React from 'react';
+import { usePomodoroStore } from '../stores/pomodoroStore';
 
 export function Settings() {
+  const { 
+    focusTime, 
+    breakTime, 
+    totalRounds, 
+    notificationsEnabled,
+    setFocusTime,
+    setBreakTime,
+    setTotalRounds,
+    setNotificationsEnabled
+  } = usePomodoroStore();
+
   return (
     <main className="settings-page">
       <div className="settings-scroll-area">
@@ -44,6 +56,86 @@ export function Settings() {
                     <option>Spanish</option>
                     <option>Portuguese</option>
                   </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section - Pomodoro Configuration */}
+          <div className="settings-section">
+            <div className="settings-section-header">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <h3>Pomodoro Configuration</h3>
+            </div>
+            <div className="settings-card">
+              <div className="settings-card-row">
+                <div className="settings-card-info">
+                  <h4>Focus Duration</h4>
+                  <p>Set the length of your focus sessions (in minutes).</p>
+                </div>
+                <div className="settings-card-actions">
+                  <input 
+                    type="number" 
+                    className="form-input" 
+                    style={{ width: '80px' }} 
+                    value={focusTime}
+                    onChange={(e) => setFocusTime(parseInt(e.target.value) || 1)}
+                    min="1"
+                    max="60"
+                  />
+                </div>
+              </div>
+              <div className="settings-divider"></div>
+              <div className="settings-card-row">
+                <div className="settings-card-info">
+                  <h4>Break Duration</h4>
+                  <p>Set the length of your break periods (in minutes).</p>
+                </div>
+                <div className="settings-card-actions">
+                  <input 
+                    type="number" 
+                    className="form-input" 
+                    style={{ width: '80px' }} 
+                    value={breakTime}
+                    onChange={(e) => setBreakTime(parseInt(e.target.value) || 1)}
+                    min="1"
+                    max="30"
+                  />
+                </div>
+              </div>
+              <div className="settings-divider"></div>
+              <div className="settings-card-row">
+                <div className="settings-card-info">
+                  <h4>Target Rounds</h4>
+                  <p>Set the number of rounds for a full focus cycle.</p>
+                </div>
+                <div className="settings-card-actions">
+                  <input 
+                    type="number" 
+                    className="form-input" 
+                    style={{ width: '80px' }} 
+                    value={totalRounds}
+                    onChange={(e) => setTotalRounds(parseInt(e.target.value) || 1)}
+                    min="1"
+                    max="12"
+                  />
+                </div>
+              </div>
+              <div className="settings-divider"></div>
+              <div className="settings-card-row">
+                <div className="settings-card-info">
+                  <h4>Desktop Notifications</h4>
+                  <p>Receive an alert when a session ends.</p>
+                </div>
+                <div className="settings-card-actions">
+                  <label className="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      checked={notificationsEnabled}
+                      onChange={(e) => setNotificationsEnabled(e.target.checked)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
                 </div>
               </div>
             </div>
