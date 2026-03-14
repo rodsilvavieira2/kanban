@@ -16,7 +16,7 @@
   "author": "rodrigo",
   "license": "MIT",
   "devDependencies": {
-    "@electron-forge/cli": "^7.11.1",
+    "@electron-forge/cli": "^7.6.1",
     "@electron-forge/maker-deb": "^7.11.1",
     "@electron-forge/maker-rpm": "^7.11.1",
     "@electron-forge/maker-squirrel": "^7.11.1",
@@ -31,12 +31,13 @@
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-react": "^5.1.4",
-    "electron": "41.0.0",
+    "electron": "^0.4.1",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0",
     "sass": "^1.98.0",
+    "ts-node": "^10.9.2",
     "typescript": "~4.5.4",
-    "vite": "^5.4.21"
+    "vite": "^8.0.0"
   },
   "dependencies": {
     "@babel/runtime": "^7.28.6",
