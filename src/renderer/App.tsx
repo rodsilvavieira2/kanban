@@ -1,4 +1,3 @@
-import React from 'react';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { RootLayout } from './layouts/RootLayout';
 import { Dashboard } from './components/Dashboard';

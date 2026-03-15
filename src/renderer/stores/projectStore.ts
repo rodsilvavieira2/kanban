@@ -1,5 +1,12 @@
 import { create } from 'zustand';
 import { Project } from '../../shared/schemas/models';
+import { KanbanApiType } from '../../preload';
+
+declare global {
+  interface Window {
+    kanbanApi: KanbanApiType;
+  }
+}
 
 interface ProjectState {
   projects: Project[];
@@ -35,7 +42,6 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       // Re-fetch to stay in sync with SQLite
       await get().loadProjects();
     } catch (error: any) {
-      console.error('Failed to create project:', error);
       set({ error: error.message || 'Failed to create project' });
       throw error;
     }
