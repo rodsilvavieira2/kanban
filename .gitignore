@@ -95,7 +95,6 @@ typings/
 out/
 
 # Database and Runtime data
-data/
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
