@@ -1,14 +1,14 @@
-import { IColumnRepository } from '../../domain/repositories/IColumnRepository';
-import { v4 as uuidv4 } from 'uuid';
+import { IColumnRepository } from "../../domain/repositories/IColumnRepository";
+import { v4 as uuidv4 } from "uuid";
 
 export class InitializeProjectColumnsUseCase {
   constructor(private columnRepository: IColumnRepository) {}
 
   async execute(projectId: string): Promise<void> {
     const defaultColumns = [
-      { title: 'Todo', order: 0, color: '#666666' },
-      { title: 'In Progress', order: 1, color: '#0070F3' },
-      { title: 'Completed', order: 2, color: '#0070F3' }
+      { title: "Todo", order: 0, color: "#666666" },
+      { title: "In Progress", order: 1, color: "#0070F3" },
+      { title: "Completed", order: 2, color: "#0070F3" },
     ];
 
     for (const col of defaultColumns) {
@@ -17,7 +17,7 @@ export class InitializeProjectColumnsUseCase {
         projectId,
         title: col.title,
         order: col.order,
-        color: col.color
+        color: col.color,
       });
     }
   }

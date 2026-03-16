@@ -1,26 +1,31 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-import { contextBridge, ipcRenderer } from 'electron';
+import { contextBridge, ipcRenderer } from "electron";
 
-export const EXPOSED_API_KEY = 'kanbanApi';
+export const EXPOSED_API_KEY = "kanbanApi";
 
 const kanbanApi = {
-  getProjects: () => ipcRenderer.invoke('get-projects'),
-  createProject: (data: any) => ipcRenderer.invoke('create-project', data),
-  deleteProject: (id: string) => ipcRenderer.invoke('delete-project', id),
-  getProjectData: (projectId: string) => ipcRenderer.invoke('get-project-data', projectId),
-  createTask: (data: any) => ipcRenderer.invoke('create-task', data),
-  moveTask: (request: any) => ipcRenderer.invoke('move-task', request),
-  updateTaskTime: (taskId: string, minutes: number) => ipcRenderer.invoke('update-task-time', { taskId, minutes }),
+  getProjects: () => ipcRenderer.invoke("get-projects"),
+  createProject: (data: any) => ipcRenderer.invoke("create-project", data),
+  deleteProject: (id: string) => ipcRenderer.invoke("delete-project", id),
+  getProjectData: (projectId: string) =>
+    ipcRenderer.invoke("get-project-data", projectId),
+  createTask: (data: any) => ipcRenderer.invoke("create-task", data),
+  moveTask: (request: any) => ipcRenderer.invoke("move-task", request),
+  updateTaskTime: (taskId: string, minutes: number) =>
+    ipcRenderer.invoke("update-task-time", { taskId, minutes }),
   onKanbanUpdated: (callback: () => void) => {
-    ipcRenderer.removeAllListeners('kanban-updated');
-    ipcRenderer.on('kanban-updated', () => callback());
+    ipcRenderer.removeAllListeners("kanban-updated");
+    ipcRenderer.on("kanban-updated", () => callback());
   },
-  getRecentActivity: (limit?: number) => ipcRenderer.invoke('get-recent-activity', limit),
-  getSettings: () => ipcRenderer.invoke('get-settings'),
-  updateSettings: (settings: Record<string, string>) => ipcRenderer.invoke('update-settings', settings),
-  exportData: () => ipcRenderer.invoke('export-data'),
-  showSaveDialog: (defaultFilename: string, content: string) => ipcRenderer.invoke('show-save-dialog', { defaultFilename, content }),
+  getRecentActivity: (limit?: number) =>
+    ipcRenderer.invoke("get-recent-activity", limit),
+  getSettings: () => ipcRenderer.invoke("get-settings"),
+  updateSettings: (settings: Record<string, string>) =>
+    ipcRenderer.invoke("update-settings", settings),
+  exportData: () => ipcRenderer.invoke("export-data"),
+  showSaveDialog: (defaultFilename: string, content: string) =>
+    ipcRenderer.invoke("show-save-dialog", { defaultFilename, content }),
 };
 
 // Use contextBridge to expose safety limited APIs to the Renderer Process

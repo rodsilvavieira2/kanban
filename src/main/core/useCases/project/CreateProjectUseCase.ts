@@ -1,17 +1,17 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Project } from '../../../../shared/schemas/models';
-import { IProjectRepository } from '../../domain/repositories/IProjectRepository';
-import { InitializeProjectColumnsUseCase } from '../column/InitializeProjectColumnsUseCase';
+import { v4 as uuidv4 } from "uuid";
+import { Project } from "../../../../shared/schemas/models";
+import { IProjectRepository } from "../../domain/repositories/IProjectRepository";
+import { InitializeProjectColumnsUseCase } from "../column/InitializeProjectColumnsUseCase";
 
 export class CreateProjectUseCase {
   constructor(
     private projectRepository: IProjectRepository,
-    private initializeColumnsUseCase: InitializeProjectColumnsUseCase
+    private initializeColumnsUseCase: InitializeProjectColumnsUseCase,
   ) {}
 
   async execute(projectData: Partial<Project>): Promise<Project> {
     if (!projectData.name) {
-      throw new Error('Project name is required');
+      throw new Error("Project name is required");
     }
 
     const projectId = uuidv4();
@@ -19,8 +19,8 @@ export class CreateProjectUseCase {
     const project: Project = {
       id: projectId,
       name: projectData.name,
-      description: projectData.description || '',
-      status: projectData.status || 'Planning',
+      description: projectData.description || "",
+      status: projectData.status || "Planning",
       dueDate: projectData.dueDate,
       progress: 0,
       tasksCount: 0,
@@ -29,7 +29,7 @@ export class CreateProjectUseCase {
     };
 
     const savedProject = await this.projectRepository.save(project);
-    
+
     // Initialize default columns for the new project
     await this.initializeColumnsUseCase.execute(projectId);
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -8,18 +8,18 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
-  variant?: 'danger' | 'primary';
+  variant?: "danger" | "primary";
 }
 
 export function ConfirmDialog({
   isOpen,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
   onConfirm,
   onCancel,
-  variant = 'primary'
+  variant = "primary",
 }: ConfirmDialogProps) {
   if (!isOpen) return null;
 
@@ -31,7 +31,16 @@ export function ConfirmDialog({
             <h2>{title}</h2>
           </div>
           <button className="icon-button" onClick={onCancel}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <line x1="18" y1="6" x2="6" y2="18"></line>
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
@@ -43,9 +52,11 @@ export function ConfirmDialog({
         </div>
 
         <div className="modal-footer">
-          <button className="btn-secondary" onClick={onCancel}>{cancelLabel}</button>
-          <button 
-            className={variant === 'danger' ? 'btn-danger' : 'btn-primary'} 
+          <button className="btn-secondary" onClick={onCancel}>
+            {cancelLabel}
+          </button>
+          <button
+            className={variant === "danger" ? "btn-danger" : "btn-primary"}
             onClick={onConfirm}
           >
             {confirmLabel}

@@ -1,6 +1,6 @@
-import { IProjectRepository } from '../../domain/repositories/IProjectRepository';
-import { IColumnRepository } from '../../domain/repositories/IColumnRepository';
-import { ITaskRepository } from '../../domain/repositories/ITaskRepository';
+import { IProjectRepository } from "../../domain/repositories/IProjectRepository";
+import { IColumnRepository } from "../../domain/repositories/IColumnRepository";
+import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
 
 export interface ExportedTask {
   id: string;
@@ -40,7 +40,7 @@ export class ExportDataUseCase {
   constructor(
     private projectRepository: IProjectRepository,
     private columnRepository: IColumnRepository,
-    private taskRepository: ITaskRepository
+    private taskRepository: ITaskRepository,
   ) {}
 
   async execute(): Promise<ExportPayload> {
@@ -48,11 +48,15 @@ export class ExportDataUseCase {
 
     const exportedProjects: ExportedProject[] = await Promise.all(
       projects.map(async (project) => {
-        const columns = await this.columnRepository.findAllByProjectId(project.id);
+        const columns = await this.columnRepository.findAllByProjectId(
+          project.id,
+        );
 
         const exportedColumns: ExportedColumn[] = await Promise.all(
           columns.map(async (column) => {
-            const tasks = await this.taskRepository.findAllByColumnId(column.id);
+            const tasks = await this.taskRepository.findAllByColumnId(
+              column.id,
+            );
             const exportedTasks: ExportedTask[] = tasks.map((task) => ({
               id: task.id,
               title: task.title,
@@ -70,7 +74,7 @@ export class ExportDataUseCase {
               order: column.order,
               tasks: exportedTasks,
             };
-          })
+          }),
         );
 
         return {
@@ -82,12 +86,12 @@ export class ExportDataUseCase {
           createdAt: project.createdAt || undefined,
           columns: exportedColumns,
         };
-      })
+      }),
     );
 
     return {
       exportedAt: new Date().toISOString(),
-      version: '1.0.0',
+      version: "1.0.0",
       projects: exportedProjects,
     };
   }

@@ -1,5 +1,5 @@
-import { ActivityLog } from '../../../../shared/schemas/models';
-import { ActivityLogRepository } from '../../repositories/ActivityLogRepository';
+import { ActivityLog } from "../../../../shared/schemas/models";
+import { ActivityLogRepository } from "../../repositories/ActivityLogRepository";
 
 export class GetRecentActivityUseCase {
   constructor(private activityLogRepository: ActivityLogRepository) {}

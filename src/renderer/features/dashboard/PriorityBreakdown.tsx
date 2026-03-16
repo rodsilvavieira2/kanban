@@ -1,8 +1,8 @@
-import React from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Doughnut } from 'react-chartjs-2';
+import React from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
 
-import { useKanbanStore } from '../../stores/kanbanStore';
+import { useKanbanStore } from "../../stores/kanbanStore";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -15,20 +15,20 @@ interface Priority {
 export function PriorityBreakdown() {
   const { tasks, columns } = useKanbanStore();
 
-  const priorities: Priority[] = columns.map(col => ({
+  const priorities: Priority[] = columns.map((col) => ({
     label: col.title,
-    value: tasks.filter(t => t.columnId === col.id).length,
-    color: col.color || '#888888',
+    value: tasks.filter((t) => t.columnId === col.id).length,
+    color: col.color || "#888888",
   }));
 
   const total = tasks.length;
 
   const chartData = {
-    labels: priorities.map(p => p.label),
+    labels: priorities.map((p) => p.label),
     datasets: [
       {
-        data: priorities.map(p => p.value),
-        backgroundColor: priorities.map(p => p.color),
+        data: priorities.map((p) => p.value),
+        backgroundColor: priorities.map((p) => p.color),
         borderWidth: 0,
         hoverOffset: 4,
       },
@@ -36,7 +36,7 @@ export function PriorityBreakdown() {
   };
 
   const chartOptions = {
-    cutout: '80%',
+    cutout: "80%",
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
@@ -48,9 +48,10 @@ export function PriorityBreakdown() {
       },
     },
   };
-  
+
   const sortedPriorities = [...priorities].sort((a, b) => b.value - a.value);
-  const topPriority = sortedPriorities.length > 0 ? sortedPriorities[0].label : 'None';
+  const topPriority =
+    sortedPriorities.length > 0 ? sortedPriorities[0].label : "None";
 
   return (
     <div className="priority-breakdown">
@@ -58,7 +59,9 @@ export function PriorityBreakdown() {
       <div className="priority-chart-container">
         <div className="donut-chart">
           {total === 0 ? (
-            <div className="empty-chart text-accents-5 text-sm p-4 text-center">No tasks</div>
+            <div className="empty-chart text-accents-5 text-sm p-4 text-center">
+              No tasks
+            </div>
           ) : (
             <Doughnut data={chartData} options={chartOptions} />
           )}
@@ -77,7 +80,7 @@ export function PriorityBreakdown() {
             </div>
           ))}
           <p className="priority-note">
-             Most tasks are currently in <strong>{topPriority}</strong>.
+            Most tasks are currently in <strong>{topPriority}</strong>.
           </p>
         </div>
       </div>

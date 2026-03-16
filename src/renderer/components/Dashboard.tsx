@@ -1,4 +1,8 @@
-import { SummaryCards, PriorityBreakdown, ActivityFeed } from '../features/dashboard';
+import {
+  SummaryCards,
+  PriorityBreakdown,
+  ActivityFeed,
+} from "../features/dashboard";
 
 export function Dashboard() {
   return (

@@ -1,10 +1,10 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const ProjectSchema = z.object({
   id: z.string().uuid(),
-  name: z.string().min(1, 'Project name is required'),
+  name: z.string().min(1, "Project name is required"),
   description: z.string().optional(),
-  status: z.enum(['Planning', 'In Progress', 'Completed']),
+  status: z.enum(["Planning", "In Progress", "Completed"]),
   dueDate: z.string().optional(),
   progress: z.number().min(0).max(100).default(0),
   tasksCount: z.number().default(0),

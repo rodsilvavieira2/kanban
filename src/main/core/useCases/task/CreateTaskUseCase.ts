@@ -1,27 +1,29 @@
-import { v4 as uuidv4 } from 'uuid';
-import { Task } from '../../../../shared/schemas/models';
-import { ITaskRepository } from '../../domain/repositories/ITaskRepository';
-import { ActivityLogRepository } from '../repositories/ActivityLogRepository';
+import { v4 as uuidv4 } from "uuid";
+import { Task } from "../../../../shared/schemas/models";
+import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
+import { ActivityLogRepository } from "../repositories/ActivityLogRepository";
 
 export class CreateTaskUseCase {
   constructor(
     private taskRepository: ITaskRepository,
-    private activityLogRepository: ActivityLogRepository
+    private activityLogRepository: ActivityLogRepository,
   ) {}
 
   async execute(taskData: Partial<Task>): Promise<Task> {
     if (!taskData.title || !taskData.columnId) {
-      throw new Error('Task title and column ID are required');
+      throw new Error("Task title and column ID are required");
     }
 
-    const tasksInColumn = await this.taskRepository.findAllByColumnId(taskData.columnId);
+    const tasksInColumn = await this.taskRepository.findAllByColumnId(
+      taskData.columnId,
+    );
     const order = tasksInColumn.length;
 
     const task: Task = {
       id: uuidv4(),
       columnId: taskData.columnId,
       title: taskData.title,
-      description: taskData.description || '',
+      description: taskData.description || "",
       dueDate: taskData.dueDate,
       order,
       timeSpentMinutes: 0,
@@ -32,8 +34,8 @@ export class CreateTaskUseCase {
     const savedTask = await this.taskRepository.save(task);
 
     await this.activityLogRepository.create({
-      action: 'Created task',
-      entityType: 'Task',
+      action: "Created task",
+      entityType: "Task",
       entityId: savedTask.id,
       details: `Created task "${savedTask.title}"`,
     });

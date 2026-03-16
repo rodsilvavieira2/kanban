@@ -1,4 +1,4 @@
-import { Task } from '../../../../shared/schemas/models';
+import { Task } from "../../../../shared/schemas/models";
 
 export interface ITaskRepository {
   findAllByColumnId(columnId: string): Promise<Task[]>;

@@ -1,16 +1,16 @@
-import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
-import { GetProjectsUseCase } from './useCases/project/GetProjectsUseCase';
-import { GetProjectDataUseCase } from './useCases/project/GetProjectDataUseCase';
-import { CreateTaskUseCase } from './useCases/task/CreateTaskUseCase';
-import { MoveTaskUseCase } from './useCases/task/MoveTaskUseCase';
-import { UpdateTaskTimeUseCase } from './useCases/task/UpdateTaskTimeUseCase';
+} from "@modelcontextprotocol/sdk/types.js";
+import { GetProjectsUseCase } from "./useCases/project/GetProjectsUseCase";
+import { GetProjectDataUseCase } from "./useCases/project/GetProjectDataUseCase";
+import { CreateTaskUseCase } from "./useCases/task/CreateTaskUseCase";
+import { MoveTaskUseCase } from "./useCases/task/MoveTaskUseCase";
+import { UpdateTaskTimeUseCase } from "./useCases/task/UpdateTaskTimeUseCase";
 
 export class McpServer {
   private server: Server;
@@ -21,19 +21,19 @@ export class McpServer {
     private createTaskUseCase: CreateTaskUseCase,
     private moveTaskUseCase: MoveTaskUseCase,
     private updateTaskTimeUseCase: UpdateTaskTimeUseCase,
-    private onUpdateCallback?: () => void
+    private onUpdateCallback?: () => void,
   ) {
     this.server = new Server(
       {
-        name: 'taskmaster-mcp',
-        version: '1.0.0',
+        name: "taskmaster-mcp",
+        version: "1.0.0",
       },
       {
         capabilities: {
           resources: {},
           tools: {},
         },
-      }
+      },
     );
 
     this.setupHandlers();
@@ -47,84 +47,88 @@ export class McpServer {
         resources: projects.map((p) => ({
           uri: `kanban://projects/${p.id}/board`,
           name: `${p.name} Board State`,
-          mimeType: 'application/json',
+          mimeType: "application/json",
           description: `Full state of the ${p.name} board including columns and tasks.`,
         })),
       };
     });
 
     // Read a specific resource
-    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-      const uri = new URL(request.params.uri);
-      const projectId = uri.pathname.split('/')[2];
+    this.server.setRequestHandler(
+      ReadResourceRequestSchema,
+      async (request) => {
+        const uri = new URL(request.params.uri);
+        const projectId = uri.pathname.split("/")[2];
 
-      if (uri.protocol !== 'kanban:' || !projectId) {
-        throw new Error(`Invalid URI: ${request.params.uri}`);
-      }
+        if (uri.protocol !== "kanban:" || !projectId) {
+          throw new Error(`Invalid URI: ${request.params.uri}`);
+        }
 
-      const projectData = await this.getProjectDataUseCase.execute(projectId);
+        const projectData = await this.getProjectDataUseCase.execute(projectId);
 
-      return {
-        contents: [
-          {
-            uri: request.params.uri,
-            mimeType: 'application/json',
-            text: JSON.stringify(projectData, null, 2),
-          },
-        ],
-      };
-    });
+        return {
+          contents: [
+            {
+              uri: request.params.uri,
+              mimeType: "application/json",
+              text: JSON.stringify(projectData, null, 2),
+            },
+          ],
+        };
+      },
+    );
 
     // List available tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
           {
-            name: 'create_task',
-            description: 'Create a new task in a project board',
+            name: "create_task",
+            description: "Create a new task in a project board",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
-                projectId: { type: 'string' },
-                columnId: { type: 'string' },
-                title: { type: 'string' },
-                description: { type: 'string' },
-                dueDate: { type: 'string' },
+                projectId: { type: "string" },
+                columnId: { type: "string" },
+                title: { type: "string" },
+                description: { type: "string" },
+                dueDate: { type: "string" },
               },
-              required: ['projectId', 'columnId', 'title'],
+              required: ["projectId", "columnId", "title"],
             },
           },
           {
-            name: 'move_task',
-            description: 'Move a task within a board (reorder or move between columns)',
+            name: "move_task",
+            description:
+              "Move a task within a board (reorder or move between columns)",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
-                taskId: { type: 'string' },
-                sourceColumnId: { type: 'string' },
-                destinationColumnId: { type: 'string' },
-                sourceIndex: { type: 'number' },
-                destinationIndex: { type: 'number' },
+                taskId: { type: "string" },
+                sourceColumnId: { type: "string" },
+                destinationColumnId: { type: "string" },
+                sourceIndex: { type: "number" },
+                destinationIndex: { type: "number" },
               },
               required: [
-                'taskId',
-                'sourceColumnId',
-                'destinationColumnId',
-                'sourceIndex',
-                'destinationIndex',
+                "taskId",
+                "sourceColumnId",
+                "destinationColumnId",
+                "sourceIndex",
+                "destinationIndex",
               ],
             },
           },
           {
-            name: 'update_task_time',
-            description: 'Add minutes to the time spent on a specific task',
+            name: "update_task_time",
+            description: "Add minutes to the time spent on a specific task",
             inputSchema: {
-              type: 'object',
+              type: "object",
               properties: {
-                taskId: { type: 'string' },
-                minutes: { type: 'number' },
+                taskId: { type: "string" },
+                minutes: { type: "number" },
               },
-              required: ['taskId', 'minutes'],
+              required: ["taskId", "minutes"],
             },
           },
         ],
@@ -134,28 +138,35 @@ export class McpServer {
     // Call a tool
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       switch (request.params.name) {
-        case 'create_task': {
+        case "create_task": {
           const { projectId, ...taskData } = request.params.arguments as any;
           const task = await this.createTaskUseCase.execute(taskData);
           if (this.onUpdateCallback) this.onUpdateCallback();
           return {
-            content: [{ type: 'text', text: `Task created successfully: ${task.id}` }],
+            content: [
+              { type: "text", text: `Task created successfully: ${task.id}` },
+            ],
           };
         }
-        case 'move_task': {
+        case "move_task": {
           const moveRequest = request.params.arguments as any;
           await this.moveTaskUseCase.execute(moveRequest);
           if (this.onUpdateCallback) this.onUpdateCallback();
           return {
-            content: [{ type: 'text', text: 'Task moved successfully' }],
+            content: [{ type: "text", text: "Task moved successfully" }],
           };
         }
-        case 'update_task_time': {
+        case "update_task_time": {
           const { taskId, minutes } = request.params.arguments as any;
           await this.updateTaskTimeUseCase.execute(taskId, minutes);
           if (this.onUpdateCallback) this.onUpdateCallback();
           return {
-            content: [{ type: 'text', text: `Successfully added ${minutes} minutes to task ${taskId}` }],
+            content: [
+              {
+                type: "text",
+                text: `Successfully added ${minutes} minutes to task ${taskId}`,
+              },
+            ],
           };
         }
         default:
@@ -167,6 +178,6 @@ export class McpServer {
   async start() {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    console.log('MCP Server started on stdio');
+    console.log("MCP Server started on stdio");
   }
 }

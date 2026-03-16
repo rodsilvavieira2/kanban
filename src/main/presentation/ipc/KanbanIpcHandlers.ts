@@ -1,16 +1,16 @@
-import { ipcMain, dialog } from 'electron';
-import fs from 'fs';
-import { GetProjectsUseCase } from '../../core/useCases/project/GetProjectsUseCase';
-import { CreateProjectUseCase } from '../../core/useCases/project/CreateProjectUseCase';
-import { DeleteProjectUseCase } from '../../core/useCases/project/DeleteProjectUseCase';
-import { GetProjectDataUseCase } from '../../core/useCases/project/GetProjectDataUseCase';
-import { CreateTaskUseCase } from '../../core/useCases/task/CreateTaskUseCase';
-import { MoveTaskUseCase } from '../../core/useCases/task/MoveTaskUseCase';
-import { UpdateTaskTimeUseCase } from '../../core/useCases/task/UpdateTaskTimeUseCase';
-import { GetRecentActivityUseCase } from '../../core/useCases/activity/GetRecentActivityUseCase';
-import { GetSettingsUseCase } from '../../core/useCases/settings/GetSettingsUseCase';
-import { UpdateSettingsUseCase } from '../../core/useCases/settings/UpdateSettingsUseCase';
-import { ExportDataUseCase } from '../../core/useCases/export/ExportDataUseCase';
+import { ipcMain, dialog } from "electron";
+import fs from "fs";
+import { GetProjectsUseCase } from "../../core/useCases/project/GetProjectsUseCase";
+import { CreateProjectUseCase } from "../../core/useCases/project/CreateProjectUseCase";
+import { DeleteProjectUseCase } from "../../core/useCases/project/DeleteProjectUseCase";
+import { GetProjectDataUseCase } from "../../core/useCases/project/GetProjectDataUseCase";
+import { CreateTaskUseCase } from "../../core/useCases/task/CreateTaskUseCase";
+import { MoveTaskUseCase } from "../../core/useCases/task/MoveTaskUseCase";
+import { UpdateTaskTimeUseCase } from "../../core/useCases/task/UpdateTaskTimeUseCase";
+import { GetRecentActivityUseCase } from "../../core/useCases/activity/GetRecentActivityUseCase";
+import { GetSettingsUseCase } from "../../core/useCases/settings/GetSettingsUseCase";
+import { UpdateSettingsUseCase } from "../../core/useCases/settings/UpdateSettingsUseCase";
+import { ExportDataUseCase } from "../../core/useCases/export/ExportDataUseCase";
 
 export function setupKanbanIpcHandlers(
   getProjectsUseCase: GetProjectsUseCase,
@@ -23,139 +23,148 @@ export function setupKanbanIpcHandlers(
   getRecentActivityUseCase: GetRecentActivityUseCase,
   getSettingsUseCase: GetSettingsUseCase,
   updateSettingsUseCase: UpdateSettingsUseCase,
-  exportDataUseCase: ExportDataUseCase
+  exportDataUseCase: ExportDataUseCase,
 ) {
   // --- Project IPC Handlers ---
-  
-  ipcMain.handle('get-projects', async () => {
+
+  ipcMain.handle("get-projects", async () => {
     try {
       return await getProjectsUseCase.execute();
     } catch (error) {
-      console.error('Failed to get projects (IPC):', error);
+      console.error("Failed to get projects (IPC):", error);
       throw error;
     }
   });
 
-  ipcMain.handle('create-project', async (event, projectData) => {
+  ipcMain.handle("create-project", async (event, projectData) => {
     try {
       return await createProjectUseCase.execute(projectData);
     } catch (error) {
-      console.error('Failed to create project (IPC):', error);
+      console.error("Failed to create project (IPC):", error);
       throw error;
     }
   });
-  
-  ipcMain.handle('delete-project', async (event, id) => {
+
+  ipcMain.handle("delete-project", async (event, id) => {
     try {
       await deleteProjectUseCase.execute(id);
       return { success: true };
     } catch (error) {
-      console.error('Failed to delete project (IPC):', error);
+      console.error("Failed to delete project (IPC):", error);
       throw error;
     }
   });
 
-  ipcMain.handle('get-project-data', async (event, projectId) => {
+  ipcMain.handle("get-project-data", async (event, projectId) => {
     try {
       return await getProjectDataUseCase.execute(projectId);
     } catch (error) {
-      console.error('Failed to get project data (IPC):', error);
+      console.error("Failed to get project data (IPC):", error);
       throw error;
     }
   });
 
   // --- Task IPC Handlers ---
 
-  ipcMain.handle('create-task', async (event, taskData) => {
+  ipcMain.handle("create-task", async (event, taskData) => {
     try {
       return await createTaskUseCase.execute(taskData);
     } catch (error) {
-      console.error('Failed to create task (IPC):', error);
+      console.error("Failed to create task (IPC):", error);
       throw error;
     }
   });
 
-  ipcMain.handle('move-task', async (event, request) => {
+  ipcMain.handle("move-task", async (event, request) => {
     try {
       await moveTaskUseCase.execute(request);
       return { success: true };
     } catch (error) {
-      console.error('Failed to move task (IPC):', error);
+      console.error("Failed to move task (IPC):", error);
       throw error;
     }
   });
 
-  ipcMain.handle('update-task-time', async (event, { taskId, minutes }) => {
+  ipcMain.handle("update-task-time", async (event, { taskId, minutes }) => {
     try {
       await updateTaskTimeUseCase.execute(taskId, minutes);
       return { success: true };
     } catch (error) {
-      console.error('Failed to update task time (IPC):', error);
+      console.error("Failed to update task time (IPC):", error);
       throw error;
     }
   });
 
   // --- Activity IPC Handlers ---
 
-  ipcMain.handle('get-recent-activity', async (event, limit) => {
+  ipcMain.handle("get-recent-activity", async (event, limit) => {
     try {
       return await getRecentActivityUseCase.execute(limit);
     } catch (error) {
-      console.error('Failed to get recent activity (IPC):', error);
+      console.error("Failed to get recent activity (IPC):", error);
       throw error;
     }
   });
 
   // --- Settings IPC Handlers ---
-  
-  ipcMain.handle('get-settings', async () => {
+
+  ipcMain.handle("get-settings", async () => {
     try {
       return await getSettingsUseCase.execute();
     } catch (error) {
-      console.error('Failed to get settings (IPC):', error);
+      console.error("Failed to get settings (IPC):", error);
       throw error;
     }
   });
 
-  ipcMain.handle('update-settings', async (event, settings) => {
+  ipcMain.handle("update-settings", async (event, settings) => {
     try {
       await updateSettingsUseCase.execute(settings);
       return { success: true };
     } catch (error) {
-      console.error('Failed to update settings (IPC):', error);
+      console.error("Failed to update settings (IPC):", error);
       throw error;
     }
   });
 
   // --- Export IPC Handlers ---
 
-  ipcMain.handle('export-data', async () => {
+  ipcMain.handle("export-data", async () => {
     try {
       return await exportDataUseCase.execute();
     } catch (error) {
-      console.error('Failed to export data (IPC):', error);
+      console.error("Failed to export data (IPC):", error);
       throw error;
     }
   });
 
-  ipcMain.handle('show-save-dialog', async (event, { defaultFilename, content }: { defaultFilename: string; content: string }) => {
-    try {
-      const { canceled, filePath } = await dialog.showSaveDialog({
-        title: 'Export Workspace Data',
-        defaultPath: defaultFilename,
-        filters: [{ name: 'JSON Files', extensions: ['json'] }],
-        properties: ['showOverwriteConfirmation'],
-      });
+  ipcMain.handle(
+    "show-save-dialog",
+    async (
+      event,
+      {
+        defaultFilename,
+        content,
+      }: { defaultFilename: string; content: string },
+    ) => {
+      try {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+          title: "Export Workspace Data",
+          defaultPath: defaultFilename,
+          filters: [{ name: "JSON Files", extensions: ["json"] }],
+          properties: ["showOverwriteConfirmation"],
+        });
 
-      if (canceled || !filePath) {
-        return { success: false, canceled: true };
+        if (canceled || !filePath) {
+          return { success: false, canceled: true };
+        }
+
+        fs.writeFileSync(filePath, content, "utf-8");
+        return { success: true, filePath };
+      } catch (error) {
+        console.error("Failed to save file (IPC):", error);
+        throw error;
       }
-
-      fs.writeFileSync(filePath, content, 'utf-8');
-      return { success: true, filePath };
-    } catch (error) {
-      console.error('Failed to save file (IPC):', error);
-      throw error;
-    }
-  });
+    },
+  );
 }

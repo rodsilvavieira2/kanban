@@ -1,4 +1,4 @@
-import { ITaskRepository } from '../../domain/repositories/ITaskRepository';
+import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
 
 export class UpdateTaskTimeUseCase {
   constructor(private taskRepository: ITaskRepository) {}
@@ -7,7 +7,7 @@ export class UpdateTaskTimeUseCase {
     if (minutes <= 0) {
       return;
     }
-    
+
     const task = await this.taskRepository.findById(taskId);
     if (!task) {
       throw new Error(`Task with ID ${taskId} not found`);

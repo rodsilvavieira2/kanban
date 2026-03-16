@@ -1,22 +1,27 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { useKanbanStore } from '../stores/kanbanStore';
-import { useProjectStore } from '../stores/projectStore';
-import { Plus, MoreHorizontal, Search, ArrowLeft } from 'lucide-react';
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
+import { useKanbanStore } from "../stores/kanbanStore";
+import { useProjectStore } from "../stores/projectStore";
+import { Plus, MoreHorizontal, Search, ArrowLeft } from "lucide-react";
 
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
-  
+
   const { projects, loadProjects } = useProjectStore();
-  const { 
-    columns, 
-    tasks, 
-    isLoading, 
-    loadProjectData, 
+  const {
+    columns,
+    tasks,
+    isLoading,
+    loadProjectData,
     moveTask,
-    initUpdateListener
+    initUpdateListener,
   } = useKanbanStore();
 
   useEffect(() => {
@@ -27,7 +32,7 @@ export function KanbanBoard() {
     }
   }, [projectId, loadProjects, loadProjectData, initUpdateListener]);
 
-  const project = projects.find(p => p.id === projectId);
+  const project = projects.find((p) => p.id === projectId);
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source, draggableId } = result;
@@ -50,23 +55,32 @@ export function KanbanBoard() {
     });
   };
 
-  if (isLoading && columns.length === 0) return <div className="p-8 text-center text-accents-5">Loading board...</div>;
+  if (isLoading && columns.length === 0)
+    return (
+      <div className="p-8 text-center text-accents-5">Loading board...</div>
+    );
 
   return (
     <div className="kanban-view">
       <div className="kanban-header">
         <div className="kanban-header-left">
-          <button className="icon-button back-button" onClick={() => navigate('/projects')}>
+          <button
+            className="icon-button back-button"
+            onClick={() => navigate("/projects")}
+          >
             <ArrowLeft size={20} />
           </button>
-          <h2>{project?.name || 'Project Board'}</h2>
+          <h2>{project?.name || "Project Board"}</h2>
         </div>
         <div className="kanban-header-right">
           <div className="search-bar">
             <Search size={16} />
             <input type="text" placeholder="Search tasks..." />
           </div>
-          <button className="btn-primary" onClick={() => navigate(`/projects/${projectId}/tasks/new`)}>
+          <button
+            className="btn-primary"
+            onClick={() => navigate(`/projects/${projectId}/tasks/new`)}
+          >
             <Plus size={16} />
             New Task
           </button>
@@ -84,9 +98,9 @@ export function KanbanBoard() {
               <div className="kanban-column" key={column.id}>
                 <div className="column-header">
                   <div className="column-title">
-                    <span 
-                      className="column-color-dot" 
-                      style={{ backgroundColor: column.color || '#333' }}
+                    <span
+                      className="column-color-dot"
+                      style={{ backgroundColor: column.color || "#333" }}
                     ></span>
                     <h3>{column.title}</h3>
                     <span className="task-count">{columnTasks.length}</span>
@@ -99,15 +113,19 @@ export function KanbanBoard() {
                 <Droppable droppableId={column.id}>
                   {(provided, snapshot) => (
                     <div
-                      className={`column-tasks ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
+                      className={`column-tasks ${snapshot.isDraggingOver ? "dragging-over" : ""}`}
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                     >
                       {columnTasks.map((task, index) => (
-                        <Draggable key={task.id} draggableId={task.id} index={index}>
+                        <Draggable
+                          key={task.id}
+                          draggableId={task.id}
+                          index={index}
+                        >
                           {(provided, snapshot) => (
                             <div
-                              className={`kanban-task-card ${snapshot.isDragging ? 'dragging' : ''}`}
+                              className={`kanban-task-card ${snapshot.isDragging ? "dragging" : ""}`}
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
@@ -118,14 +136,16 @@ export function KanbanBoard() {
                                   {task.description}
                                 </p>
                               )}
-                              
+
                               <div className="task-meta mt-3">
                                 <div className="task-meta-right">
-                                   {task.dueDate && (
-                                     <span className="task-date text-xs text-accents-5">
-                                       {new Date(task.dueDate).toLocaleDateString()}
-                                     </span>
-                                   )}
+                                  {task.dueDate && (
+                                    <span className="task-date text-xs text-accents-5">
+                                      {new Date(
+                                        task.dueDate,
+                                      ).toLocaleDateString()}
+                                    </span>
+                                  )}
                                 </div>
                               </div>
                             </div>
@@ -137,9 +157,13 @@ export function KanbanBoard() {
                   )}
                 </Droppable>
 
-                <button 
+                <button
                   className="add-task-btn"
-                  onClick={() => navigate(`/projects/${projectId}/tasks/new`, { state: { columnId: column.id } })}
+                  onClick={() =>
+                    navigate(`/projects/${projectId}/tasks/new`, {
+                      state: { columnId: column.id },
+                    })
+                  }
                 >
                   <Plus size={16} />
                   Add Task
@@ -147,7 +171,7 @@ export function KanbanBoard() {
               </div>
             );
           })}
-          
+
           <div className="add-column-placeholder">
             <button className="add-column-btn">
               <Plus size={24} />

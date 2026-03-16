@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface PomodoroSettings {
   focusTime: number; // minutes
@@ -25,11 +25,12 @@ export const usePomodoroStore = create<PomodoroSettings>()(
       setFocusTime: (time) => set({ focusTime: time }),
       setBreakTime: (time) => set({ breakTime: time }),
       setTotalRounds: (rounds) => set({ totalRounds: rounds }),
-      setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
+      setNotificationsEnabled: (enabled) =>
+        set({ notificationsEnabled: enabled }),
       setSelectedTaskId: (id) => set({ selectedTaskId: id }),
     }),
     {
-      name: 'pomodoro-settings',
-    }
-  )
+      name: "pomodoro-settings",
+    },
+  ),
 );

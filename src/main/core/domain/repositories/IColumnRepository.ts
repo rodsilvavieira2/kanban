@@ -1,4 +1,4 @@
-import { Column } from '../../../../shared/schemas/models';
+import { Column } from "../../../../shared/schemas/models";
 
 export interface IColumnRepository {
   findAllByProjectId(projectId: string): Promise<Column[]>;

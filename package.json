@@ -10,7 +10,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "eslint --ext .ts,.tsx ."
+    "lint": "eslint --ext .ts,.tsx .",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json,css,scss}\""
   },
   "keywords": [],
   "author": "rodrigo",
@@ -34,6 +35,7 @@
     "electron": "^41.0.0",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.32.0",
+    "prettier": "^3.8.1",
     "sass": "^1.98.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.0",

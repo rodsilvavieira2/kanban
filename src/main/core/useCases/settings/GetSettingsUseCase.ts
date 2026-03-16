@@ -1,4 +1,4 @@
-import { SettingsRepository } from '../../repositories/SettingsRepository';
+import { SettingsRepository } from "../../repositories/SettingsRepository";
 
 export class GetSettingsUseCase {
   constructor(private settingsRepository: SettingsRepository) {}

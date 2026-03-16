@@ -1,9 +1,11 @@
-import React from 'react';
-import { Box, Grid, Layers, Clock, Settings } from 'lucide-react';
+import React from "react";
+import { Box, Grid, Layers, Clock, Settings } from "lucide-react";
 
 interface SidebarProps {
-  currentView: 'dashboard' | 'projects' | 'pomodoro' | 'settings';
-  onViewChange: (view: 'dashboard' | 'projects' | 'pomodoro' | 'settings') => void;
+  currentView: "dashboard" | "projects" | "pomodoro" | "settings";
+  onViewChange: (
+    view: "dashboard" | "projects" | "pomodoro" | "settings",
+  ) => void;
 }
 
 export function Sidebar({ currentView, onViewChange }: SidebarProps) {
@@ -17,34 +19,34 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
       </div>
 
       <nav className="nav-menu">
-        <a 
-          className={`nav-item ${currentView === 'dashboard' ? 'active' : ''}`}
-          onClick={() => onViewChange('dashboard')}
+        <a
+          className={`nav-item ${currentView === "dashboard" ? "active" : ""}`}
+          onClick={() => onViewChange("dashboard")}
         >
           <Grid size={18} strokeWidth={1.5} />
           Dashboard
         </a>
-        <a 
-          className={`nav-item ${currentView === 'projects' ? 'active' : ''}`}
-          onClick={() => onViewChange('projects')}
+        <a
+          className={`nav-item ${currentView === "projects" ? "active" : ""}`}
+          onClick={() => onViewChange("projects")}
         >
           <Layers size={18} strokeWidth={1.5} />
           Projects
         </a>
-        <a 
-          className={`nav-item ${currentView === 'pomodoro' ? 'active' : ''}`}
-          onClick={() => onViewChange('pomodoro')}
+        <a
+          className={`nav-item ${currentView === "pomodoro" ? "active" : ""}`}
+          onClick={() => onViewChange("pomodoro")}
         >
           <Clock size={18} strokeWidth={1.5} />
           Pomodoro
         </a>
       </nav>
 
-      <div style={{ marginTop: 'auto', padding: '24px' }}>
-        <button 
-          className={`btn-secondary ${currentView === 'settings' ? 'active' : ''}`} 
-          style={{ width: '100%', justifyContent: 'center' }}
-          onClick={() => onViewChange('settings')}
+      <div style={{ marginTop: "auto", padding: "24px" }}>
+        <button
+          className={`btn-secondary ${currentView === "settings" ? "active" : ""}`}
+          style={{ width: "100%", justifyContent: "center" }}
+          onClick={() => onViewChange("settings")}
         >
           <Settings size={18} strokeWidth={1.5} />
           Settings

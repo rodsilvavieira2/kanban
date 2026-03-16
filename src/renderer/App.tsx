@@ -1,15 +1,15 @@
-import { createHashRouter, RouterProvider } from 'react-router-dom';
-import { RootLayout } from './layouts/RootLayout';
-import { Dashboard } from './components/Dashboard';
-import { ProjectsList } from './components/ProjectsList';
-import { KanbanBoard } from './components/KanbanBoard';
-import { CreateTask } from './components/CreateTask';
-import { Settings } from './components/Settings';
-import { Pomodoro } from './components/Pomodoro';
+import { createHashRouter, RouterProvider } from "react-router-dom";
+import { RootLayout } from "./layouts/RootLayout";
+import { Dashboard } from "./components/Dashboard";
+import { ProjectsList } from "./components/ProjectsList";
+import { KanbanBoard } from "./components/KanbanBoard";
+import { CreateTask } from "./components/CreateTask";
+import { Settings } from "./components/Settings";
+import { Pomodoro } from "./components/Pomodoro";
 
 const router = createHashRouter([
   {
-    path: '/',
+    path: "/",
     element: <RootLayout />,
     children: [
       {
@@ -17,23 +17,23 @@ const router = createHashRouter([
         element: <Dashboard />,
       },
       {
-        path: 'pomodoro',
+        path: "pomodoro",
         element: <Pomodoro />,
       },
       {
-        path: 'projects',
+        path: "projects",
         element: <ProjectsList />,
       },
       {
-        path: 'projects/:projectId',
+        path: "projects/:projectId",
         element: <KanbanBoard />,
       },
       {
-        path: 'projects/:projectId/tasks/new',
+        path: "projects/:projectId/tasks/new",
         element: <CreateTask />,
       },
       {
-        path: 'settings',
+        path: "settings",
         element: <Settings />,
       },
     ],
