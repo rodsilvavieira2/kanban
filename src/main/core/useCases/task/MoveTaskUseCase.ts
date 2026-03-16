@@ -1,5 +1,5 @@
 import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
-import { ActivityLogRepository } from "../repositories/ActivityLogRepository";
+import { ActivityLogRepository } from "../../repositories/ActivityLogRepository";
 
 export interface MoveTaskRequest {
   taskId: string;
@@ -55,11 +55,14 @@ export class MoveTaskUseCase {
       );
 
       // Update other tasks in destination
-      destinationTasks.splice(
-        destinationIndex,
-        0,
-        (await this.taskRepository.findById(taskId))!,
-      );
+      const taskToMove = await this.taskRepository.findById(taskId);
+      if (taskToMove) {
+        destinationTasks.splice(
+          destinationIndex,
+          0,
+          taskToMove,
+        );
+      }
       await this.taskRepository.reorder(
         destinationTasks.map((task, index) => ({ id: task.id, order: index })),
       );

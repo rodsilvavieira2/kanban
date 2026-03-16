@@ -6,14 +6,14 @@ export const EXPOSED_API_KEY = "kanbanApi";
 
 const kanbanApi = {
   getProjects: () => ipcRenderer.invoke("get-projects"),
-  createProject: (data: any) => ipcRenderer.invoke("create-project", data),
+  createProject: (data: Record<string, unknown>) => ipcRenderer.invoke("create-project", data),
   deleteProject: (id: string) => ipcRenderer.invoke("delete-project", id),
   getProjectData: (projectId: string) =>
     ipcRenderer.invoke("get-project-data", projectId),
-  createTask: (data: any) => ipcRenderer.invoke("create-task", data),
-  updateTask: (request: { taskId: string; data: any }) =>
+  createTask: (data: Record<string, unknown>) => ipcRenderer.invoke("create-task", data),
+  updateTask: (request: { taskId: string; data: Record<string, unknown> }) =>
     ipcRenderer.invoke("update-task", request),
-  moveTask: (request: any) => ipcRenderer.invoke("move-task", request),
+  moveTask: (request: Record<string, unknown>) => ipcRenderer.invoke("move-task", request),
   updateTaskTime: (taskId: string, minutes: number) =>
     ipcRenderer.invoke("update-task-time", { taskId, minutes }),
   onKanbanUpdated: (callback: () => void) => {

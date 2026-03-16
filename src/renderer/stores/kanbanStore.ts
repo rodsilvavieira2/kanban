@@ -35,9 +35,9 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     try {
       const { columns, tasks } = await kanbanApi.getProjectData(projectId);
       set({ columns, tasks, isLoading: false });
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
-        error: error.message || "Failed to load project data",
+        error: error instanceof Error ? error.message : "Failed to load project data",
         isLoading: false,
       });
     }
@@ -53,8 +53,8 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
         allTasks = [...allTasks, ...tasks.map(t => ({ ...t, projectId: project.id }))];
       }
       set({ tasks: allTasks, isLoading: false });
-    } catch (error: any) {
-      set({ error: error.message || "Failed to load tasks", isLoading: false });
+    } catch (error: unknown) {
+      set({ error: error instanceof Error ? error.message : "Failed to load tasks", isLoading: false });
     }
   },
 
@@ -64,8 +64,8 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       set((state) => ({
         tasks: [...state.tasks, newTask],
       }));
-    } catch (error: any) {
-      set({ error: error.message || "Failed to create task" });
+    } catch (error: unknown) {
+      set({ error: error instanceof Error ? error.message : "Failed to create task" });
     }
   },
 
@@ -75,14 +75,13 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       set((state) => ({
         tasks: state.tasks.map((t) => (t.id === taskId ? updatedTask : t)),
       }));
-    } catch (error: any) {
-      set({ error: error.message || "Failed to update task" });
+    } catch (error: unknown) {
+      set({ error: error instanceof Error ? error.message : "Failed to update task" });
     }
   },
 
   moveTask: async (request) => {
     const {
-      taskId,
       sourceColumnId,
       destinationColumnId,
       sourceIndex,
@@ -147,9 +146,9 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
 
     try {
       await kanbanApi.moveTask(request);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to move task (IPC):", error);
-      set({ error: error.message || "Failed to move task, please refresh." });
+      set({ error: error instanceof Error ? error.message : "Failed to move task, please refresh." });
     }
   },
 
@@ -163,9 +162,9 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
             : t,
         ),
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update task time:", error);
-      set({ error: error.message || "Failed to update task time" });
+      set({ error: error instanceof Error ? error.message : "Failed to update task time" });
     }
   },
 

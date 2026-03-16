@@ -1,4 +1,4 @@
-import DatabaseConstructor, { Database } from 'better-sqlite3';
+import { Database } from 'better-sqlite3';
 import { Project } from '../../../shared/schemas/models';
 import { IProjectRepository } from '../../core/domain/repositories/IProjectRepository';
 
@@ -12,13 +12,13 @@ export class SQLiteProjectRepository implements IProjectRepository {
       FROM projects p
     `);
     
-    const rows = stmt.all() as any[];
+    const rows = stmt.all() as Record<string, unknown>[];
     return rows.map(row => this.mapToEntity(row));
   }
 
   async findById(id: string): Promise<Project | undefined> {
     const stmt = this.db.prepare('SELECT * FROM projects WHERE id = ?');
-    const row = stmt.get(id) as any;
+    const row = stmt.get(id) as Record<string, unknown>;
     
     if (!row) return undefined;
     return this.mapToEntity(row);
@@ -44,7 +44,9 @@ export class SQLiteProjectRepository implements IProjectRepository {
       stmt.run(id, name, description, status, dueDate);
     }
     
-    return (await this.findById(id))!;
+    const project = await this.findById(id);
+    if (!project) throw new Error("Project not found");
+    return project;
   }
 
   async delete(id: string): Promise<void> {
@@ -52,12 +54,12 @@ export class SQLiteProjectRepository implements IProjectRepository {
     stmt.run(id);
   }
 
-  private mapToEntity(row: any): Project {
+  private mapToEntity(row: Record<string, unknown>): Project {
     return {
       id: row.id,
       name: row.name,
       description: row.description || '',
-      status: row.status as any,
+      status: row.status as 'active' | 'archived',
       dueDate: row.due_date || undefined,
       progress: row.progress || 0,
       tasksCount: row.tasksCount || 0,

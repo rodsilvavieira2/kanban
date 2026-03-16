@@ -29,7 +29,7 @@ export class GetDashboardStatsUseCase {
 
   async execute(): Promise<DashboardStats> {
     const projects = await this.projectRepository.findAll();
-    let allTasks = [];
+    const allTasks = [];
 
     for (const project of projects) {
       const tasks = await this.taskRepository.findAllByProjectId(project.id);
@@ -38,13 +38,9 @@ export class GetDashboardStatsUseCase {
 
     // This is a simplified version. In a real app, we'd have an activity_logs table.
     // For now, we'll derive some stats from current tasks.
-
-    const completedTasksCount = allTasks.filter((t) => {
-      // Find the column this task belongs to and check its title
-      // Since we don't have columns here, we'll assume tasks in 'Completed' column are done
-      // In a real repo, we'd join with columns
-      return false; // Placeholder until we have a better way or join
-    }).length;
+    // Find the column this task belongs to and check its title
+    // Since we don't have columns here, we'll assume tasks in 'Completed' column are done
+    // In a real repo, we'd join with columns
 
     // For the sake of this prototype, let's mock the complex stats but keep counts real
     return {

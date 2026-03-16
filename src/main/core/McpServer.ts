@@ -3,6 +3,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { GetProjectsUseCase } from "./useCases/project/GetProjectsUseCase";
@@ -169,9 +171,9 @@ export class McpServer {
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
       switch (request.params.name) {
         case "create_task": {
-          const { projectId, ...taskData } = request.params.arguments as any;
-          const task = await this.createTaskUseCase.execute(taskData);
-          if (this.onUpdateCallback) this.onUpdateCallback();
+          const taskData = request.params.arguments as Record<string, unknown>;
+          const task = await this.createTaskUseCase.execute(taskData as { title: string; description?: string; columnId: string; projectId: string; dueDate?: string });
+          if (this.onDataUpdated) this.onDataUpdated();
           return {
             content: [
               { type: "text", text: `Task created successfully: ${task.id}` },
@@ -179,9 +181,9 @@ export class McpServer {
           };
         }
         case "update_task": {
-          const { taskId, ...taskData } = request.params.arguments as any;
-          const task = await this.updateTaskUseCase.execute(taskId, taskData);
-          if (this.onUpdateCallback) this.onUpdateCallback();
+          const { taskId, ...taskData } = request.params.arguments as Record<string, unknown>;
+          const task = await this.updateTaskUseCase.execute(taskId as string, taskData);
+          if (this.onDataUpdated) this.onDataUpdated();
           return {
             content: [
               { type: "text", text: `Task updated successfully: ${task.id}` },
@@ -189,17 +191,17 @@ export class McpServer {
           };
         }
         case "move_task": {
-          const moveRequest = request.params.arguments as any;
+          const moveRequest = request.params.arguments as { taskId: string; sourceColumnId: string; destinationColumnId: string; sourceIndex: number; destinationIndex: number; };
           await this.moveTaskUseCase.execute(moveRequest);
-          if (this.onUpdateCallback) this.onUpdateCallback();
+          if (this.onDataUpdated) this.onDataUpdated();
           return {
             content: [{ type: "text", text: "Task moved successfully" }],
           };
         }
         case "update_task_time": {
-          const { taskId, minutes } = request.params.arguments as any;
-          await this.updateTaskTimeUseCase.execute(taskId, minutes);
-          if (this.onUpdateCallback) this.onUpdateCallback();
+          const { taskId, minutes } = request.params.arguments as Record<string, unknown>;
+          await this.updateTaskTimeUseCase.execute(taskId as string, minutes as number);
+          if (this.onDataUpdated) this.onDataUpdated();
           return {
             content: [
               {

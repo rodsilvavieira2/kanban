@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { Task } from "../../../../shared/schemas/models";
 import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
-import { ActivityLogRepository } from "../repositories/ActivityLogRepository";
+import { ActivityLogRepository } from "../../repositories/ActivityLogRepository";
 
 export class CreateTaskUseCase {
   constructor(

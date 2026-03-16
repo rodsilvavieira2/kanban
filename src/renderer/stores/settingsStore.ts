@@ -32,9 +32,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         settings: { ...state.settings, ...dbSettings },
         isLoading: false,
       }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
-        error: error.message || "Failed to load settings",
+        error: error instanceof Error ? error.message : "Failed to load settings",
         isLoading: false,
       });
     }
@@ -49,12 +49,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
     try {
       await kanbanApi.updateSettings({ [key]: value });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update setting:", error);
       // Revert on failure
       set({
         settings: currentSettings,
-        error: error.message || "Failed to update setting",
+        error: error instanceof Error ? error.message : "Failed to update setting",
       });
     }
   },
@@ -68,12 +68,12 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
     try {
       await kanbanApi.updateSettings(newSettings);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to update settings:", error);
       // Revert on failure
       set({
         settings: currentSettings,
-        error: error.message || "Failed to update settings",
+        error: error instanceof Error ? error.message : "Failed to update settings",
       });
     }
   },

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useKanbanStore } from "../stores/kanbanStore";
-import { ArrowLeft, X, Plus } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 
 export function CreateTask() {
   const navigate = useNavigate();
@@ -35,10 +35,10 @@ export function CreateTask() {
   };
 
   const handleCreate = async () => {
-    if (!title || !columnId) return;
+    if (!title || !columnId || !projectId) return;
 
     try {
-      await createTask(projectId!, {
+      await createTask(projectId, {
         title,
         description,
         columnId,

@@ -1,6 +1,6 @@
 import { Task } from "../../../../shared/schemas/models";
 import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
-import { ActivityLogRepository } from "../repositories/ActivityLogRepository";
+import { ActivityLogRepository } from "../../repositories/ActivityLogRepository";
 
 export class UpdateTaskUseCase {
   constructor(

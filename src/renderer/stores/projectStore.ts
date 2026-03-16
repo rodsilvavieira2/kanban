@@ -28,10 +28,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     try {
       const projects = await kanbanApi.getProjects();
       set({ projects, isLoading: false });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to load projects:", error);
       set({
-        error: error.message || "Failed to load projects",
+        error: error instanceof Error ? error.message : "Failed to load projects",
         isLoading: false,
       });
     }
@@ -42,8 +42,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       await kanbanApi.createProject(data);
       // Re-fetch to stay in sync with SQLite
       await get().loadProjects();
-    } catch (error: any) {
-      set({ error: error.message || "Failed to create project" });
+    } catch (error: unknown) {
+      set({ error: error instanceof Error ? error.message : "Failed to create project" });
       throw error;
     }
   },
@@ -53,9 +53,9 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       await kanbanApi.deleteProject(id);
       // Re-fetch to stay in sync with SQLite
       await get().loadProjects();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to delete project:", error);
-      set({ error: error.message || "Failed to delete project" });
+      set({ error: error instanceof Error ? error.message : "Failed to delete project" });
       throw error;
     }
   },

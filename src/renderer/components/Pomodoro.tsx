@@ -11,7 +11,6 @@ import {
   Coffee,
   RefreshCw,
   Clock,
-  CheckCircle2,
 } from "lucide-react";
 
 export function Pomodoro() {
@@ -40,7 +39,7 @@ export function Pomodoro() {
 
   const filteredTasks = useMemo(() => {
     if (selectedProjectId === "all") return tasks;
-    return tasks.filter((t: any) => t.projectId === selectedProjectId);
+    return tasks.filter((t: { projectId?: string }) => t.projectId === selectedProjectId);
   }, [tasks, selectedProjectId]);
 
   const selectedTask = useMemo(
