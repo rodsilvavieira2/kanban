@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { useSettingsStore } from "../stores/settingsStore";
+import { useProjectStore } from "../stores/projectStore";
 import {
   RotateCcw,
   Pause,
@@ -23,16 +24,24 @@ export function Pomodoro() {
   const notificationsEnabled = settings.notificationsEnabled === "true";
 
   const { tasks, isLoading, loadAllTasks, updateTaskTime } = useKanbanStore();
+  const { projects, loadProjects } = useProjectStore();
 
   const [timeLeft, setTimeLeft] = useState(focusTime * 60);
   const [totalTime, setTotalTime] = useState(focusTime * 60);
   const [isActive, setIsActive] = useState(false);
   const [roundsCompleted, setRoundsCompleted] = useState(0);
   const [isBreak, setIsBreak] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("all");
 
   useEffect(() => {
     loadAllTasks();
-  }, [loadAllTasks]);
+    loadProjects();
+  }, [loadAllTasks, loadProjects]);
+
+  const filteredTasks = useMemo(() => {
+    if (selectedProjectId === "all") return tasks;
+    return tasks.filter((t: any) => t.projectId === selectedProjectId);
+  }, [tasks, selectedProjectId]);
 
   const selectedTask = useMemo(
     () => tasks.find((t) => t.id === selectedTaskId),
@@ -88,6 +97,22 @@ export function Pomodoro() {
     [focusTime, sendNotification],
   );
 
+  const prevTimeLeft = useRef(timeLeft);
+  useEffect(() => {
+    if (isActive && !isBreak) {
+      const timeDiff = prevTimeLeft.current - timeLeft;
+      if (timeDiff > 0 && timeLeft < totalTime) {
+        const elapsed = totalTime - timeLeft;
+        if (elapsed > 0 && elapsed % 60 === 0) {
+          if (selectedTaskId) {
+            updateTaskTime(selectedTaskId, 1);
+          }
+        }
+      }
+    }
+    prevTimeLeft.current = timeLeft;
+  }, [timeLeft, isActive, isBreak, totalTime, selectedTaskId, updateTaskTime]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
@@ -99,10 +124,6 @@ export function Pomodoro() {
       setIsActive(false);
 
       if (!isBreak) {
-        // Focus session finished - Update task time
-        if (selectedTaskId) {
-          updateTaskTime(selectedTaskId, focusTime);
-        }
         startBreak(false);
       } else {
         startFocus(false);
@@ -116,9 +137,6 @@ export function Pomodoro() {
     isBreak,
     startBreak,
     startFocus,
-    selectedTaskId,
-    focusTime,
-    updateTaskTime,
   ]);
 
   const toggleTimer = () => {
@@ -259,26 +277,50 @@ export function Pomodoro() {
         <div className="tasks-panel">
           <div className="tasks-panel-header">
             <h3>Kanban Tasks</h3>
-            <button
-              className="icon-button"
-              onClick={() => loadAllTasks()}
-              disabled={isLoading}
-            >
-              <RefreshCw
-                size={18}
-                strokeWidth={2}
-                className={isLoading ? "animate-spin" : ""}
-              />
-            </button>
+            <div className="header-actions" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <select
+                className="project-select"
+                value={selectedProjectId}
+                onChange={(e) => setSelectedProjectId(e.target.value)}
+                style={{
+                  background: "transparent",
+                  border: "1px solid var(--accents-2)",
+                  color: "var(--accents-8)",
+                  borderRadius: "4px",
+                  padding: "4px 8px",
+                  fontSize: "12px",
+                  outline: "none",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="all">All Projects</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                className="icon-button"
+                onClick={() => loadAllTasks()}
+                disabled={isLoading}
+              >
+                <RefreshCw
+                  size={18}
+                  strokeWidth={2}
+                  className={isLoading ? "animate-spin" : ""}
+                />
+              </button>
+            </div>
           </div>
 
           <div className="tasks-list">
-            {tasks.length === 0 && !isLoading && (
+            {filteredTasks.length === 0 && !isLoading && (
               <p className="text-center text-accents-5 py-8">
                 No tasks found. Create some in a project first!
               </p>
             )}
-            {tasks.map((task) => (
+            {filteredTasks.map((task) => (
               <div
                 key={task.id}
                 className={`pomodoro-task-card ${selectedTaskId === task.id ? "active" : ""}`}

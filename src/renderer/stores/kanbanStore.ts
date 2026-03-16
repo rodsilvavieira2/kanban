@@ -49,7 +49,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       let allTasks: Task[] = [];
       for (const project of projects) {
         const { tasks } = await kanbanApi.getProjectData(project.id);
-        allTasks = [...allTasks, ...tasks];
+        allTasks = [...allTasks, ...tasks.map(t => ({ ...t, projectId: project.id }))];
       }
       set({ tasks: allTasks, isLoading: false });
     } catch (error: any) {

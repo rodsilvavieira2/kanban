@@ -28,6 +28,7 @@ export type Column = z.infer<typeof ColumnSchema>;
 export const TaskSchema = z.object({
   id: z.string().uuid(),
   columnId: z.string(),
+  projectId: z.string().optional(),
   title: z.string().min(1),
   description: z.string().optional(),
   dueDate: z.string().optional(),

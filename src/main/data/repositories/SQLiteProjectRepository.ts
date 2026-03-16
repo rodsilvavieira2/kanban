@@ -8,7 +8,7 @@ export class SQLiteProjectRepository implements IProjectRepository {
   async findAll(): Promise<Project[]> {
     const stmt = this.db.prepare(`
       SELECT p.*, 
-      (SELECT COUNT(id) FROM tasks t INNER JOIN columns c ON t.column_id = c.id WHERE c.project_id = p.id) as tasksCount 
+      (SELECT COUNT(t.id) FROM tasks t INNER JOIN columns c ON t.column_id = c.id WHERE c.project_id = p.id) as tasksCount 
       FROM projects p
     `);
     
