@@ -129,6 +129,7 @@ export function KanbanBoard() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
+                              onClick={() => navigate(`/projects/${projectId}/tasks/${task.id}/edit`)}
                             >
                               <h4 className="task-title">{task.title}</h4>
                               {task.description && (

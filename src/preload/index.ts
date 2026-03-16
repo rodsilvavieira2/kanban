@@ -11,6 +11,8 @@ const kanbanApi = {
   getProjectData: (projectId: string) =>
     ipcRenderer.invoke("get-project-data", projectId),
   createTask: (data: any) => ipcRenderer.invoke("create-task", data),
+  updateTask: (request: { taskId: string; data: any }) =>
+    ipcRenderer.invoke("update-task", request),
   moveTask: (request: any) => ipcRenderer.invoke("move-task", request),
   updateTaskTime: (taskId: string, minutes: number) =>
     ipcRenderer.invoke("update-task-time", { taskId, minutes }),

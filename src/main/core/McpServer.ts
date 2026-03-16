@@ -2,13 +2,13 @@ import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
   CallToolRequestSchema,
-  ListResourcesRequestSchema,
   ListToolsRequestSchema,
-  ReadResourceRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+
 import { GetProjectsUseCase } from "./useCases/project/GetProjectsUseCase";
 import { GetProjectDataUseCase } from "./useCases/project/GetProjectDataUseCase";
 import { CreateTaskUseCase } from "./useCases/task/CreateTaskUseCase";
+import { UpdateTaskUseCase } from "./useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "./useCases/task/UpdateTaskTimeUseCase";
 
@@ -19,9 +19,10 @@ export class McpServer {
     private getProjectsUseCase: GetProjectsUseCase,
     private getProjectDataUseCase: GetProjectDataUseCase,
     private createTaskUseCase: CreateTaskUseCase,
+    private updateTaskUseCase: UpdateTaskUseCase,
     private moveTaskUseCase: MoveTaskUseCase,
     private updateTaskTimeUseCase: UpdateTaskTimeUseCase,
-    private onUpdateCallback?: () => void,
+    private onDataUpdated: () => void,
   ) {
     this.server = new Server(
       {
@@ -98,8 +99,37 @@ export class McpServer {
             },
           },
           {
-            name: "move_task",
-            description:
+            name: "update_task",
+            description: "Update an existing task in the Kanban board",
+            inputSchema: {
+              type: "object",
+              properties: {
+                taskId: {
+                  type: "string",
+                  description: "The ID of the task to update",
+                },
+                title: {
+                  type: "string",
+                  description: "The new title of the task",
+                },
+                description: {
+                  type: "string",
+                  description: "The new description of the task",
+                },
+                columnId: {
+                  type: "string",
+                  description: "The ID of the column this task belongs to",
+                },
+                dueDate: {
+                  type: "string",
+                  description: "The new due date of the task (YYYY-MM-DD)",
+                },
+              },
+              required: ["taskId"],
+            },
+          },
+          {
+            name: "move_task",            description:
               "Move a task within a board (reorder or move between columns)",
             inputSchema: {
               type: "object",
@@ -145,6 +175,16 @@ export class McpServer {
           return {
             content: [
               { type: "text", text: `Task created successfully: ${task.id}` },
+            ],
+          };
+        }
+        case "update_task": {
+          const { taskId, ...taskData } = request.params.arguments as any;
+          const task = await this.updateTaskUseCase.execute(taskId, taskData);
+          if (this.onUpdateCallback) this.onUpdateCallback();
+          return {
+            content: [
+              { type: "text", text: `Task updated successfully: ${task.id}` },
             ],
           };
         }

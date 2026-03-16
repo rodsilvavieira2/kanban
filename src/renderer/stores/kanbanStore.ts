@@ -12,6 +12,7 @@ interface KanbanState {
   loadProjectData: (projectId: string) => Promise<void>;
   loadAllTasks: () => Promise<void>;
   createTask: (projectId: string, taskData: Partial<Task>) => Promise<void>;
+  updateTask: (taskId: string, taskData: Partial<Task>) => Promise<void>;
   moveTask: (request: {
     taskId: string;
     sourceColumnId: string;
@@ -65,6 +66,17 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       }));
     } catch (error: any) {
       set({ error: error.message || "Failed to create task" });
+    }
+  },
+
+  updateTask: async (taskId: string, taskData: Partial<Task>) => {
+    try {
+      const updatedTask = await kanbanApi.updateTask({ taskId, data: taskData });
+      set((state) => ({
+        tasks: state.tasks.map((t) => (t.id === taskId ? updatedTask : t)),
+      }));
+    } catch (error: any) {
+      set({ error: error.message || "Failed to update task" });
     }
   },
 

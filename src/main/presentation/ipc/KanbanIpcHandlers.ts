@@ -5,6 +5,7 @@ import { CreateProjectUseCase } from "../../core/useCases/project/CreateProjectU
 import { DeleteProjectUseCase } from "../../core/useCases/project/DeleteProjectUseCase";
 import { GetProjectDataUseCase } from "../../core/useCases/project/GetProjectDataUseCase";
 import { CreateTaskUseCase } from "../../core/useCases/task/CreateTaskUseCase";
+import { UpdateTaskUseCase } from "../../core/useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "../../core/useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "../../core/useCases/task/UpdateTaskTimeUseCase";
 import { GetRecentActivityUseCase } from "../../core/useCases/activity/GetRecentActivityUseCase";
@@ -18,6 +19,7 @@ export function setupKanbanIpcHandlers(
   deleteProjectUseCase: DeleteProjectUseCase,
   getProjectDataUseCase: GetProjectDataUseCase,
   createTaskUseCase: CreateTaskUseCase,
+  updateTaskUseCase: UpdateTaskUseCase,
   moveTaskUseCase: MoveTaskUseCase,
   updateTaskTimeUseCase: UpdateTaskTimeUseCase,
   getRecentActivityUseCase: GetRecentActivityUseCase,
@@ -71,6 +73,15 @@ export function setupKanbanIpcHandlers(
       return await createTaskUseCase.execute(taskData);
     } catch (error) {
       console.error("Failed to create task (IPC):", error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle("update-task", async (event, { taskId, data }) => {
+    try {
+      return await updateTaskUseCase.execute(taskId, data);
+    } catch (error) {
+      console.error("Failed to update task (IPC):", error);
       throw error;
     }
   });

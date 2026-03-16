@@ -17,6 +17,7 @@ import { DeleteProjectUseCase } from "./core/useCases/project/DeleteProjectUseCa
 import { GetProjectDataUseCase } from "./core/useCases/project/GetProjectDataUseCase";
 import { InitializeProjectColumnsUseCase } from "./core/useCases/column/InitializeProjectColumnsUseCase";
 import { CreateTaskUseCase } from "./core/useCases/task/CreateTaskUseCase";
+import { UpdateTaskUseCase } from "./core/useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./core/useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "./core/useCases/task/UpdateTaskTimeUseCase";
 import { GetRecentActivityUseCase } from "./core/useCases/activity/GetRecentActivityUseCase";
@@ -89,6 +90,10 @@ app.on("ready", async () => {
     taskRepository,
     activityLogRepository,
   );
+  const updateTaskUseCase = new UpdateTaskUseCase(
+    taskRepository,
+    activityLogRepository,
+  );
   const moveTaskUseCase = new MoveTaskUseCase(
     taskRepository,
     activityLogRepository,
@@ -112,6 +117,7 @@ app.on("ready", async () => {
     deleteProjectUseCase,
     getProjectDataUseCase,
     createTaskUseCase,
+    updateTaskUseCase,
     moveTaskUseCase,
     updateTaskTimeUseCase,
     getRecentActivityUseCase,
@@ -125,6 +131,7 @@ app.on("ready", async () => {
     getProjectsUseCase,
     getProjectDataUseCase,
     createTaskUseCase,
+    updateTaskUseCase,
     moveTaskUseCase,
     updateTaskTimeUseCase,
     () => {
