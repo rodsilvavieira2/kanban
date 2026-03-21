@@ -1,70 +1,70 @@
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  ListResourcesRequestSchema,
-  ReadResourceRequestSchema,
-} from "@modelcontextprotocol/sdk/types.js";
+import http from "node:http";
+import { McpServer as McpSdkServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import { z } from "zod";
 
 import { GetProjectsUseCase } from "./useCases/project/GetProjectsUseCase";
+import { CreateProjectUseCase } from "./useCases/project/CreateProjectUseCase";
+import { DeleteProjectUseCase } from "./useCases/project/DeleteProjectUseCase";
 import { GetProjectDataUseCase } from "./useCases/project/GetProjectDataUseCase";
 import { CreateTaskUseCase } from "./useCases/task/CreateTaskUseCase";
 import { UpdateTaskUseCase } from "./useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "./useCases/task/UpdateTaskTimeUseCase";
+import { GetRecentActivityUseCase } from "./useCases/activity/GetRecentActivityUseCase";
 
 export class McpServer {
-  private server: Server;
+  private server: McpSdkServer;
 
   constructor(
     private getProjectsUseCase: GetProjectsUseCase,
+    private createProjectUseCase: CreateProjectUseCase,
+    private deleteProjectUseCase: DeleteProjectUseCase,
     private getProjectDataUseCase: GetProjectDataUseCase,
     private createTaskUseCase: CreateTaskUseCase,
     private updateTaskUseCase: UpdateTaskUseCase,
     private moveTaskUseCase: MoveTaskUseCase,
     private updateTaskTimeUseCase: UpdateTaskTimeUseCase,
+    private getRecentActivityUseCase: GetRecentActivityUseCase,
     private onDataUpdated: () => void,
   ) {
-    this.server = new Server(
-      {
-        name: "taskmaster-mcp",
-        version: "1.0.0",
-      },
-      {
-        capabilities: {
-          resources: {},
-          tools: {},
-        },
-      },
-    );
+    this.server = new McpSdkServer({
+      name: "taskmaster-mcp",
+      version: "1.0.0",
+    });
 
     this.setupHandlers();
   }
 
   private setupHandlers() {
-    // List available resources
-    this.server.setRequestHandler(ListResourcesRequestSchema, async () => {
-      const projects = await this.getProjectsUseCase.execute();
-      return {
-        resources: projects.map((p) => ({
-          uri: `kanban://projects/${p.id}/board`,
-          name: `${p.name} Board State`,
-          mimeType: "application/json",
-          description: `Full state of the ${p.name} board including columns and tasks.`,
-        })),
-      };
+    // ── Resources ──────────────────────────────────────────────────────────────
+
+    const boardTemplate = new ResourceTemplate("kanban://projects/{projectId}/board", {
+      list: async () => {
+        const projects = await this.getProjectsUseCase.execute();
+        return {
+          resources: projects.map((p) => ({
+            uri: `kanban://projects/${p.id}/board`,
+            name: `${p.name} Board State`,
+            mimeType: "application/json",
+            description: `Full state of the ${p.name} board including columns and tasks.`,
+          })),
+        };
+      },
     });
 
-    // Read a specific resource
-    this.server.setRequestHandler(
-      ReadResourceRequestSchema,
-      async (request) => {
-        const uri = new URL(request.params.uri);
+    this.server.registerResource(
+      "board",
+      boardTemplate,
+      {
+        mimeType: "application/json",
+        description: "Full state of a project board including columns and tasks.",
+      },
+      async (uri) => {
         const projectId = uri.pathname.split("/")[2];
 
         if (uri.protocol !== "kanban:" || !projectId) {
-          throw new Error(`Invalid URI: ${request.params.uri}`);
+          throw new Error(`Invalid URI: ${uri.toString()}`);
         }
 
         const projectData = await this.getProjectDataUseCase.execute(projectId);
@@ -72,7 +72,7 @@ export class McpServer {
         return {
           contents: [
             {
-              uri: request.params.uri,
+              uri: uri.toString(),
               mimeType: "application/json",
               text: JSON.stringify(projectData, null, 2),
             },
@@ -81,145 +81,235 @@ export class McpServer {
       },
     );
 
-    // List available tools
-    this.server.setRequestHandler(ListToolsRequestSchema, async () => {
-      return {
-        tools: [
-          {
-            name: "create_task",
-            description: "Create a new task in a project board",
-            inputSchema: {
-              type: "object",
-              properties: {
-                projectId: { type: "string" },
-                columnId: { type: "string" },
-                title: { type: "string" },
-                description: { type: "string" },
-                dueDate: { type: "string" },
-              },
-              required: ["projectId", "columnId", "title"],
-            },
-          },
-          {
-            name: "update_task",
-            description: "Update an existing task in the Kanban board",
-            inputSchema: {
-              type: "object",
-              properties: {
-                taskId: {
-                  type: "string",
-                  description: "The ID of the task to update",
-                },
-                title: {
-                  type: "string",
-                  description: "The new title of the task",
-                },
-                description: {
-                  type: "string",
-                  description: "The new description of the task",
-                },
-                columnId: {
-                  type: "string",
-                  description: "The ID of the column this task belongs to",
-                },
-                dueDate: {
-                  type: "string",
-                  description: "The new due date of the task (YYYY-MM-DD)",
-                },
-              },
-              required: ["taskId"],
-            },
-          },
-          {
-            name: "move_task",            description:
-              "Move a task within a board (reorder or move between columns)",
-            inputSchema: {
-              type: "object",
-              properties: {
-                taskId: { type: "string" },
-                sourceColumnId: { type: "string" },
-                destinationColumnId: { type: "string" },
-                sourceIndex: { type: "number" },
-                destinationIndex: { type: "number" },
-              },
-              required: [
-                "taskId",
-                "sourceColumnId",
-                "destinationColumnId",
-                "sourceIndex",
-                "destinationIndex",
-              ],
-            },
-          },
-          {
-            name: "update_task_time",
-            description: "Add minutes to the time spent on a specific task",
-            inputSchema: {
-              type: "object",
-              properties: {
-                taskId: { type: "string" },
-                minutes: { type: "number" },
-              },
-              required: ["taskId", "minutes"],
-            },
-          },
-        ],
-      };
-    });
+    // ── Project tools ──────────────────────────────────────────────────────────
 
-    // Call a tool
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
-      switch (request.params.name) {
-        case "create_task": {
-          const taskData = request.params.arguments as Record<string, unknown>;
-          const task = await this.createTaskUseCase.execute(taskData as { title: string; description?: string; columnId: string; projectId: string; dueDate?: string });
-          if (this.onDataUpdated) this.onDataUpdated();
-          return {
-            content: [
-              { type: "text", text: `Task created successfully: ${task.id}` },
-            ],
-          };
-        }
-        case "update_task": {
-          const { taskId, ...taskData } = request.params.arguments as Record<string, unknown>;
-          const task = await this.updateTaskUseCase.execute(taskId as string, taskData);
-          if (this.onDataUpdated) this.onDataUpdated();
-          return {
-            content: [
-              { type: "text", text: `Task updated successfully: ${task.id}` },
-            ],
-          };
-        }
-        case "move_task": {
-          const moveRequest = request.params.arguments as { taskId: string; sourceColumnId: string; destinationColumnId: string; sourceIndex: number; destinationIndex: number; };
-          await this.moveTaskUseCase.execute(moveRequest);
-          if (this.onDataUpdated) this.onDataUpdated();
-          return {
-            content: [{ type: "text", text: "Task moved successfully" }],
-          };
-        }
-        case "update_task_time": {
-          const { taskId, minutes } = request.params.arguments as Record<string, unknown>;
-          await this.updateTaskTimeUseCase.execute(taskId as string, minutes as number);
-          if (this.onDataUpdated) this.onDataUpdated();
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Successfully added ${minutes} minutes to task ${taskId}`,
-              },
-            ],
-          };
-        }
-        default:
-          throw new Error(`Unknown tool: ${request.params.name}`);
-      }
-    });
+    this.server.registerTool(
+      "get_projects",
+      {
+        title: "Get Projects",
+        description:
+          "List all projects. Call this first to obtain project and column IDs required by other tools.",
+      },
+      async () => {
+        const projects = await this.getProjectsUseCase.execute();
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(projects, null, 2),
+            },
+          ],
+        };
+      },
+    );
+
+    this.server.registerTool(
+      "create_project",
+      {
+        title: "Create Project",
+        description: "Create a new Kanban project board. Returns the created project including its generated ID.",
+        inputSchema: {
+          name: z.string().describe("The name of the project"),
+          description: z.string().optional().describe("An optional description of the project"),
+          status: z
+            .enum(["Planning", "In Progress", "Completed"])
+            .optional()
+            .describe("Initial project status (defaults to Planning)"),
+          dueDate: z.string().optional().describe("Optional due date for the project (YYYY-MM-DD)"),
+        },
+      },
+      async ({ name, description, status, dueDate }) => {
+        const project = await this.createProjectUseCase.execute({ name, description, status, dueDate });
+        this.onDataUpdated();
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Project created successfully: ${JSON.stringify(project, null, 2)}`,
+            },
+          ],
+        };
+      },
+    );
+
+    this.server.registerTool(
+      "delete_project",
+      {
+        title: "Delete Project",
+        description: "Permanently delete a project and all its columns and tasks.",
+        inputSchema: {
+          projectId: z.string().describe("The ID of the project to delete"),
+        },
+      },
+      async ({ projectId }) => {
+        await this.deleteProjectUseCase.execute(projectId);
+        this.onDataUpdated();
+        return {
+          content: [{ type: "text", text: `Project ${projectId} deleted successfully` }],
+        };
+      },
+    );
+
+    // ── Task tools ─────────────────────────────────────────────────────────────
+
+    this.server.registerTool(
+      "create_task",
+      {
+        title: "Create Task",
+        description:
+          "Create a new task in a project column. Use get_projects first to obtain valid projectId and columnId values.",
+        inputSchema: {
+          projectId: z.string().describe("The ID of the project"),
+          columnId: z.string().describe("The ID of the column to place the task in"),
+          title: z.string().describe("The title of the task"),
+          description: z.string().optional().describe("An optional description of the task"),
+          dueDate: z.string().optional().describe("Optional due date (YYYY-MM-DD)"),
+          tags: z.array(z.string()).optional().describe("Optional list of tag labels for the task"),
+        },
+      },
+      async ({ projectId, columnId, title, description, dueDate, tags }) => {
+        const task = await this.createTaskUseCase.execute({ projectId, columnId, title, description, dueDate, tags });
+        this.onDataUpdated();
+        return {
+          content: [
+            { type: "text", text: `Task created successfully: ${JSON.stringify(task, null, 2)}` },
+          ],
+        };
+      },
+    );
+
+    this.server.registerTool(
+      "update_task",
+      {
+        title: "Update Task",
+        description: "Update one or more fields of an existing task. Only supplied fields are changed.",
+        inputSchema: {
+          taskId: z.string().describe("The ID of the task to update"),
+          title: z.string().optional().describe("New title for the task"),
+          description: z.string().optional().describe("New description for the task"),
+          columnId: z.string().optional().describe("Move the task to a different column by its ID"),
+          dueDate: z.string().optional().describe("New due date (YYYY-MM-DD)"),
+          tags: z.array(z.string()).optional().describe("Replacement list of tag labels (overwrites existing tags)"),
+        },
+      },
+      async ({ taskId, ...taskData }) => {
+        const task = await this.updateTaskUseCase.execute(taskId, taskData);
+        this.onDataUpdated();
+        return {
+          content: [
+            { type: "text", text: `Task updated successfully: ${JSON.stringify(task, null, 2)}` },
+          ],
+        };
+      },
+    );
+
+    this.server.registerTool(
+      "move_task",
+      {
+        title: "Move Task",
+        description:
+          "Reorder a task within a column or move it to a different column, preserving position. " +
+          "Use index 0 for the top of the column.",
+        inputSchema: {
+          taskId: z.string().describe("The ID of the task to move"),
+          sourceColumnId: z.string().describe("The ID of the column the task is currently in"),
+          destinationColumnId: z.string().describe("The ID of the column to move the task to (same as sourceColumnId for reorder)"),
+          sourceIndex: z.number().int().min(0).describe("Current zero-based position of the task in the source column"),
+          destinationIndex: z.number().int().min(0).describe("Target zero-based position in the destination column"),
+        },
+      },
+      async (moveRequest) => {
+        await this.moveTaskUseCase.execute(moveRequest);
+        this.onDataUpdated();
+        return {
+          content: [{ type: "text", text: "Task moved successfully" }],
+        };
+      },
+    );
+
+    this.server.registerTool(
+      "update_task_time",
+      {
+        title: "Update Task Time",
+        description: "Add minutes to the time spent on a task. Use positive values only.",
+        inputSchema: {
+          taskId: z.string().describe("The ID of the task"),
+          minutes: z.number().positive().describe("Number of minutes to add to the task's time spent"),
+        },
+      },
+      async ({ taskId, minutes }) => {
+        await this.updateTaskTimeUseCase.execute(taskId, minutes);
+        this.onDataUpdated();
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Successfully added ${minutes} minutes to task ${taskId}`,
+            },
+          ],
+        };
+      },
+    );
+
+    // ── Activity tools ─────────────────────────────────────────────────────────
+
+    this.server.registerTool(
+      "get_recent_activity",
+      {
+        title: "Get Recent Activity",
+        description:
+          "Retrieve the most recent activity log entries across all projects. " +
+          "Useful for understanding what changed recently before taking further actions.",
+        inputSchema: {
+          limit: z
+            .number()
+            .int()
+            .min(1)
+            .max(200)
+            .optional()
+            .describe("Maximum number of entries to return (default: 50, max: 200)"),
+        },
+      },
+      async ({ limit }) => {
+        const activity = await this.getRecentActivityUseCase.execute(limit ?? 50);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(activity, null, 2),
+            },
+          ],
+        };
+      },
+    );
   }
 
-  async start() {
-    const transport = new StdioServerTransport();
+  async start(port = 3282) {
+    const transport = new StreamableHTTPServerTransport({
+      sessionIdGenerator: undefined, // stateless — no session tracking needed for a local desktop app
+    });
+
+    const httpServer = http.createServer(async (req, res) => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, mcp-session-id");
+
+      if (req.method === "OPTIONS") {
+        res.writeHead(204).end();
+        return;
+      }
+
+      if (req.url === "/mcp") {
+        await transport.handleRequest(req, res);
+      } else {
+        res.writeHead(404).end("Not found");
+      }
+    });
+
     await this.server.connect(transport);
-    console.log("MCP Server started on stdio");
+
+    await new Promise<void>((resolve) => httpServer.listen(port, "127.0.0.1", resolve));
+
+    console.log(`MCP Server started on http://127.0.0.1:${port}/mcp`);
   }
 }

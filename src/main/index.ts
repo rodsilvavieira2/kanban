@@ -129,11 +129,14 @@ app.on("ready", async () => {
   // 5. Setup MCP Server (for AI)
   const mcpServer = new McpServer(
     getProjectsUseCase,
+    createProjectUseCase,
+    deleteProjectUseCase,
     getProjectDataUseCase,
     createTaskUseCase,
     updateTaskUseCase,
     moveTaskUseCase,
     updateTaskTimeUseCase,
+    getRecentActivityUseCase,
     () => {
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.webContents.send("kanban-updated");
