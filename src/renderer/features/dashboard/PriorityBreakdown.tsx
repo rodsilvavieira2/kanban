@@ -3,6 +3,7 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 
 import { useKanbanStore } from "../../stores/kanbanStore";
+import { getThemeColor } from "../../utils/themeUtils";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -22,10 +23,14 @@ export function PriorityBreakdown() {
     const column = columns.find((c) => c.id === task.columnId);
     if (column) {
       const title = column.title;
-      const current = columnStats.get(title) || { value: 0, color: column.color || "#888888" };
+      // Use the color key from the column to get the theme-aware color
+      const colorKey = column.color || "gray";
+      const color = getThemeColor(colorKey);
+      
+      const current = columnStats.get(title) || { value: 0, color };
       columnStats.set(title, {
         value: current.value + 1,
-        color: current.color
+        color
       });
     }
   });

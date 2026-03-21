@@ -6,9 +6,9 @@ export class InitializeProjectColumnsUseCase {
 
   async execute(projectId: string): Promise<void> {
     const defaultColumns = [
-      { title: "Todo", order: 0, color: "#666666" },
-      { title: "In Progress", order: 1, color: "#0070F3" },
-      { title: "Completed", order: 2, color: "#0070F3" },
+      { title: "Todo", order: 0, color: "gray" },
+      { title: "In Progress", order: 1, color: "blue" },
+      { title: "Completed", order: 2, color: "green" },
     ];
 
     for (const col of defaultColumns) {
