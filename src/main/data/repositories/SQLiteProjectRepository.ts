@@ -44,9 +44,9 @@ export class SQLiteProjectRepository implements IProjectRepository {
       stmt.run(id, name, description, status, dueDate);
     }
     
-    const project = await this.findById(id);
-    if (!project) throw new Error("Project not found");
-    return project;
+    const output = await this.findById(id);
+    if (!output) throw new Error("Project not found");
+    return output;
   }
 
   async delete(id: string): Promise<void> {

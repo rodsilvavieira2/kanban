@@ -51,9 +51,9 @@ export class SQLiteTaskRepository implements ITaskRepository {
       stmt.run(id, columnId, title, description, dueDate, order, timeSpentMinutes);
     }
 
-    const task = await this.findById(id);
-    if (!task) throw new Error("Task not found");
-    return task;
+    const saved = await this.findById(id);
+    if (!saved) throw new Error("Task not found");
+    return saved;
   }
 
   async delete(id: string): Promise<void> {
