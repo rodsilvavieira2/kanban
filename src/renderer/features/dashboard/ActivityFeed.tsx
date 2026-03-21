@@ -115,29 +115,31 @@ export function ActivityFeed() {
       {activities.length === 0 ? (
         <p className="text-accents-5 text-sm">No recent activity.</p>
       ) : (
-        <div className="activity-timeline">
-          {activities.map((activity) => (
-            <div key={activity.id} className="timeline-item">
-              <div
-                className={`timeline-icon ${getActionClass(activity.action)}`}
-              >
-                {getIcon(activity.action)}
+        <div className="activity-feed-content">
+          <div className="activity-timeline">
+            {activities.map((activity) => (
+              <div key={activity.id} className="timeline-item">
+                <div
+                  className={`timeline-icon ${getActionClass(activity.action)}`}
+                >
+                  {getIcon(activity.action)}
+                </div>
+                <div className="timeline-content">
+                  <p>
+                    <strong>{activity.action}</strong>
+                    {activity.details && (
+                      <span className="text-accents-5 d-block text-xs mt-1">
+                        {activity.details}
+                      </span>
+                    )}
+                  </p>
+                  <span className="time">
+                    {getRelativeTime(activity.createdAt)}
+                  </span>
+                </div>
               </div>
-              <div className="timeline-content">
-                <p>
-                  <strong>{activity.action}</strong>
-                  {activity.details && (
-                    <span className="text-accents-5 d-block text-xs mt-1">
-                      {activity.details}
-                    </span>
-                  )}
-                </p>
-                <span className="time">
-                  {getRelativeTime(activity.createdAt)}
-                </span>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

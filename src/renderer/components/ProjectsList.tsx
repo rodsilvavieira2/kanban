@@ -11,6 +11,12 @@ export function ProjectsList() {
   const deleteProject = useProjectStore((state) => state.deleteProject);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState<"name" | "createdAt">("name");
+  const [filterStatus, setFilterStatus] = useState<string>("All");
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+
   const [confirmConfig, setConfirmConfig] = useState<{
     isOpen: boolean;
     title: string;
@@ -27,6 +33,8 @@ export function ProjectsList() {
     variant: "primary",
   });
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const filterRef = useRef<HTMLDivElement>(null);
+  const sortRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadProjects();
@@ -34,11 +42,18 @@ export function ProjectsList() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(target)
       ) {
         setOpenDropdownId(null);
+      }
+      if (filterRef.current && !filterRef.current.contains(target)) {
+        setIsFilterOpen(false);
+      }
+      if (sortRef.current && !sortRef.current.contains(target)) {
+        setIsSortOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -81,6 +96,24 @@ export function ProjectsList() {
   const closeConfirm = () => {
     setConfirmConfig((prev) => ({ ...prev, isOpen: false }));
   };
+
+  // Filter and Sort logic
+  const filteredAndSortedProjects = projects
+    .filter((project) => {
+      const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus = filterStatus === "All" || project.status === filterStatus;
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      if (sortOption === "name") {
+        return a.name.localeCompare(b.name);
+      } else if (sortOption === "createdAt") {
+        const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return dateB - dateA;
+      }
+      return 0;
+    });
 
   // Computed stats from real data
   const activeCount = projects.filter(
@@ -191,7 +224,12 @@ export function ProjectsList() {
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input type="text" placeholder="Search projects..." />
+            <input
+              type="text"
+              placeholder="Search projects..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <button className="btn-primary" onClick={openModal}>
             <svg
@@ -284,37 +322,112 @@ export function ProjectsList() {
           <div className="projects-list-header">
             <h3>All Projects</h3>
             <div className="projects-list-filters">
-              <button className="btn-secondary filter-btn">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+              <div className="options-dropdown-container" ref={filterRef}>
+                <button
+                  className={`btn-secondary filter-btn ${filterStatus !== "All" ? "active" : ""}`}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
                 >
-                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                </svg>
-                Filter
-              </button>
-              <button className="btn-secondary filter-btn">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                  </svg>
+                  {filterStatus === "All" ? "Filter" : filterStatus}
+                </button>
+                {isFilterOpen && (
+                  <div className="options-dropdown filter-dropdown">
+                    <div className="dropdown-label">Filter by Status</div>
+                    <button
+                      className={`dropdown-item ${filterStatus === "All" ? "active" : ""}`}
+                      onClick={() => {
+                        setFilterStatus("All");
+                        setIsFilterOpen(false);
+                      }}
+                    >
+                      All Statuses
+                    </button>
+                    <button
+                      className={`dropdown-item ${filterStatus === "Planning" ? "active" : ""}`}
+                      onClick={() => {
+                        setFilterStatus("Planning");
+                        setIsFilterOpen(false);
+                      }}
+                    >
+                      Planning
+                    </button>
+                    <button
+                      className={`dropdown-item ${filterStatus === "In Progress" ? "active" : ""}`}
+                      onClick={() => {
+                        setFilterStatus("In Progress");
+                        setIsFilterOpen(false);
+                      }}
+                    >
+                      In Progress
+                    </button>
+                    <button
+                      className={`dropdown-item ${filterStatus === "Completed" ? "active" : ""}`}
+                      onClick={() => {
+                        setFilterStatus("Completed");
+                        setIsFilterOpen(false);
+                      }}
+                    >
+                      Completed
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="options-dropdown-container" ref={sortRef}>
+                <button
+                  className="btn-secondary filter-btn"
+                  onClick={() => setIsSortOpen(!isSortOpen)}
                 >
-                  <line x1="12" y1="5" x2="12" y2="19"></line>
-                  <polyline points="19 12 12 19 5 12"></polyline>
-                </svg>
-                Sort
-              </button>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <polyline points="19 12 12 19 5 12"></polyline>
+                  </svg>
+                  Sort: {sortOption === "name" ? "Name" : "Date"}
+                </button>
+                {isSortOpen && (
+                  <div className="options-dropdown sort-dropdown">
+                    <div className="dropdown-label">Sort by</div>
+                    <button
+                      className={`dropdown-item ${sortOption === "name" ? "active" : ""}`}
+                      onClick={() => {
+                        setSortOption("name");
+                        setIsSortOpen(false);
+                      }}
+                    >
+                      Project Name (A-Z)
+                    </button>
+                    <button
+                      className={`dropdown-item ${sortOption === "createdAt" ? "active" : ""}`}
+                      onClick={() => {
+                        setSortOption("createdAt");
+                        setIsSortOpen(false);
+                      }}
+                    >
+                      Creation Date (Newest)
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -329,137 +442,143 @@ export function ProjectsList() {
             </div>
 
             <div className="projects-table-body">
-              {projects.map((project) => (
-                <div
-                  className="projects-table-row"
-                  key={project.id}
-                  onClick={() => navigate(`/projects/${project.id}`)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <div className="table-cell col-name">
-                    <div className="project-icon-wrapper">
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="var(--accent-color)"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                      </svg>
-                    </div>
-                    <div className="project-name-info">
-                      <h4>{project.name}</h4>
-                      <p>{project.description}</p>
-                    </div>
-                  </div>
-                  <div className="table-cell col-status">
-                    <span
-                      className={`status-badge ${(project.status || "planning").toLowerCase().replace(" ", "-")}`}
-                    >
-                      {project.status || "Planning"}
-                    </span>
-                  </div>
-                  <div className="table-cell col-progress">
-                    <div className="progress-cell-wrapper">
-                      <div className="progress-bar-small">
-                        <div
-                          className={`progress ${project.progress === 100 ? "completed" : "active"}`}
-                          style={{ width: `${project.progress}%` }}
-                        ></div>
-                      </div>
-                      <span className="progress-text">{project.progress}%</span>
-                    </div>
-                  </div>
-                  <div className="table-cell col-due">
-                    <span className="due-date-text">
-                      {project.dueDate || "—"}
-                    </span>
-                  </div>
-                  <div className="table-cell col-tasks">
-                    <span className="tasks-count">{project.tasksCount}</span>
-                  </div>
-                  <div className="table-cell col-actions">
-                    <div
-                      className="options-dropdown-container"
-                      ref={openDropdownId === project.id ? dropdownRef : null}
-                    >
-                      <button
-                        className="icon-button"
-                        onClick={(e) => toggleDropdown(e, project.id)}
-                      >
+              {filteredAndSortedProjects.length === 0 ? (
+                <div className="no-results">
+                  <p>No projects match your criteria.</p>
+                </div>
+              ) : (
+                filteredAndSortedProjects.map((project) => (
+                  <div
+                    className="projects-table-row"
+                    key={project.id}
+                    onClick={() => navigate(`/projects/${project.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <div className="table-cell col-name">
+                      <div className="project-icon-wrapper">
                         <svg
-                          width="16"
-                          height="16"
+                          width="18"
+                          height="18"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="currentColor"
+                          stroke="var(--accent-color)"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <circle cx="12" cy="12" r="1"></circle>
-                          <circle cx="19" cy="12" r="1"></circle>
-                          <circle cx="5" cy="12" r="1"></circle>
+                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                         </svg>
-                      </button>
-                      {openDropdownId === project.id && (
-                        <div className="options-dropdown">
-                          <button
-                            className="dropdown-item"
-                            onClick={(e) => handleEdit(e, project.id)}
-                          >
-                            <svg
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                            </svg>
-                            Edit
-                          </button>
-                          <button
-                            className="dropdown-item delete"
-                            onClick={(e) => handleDelete(e, project.id)}
-                          >
-                            <svg
-                              width="14"
-                              height="14"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            >
-                              <polyline points="3 6 5 6 21 6"></polyline>
-                              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                              <line x1="10" y1="11" x2="10" y2="17"></line>
-                              <line x1="14" y1="11" x2="14" y2="17"></line>
-                            </svg>
-                            Delete
-                          </button>
+                      </div>
+                      <div className="project-name-info">
+                        <h4>{project.name}</h4>
+                        <p>{project.description}</p>
+                      </div>
+                    </div>
+                    <div className="table-cell col-status">
+                      <span
+                        className={`status-badge ${(project.status || "planning").toLowerCase().replace(" ", "-")}`}
+                      >
+                        {project.status || "Planning"}
+                      </span>
+                    </div>
+                    <div className="table-cell col-progress">
+                      <div className="progress-cell-wrapper">
+                        <div className="progress-bar-small">
+                          <div
+                            className={`progress ${project.progress === 100 ? "completed" : "active"}`}
+                            style={{ width: `${project.progress}%` }}
+                          ></div>
                         </div>
-                      )}
+                        <span className="progress-text">{project.progress}%</span>
+                      </div>
+                    </div>
+                    <div className="table-cell col-due">
+                      <span className="due-date-text">
+                        {project.dueDate || "—"}
+                      </span>
+                    </div>
+                    <div className="table-cell col-tasks">
+                      <span className="tasks-count">{project.tasksCount}</span>
+                    </div>
+                    <div className="table-cell col-actions">
+                      <div
+                        className="options-dropdown-container"
+                        ref={openDropdownId === project.id ? dropdownRef : null}
+                      >
+                        <button
+                          className="icon-button"
+                          onClick={(e) => toggleDropdown(e, project.id)}
+                        >
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <circle cx="12" cy="12" r="1"></circle>
+                            <circle cx="19" cy="12" r="1"></circle>
+                            <circle cx="5" cy="12" r="1"></circle>
+                          </svg>
+                        </button>
+                        {openDropdownId === project.id && (
+                          <div className="options-dropdown">
+                            <button
+                              className="dropdown-item"
+                              onClick={(e) => handleEdit(e, project.id)}
+                            >
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                              </svg>
+                              Edit
+                            </button>
+                            <button
+                              className="dropdown-item delete"
+                              onClick={(e) => handleDelete(e, project.id)}
+                            >
+                              <svg
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                              </svg>
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
           <div className="projects-pagination">
             <span className="pagination-info">
-              Showing <b>{projects.length}</b> of <b>{projects.length}</b>{" "}
+              Showing <b>{filteredAndSortedProjects.length}</b> of <b>{projects.length}</b>{" "}
               projects
             </span>
             <div className="pagination-controls">
