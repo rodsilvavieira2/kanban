@@ -34,10 +34,17 @@ export function EditTask() {
       setDescription(task.description || "");
       setColumnId(task.columnId);
       setDueDate(task.dueDate || "");
-      // Currently task schema does not have a native tags array, 
-      // but if we were storing them somewhere, we'd initialize here.
+      setSelectedTags(task.tags || []);
     }
   }, [tasks, taskId]);
+
+  useEffect(() => {
+    const allTags = new Set<string>();
+    tasks.forEach((t) => {
+      if (t.tags) t.tags.forEach((tag) => allTags.add(tag));
+    });
+    setAvailableTags(Array.from(allTags));
+  }, [tasks]);
 
   const handleCancel = () => {
     navigate(`/projects/${projectId}`);
@@ -52,6 +59,7 @@ export function EditTask() {
         description,
         columnId,
         dueDate: dueDate || undefined,
+        tags: selectedTags,
       });
       navigate(`/projects/${projectId}`);
     } catch (error) {
@@ -189,6 +197,7 @@ export function EditTask() {
                         <span key={tag} className="tag-chip">
                           {tag}
                           <button
+                            type="button"
                             className="remove-tag"
                             onClick={() => removeTag(tag)}
                           >

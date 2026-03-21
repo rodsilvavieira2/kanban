@@ -9,7 +9,7 @@ export function CreateTask() {
   const location = useLocation();
   const stateColumnId = location.state?.columnId;
 
-  const { columns, createTask } = useKanbanStore();
+  const { columns, tasks, createTask } = useKanbanStore();
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -30,6 +30,14 @@ export function CreateTask() {
     }
   }, [columns, columnId]);
 
+  useEffect(() => {
+    const allTags = new Set<string>();
+    tasks.forEach((t) => {
+      if (t.tags) t.tags.forEach((tag) => allTags.add(tag));
+    });
+    setAvailableTags(Array.from(allTags));
+  }, [tasks]);
+
   const handleCancel = () => {
     navigate(`/projects/${projectId}`);
   };
@@ -43,6 +51,7 @@ export function CreateTask() {
         description,
         columnId,
         dueDate: dueDate || undefined,
+        tags: selectedTags,
       });
       navigate(`/projects/${projectId}`);
     } catch (error) {
@@ -180,6 +189,7 @@ export function CreateTask() {
                         <span key={tag} className="tag-chip">
                           {tag}
                           <button
+                            type="button"
                             className="remove-tag"
                             onClick={() => removeTag(tag)}
                           >

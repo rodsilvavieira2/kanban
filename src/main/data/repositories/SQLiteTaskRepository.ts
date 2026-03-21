@@ -1,14 +1,25 @@
 import { Database } from 'better-sqlite3';
 import { Task } from '../../../shared/schemas/models';
 import { ITaskRepository } from '../../core/domain/repositories/ITaskRepository';
+import crypto from 'crypto';
 
 export class SQLiteTaskRepository implements ITaskRepository {
   constructor(private db: Database) {}
 
+  private getTagsForTask(taskId: string): string[] {
+    const stmt = this.db.prepare(`
+      SELECT t.name FROM tags t
+      INNER JOIN task_tags tt ON t.id = tt.tag_id
+      WHERE tt.task_id = ?
+    `);
+    const rows = stmt.all(taskId) as { name: string }[];
+    return rows.map(r => r.name);
+  }
+
   async findAllByColumnId(columnId: string): Promise<Task[]> {
     const stmt = this.db.prepare('SELECT * FROM tasks WHERE column_id = ? ORDER BY "order" ASC');
     const rows = stmt.all(columnId) as Record<string, unknown>[];
-    return rows.map(row => this.mapToEntity(row));
+    return rows.map(row => this.mapToEntity(row, this.getTagsForTask(row.id as string)));
   }
 
   async findAllByProjectId(projectId: string): Promise<Task[]> {
@@ -20,7 +31,7 @@ export class SQLiteTaskRepository implements ITaskRepository {
       ORDER BY c."order" ASC, t."order" ASC
     `);
     const rows = stmt.all(projectId) as Record<string, unknown>[];
-    return rows.map(row => this.mapToEntity(row));
+    return rows.map(row => this.mapToEntity(row, this.getTagsForTask(row.id as string)));
   }
 
   async findById(id: string): Promise<Task | undefined> {
@@ -28,11 +39,11 @@ export class SQLiteTaskRepository implements ITaskRepository {
     const row = stmt.get(id) as Record<string, unknown>;
 
     if (!row) return undefined;
-    return this.mapToEntity(row);
+    return this.mapToEntity(row, this.getTagsForTask(id));
   }
 
   async save(task: Task): Promise<Task> {
-    const { id, columnId, title, description, dueDate, order, timeSpentMinutes } = task;
+    const { id, columnId, title, description, dueDate, order, timeSpentMinutes, tags } = task;
 
     const existing = await this.findById(id);
 
@@ -49,6 +60,27 @@ export class SQLiteTaskRepository implements ITaskRepository {
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
       stmt.run(id, columnId, title, description, dueDate, order, timeSpentMinutes);
+    }
+
+    if (tags) {
+      this.db.prepare('DELETE FROM task_tags WHERE task_id = ?').run(id);
+
+      const insertTagStmt = this.db.prepare('INSERT OR IGNORE INTO tags (id, name) VALUES (?, ?)');
+      const getTagStmt = this.db.prepare('SELECT id FROM tags WHERE name = ?');
+      const insertTaskTagStmt = this.db.prepare('INSERT INTO task_tags (task_id, tag_id) VALUES (?, ?)');
+
+      for (const tagName of tags) {
+        const normalizedTag = tagName.trim();
+        if (!normalizedTag) continue;
+
+        const tagId = crypto.randomUUID();
+        insertTagStmt.run(tagId, normalizedTag);
+
+        const row = getTagStmt.get(normalizedTag) as { id: string };
+        if (row && row.id) {
+          insertTaskTagStmt.run(id, row.id);
+        }
+      }
     }
 
     const saved = await this.findById(id);
@@ -83,17 +115,18 @@ export class SQLiteTaskRepository implements ITaskRepository {
     stmt.run(minutes, taskId);
   }
 
-  private mapToEntity(row: Record<string, unknown>): Task {
+  private mapToEntity(row: Record<string, unknown>, tags: string[] = []): Task {
     return {
-      id: row.id,
-      columnId: row.column_id,
-      title: row.title,
-      description: row.description || '',
-      dueDate: row.due_date || undefined,
-      order: row.order,
-      timeSpentMinutes: row.time_spent_minutes || 0,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      id: row.id as string,
+      columnId: row.column_id as string,
+      title: row.title as string,
+      description: (row.description as string) || '',
+      dueDate: (row.due_date as string) || undefined,
+      order: row.order as number,
+      timeSpentMinutes: (row.time_spent_minutes as number) || 0,
+      tags,
+      createdAt: row.created_at as string,
+      updatedAt: row.updated_at as string,
     };
   }
 }

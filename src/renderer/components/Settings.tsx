@@ -2,6 +2,7 @@ import React from "react";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useSettingsStore } from "../stores/settingsStore";
 import { kanbanApi } from "../api";
+import { themes } from "../../shared/themes";
 import {
   Sliders,
   Clock,
@@ -110,6 +111,26 @@ export function Settings() {
                     <option value="dark">Dark Mode</option>
                     <option value="light">Light Mode</option>
                     <option value="system">System Default</option>
+                  </select>
+                </div>
+              </div>
+              <div className="settings-divider"></div>
+              <div className="settings-card-row">
+                <div className="settings-card-info">
+                  <h4>Color Scheme</h4>
+                  <p>Choose your preferred color palette.</p>
+                </div>
+                <div className="settings-card-actions">
+                  <select
+                    className="form-input"
+                    value={settings.colorScheme || "Base16 Default"}
+                    onChange={(e) => updateSetting("colorScheme", e.target.value)}
+                  >
+                    {themes.map((t) => (
+                      <option key={t.name} value={t.name}>
+                        {t.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

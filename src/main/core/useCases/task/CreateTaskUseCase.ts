@@ -27,6 +27,7 @@ export class CreateTaskUseCase {
       dueDate: taskData.dueDate,
       order,
       timeSpentMinutes: 0,
+      tags: taskData.tags || [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

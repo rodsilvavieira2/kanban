@@ -1,0 +1,689 @@
+[
+  {
+    "theme": "Day",
+    "light": {
+      "bg": "#e1e2e7",
+      "fg": "#3760bf",
+      "red": "#f52a65",
+      "green": "#587539",
+      "yellow": "#8c6c3e",
+      "blue": "#2e7de9",
+      "magenta": "#9854f1",
+      "cyan": "#007197"
+    },
+    "dark": {
+      "bg": "#1a1b26",
+      "fg": "#c0caf5",
+      "red": "#f7768e",
+      "green": "#9ece6a",
+      "yellow": "#e0af68",
+      "blue": "#7aa2f7",
+      "magenta": "#bb9af7",
+      "cyan": "#7dcfff"
+    }
+  },
+  {
+    "theme": "Night Owl",
+    "light": {
+      "bg": "#fbfbfb",
+      "fg": "#403f53",
+      "red": "#de3d3b",
+      "green": "#08916a",
+      "yellow": "#e6b450",
+      "blue": "#288ed7",
+      "magenta": "#d60a84",
+      "cyan": "#0c969b"
+    },
+    "dark": {
+      "bg": "#011627",
+      "fg": "#d6deeb",
+      "red": "#ef5350",
+      "green": "#22da6e",
+      "yellow": "#addb67",
+      "blue": "#82aaff",
+      "magenta": "#c792ea",
+      "cyan": "#21c7a8"
+    }
+  },
+  {
+    "theme": "Modus",
+    "light": {
+      "bg": "#ffffff",
+      "fg": "#000000",
+      "red": "#a60000",
+      "green": "#005e00",
+      "yellow": "#813e00",
+      "blue": "#0031a9",
+      "magenta": "#721045",
+      "cyan": "#00538b"
+    },
+    "dark": {
+      "bg": "#000000",
+      "fg": "#ffffff",
+      "red": "#ff5f59",
+      "green": "#44bc44",
+      "yellow": "#d0bc00",
+      "blue": "#2fafff",
+      "magenta": "#feacd0",
+      "cyan": "#00d3d0"
+    }
+  },
+    {
+    "theme": "Iceberg",
+    "light": {
+      "bg": "#f6f8fa",
+      "fg": "#516d7b",
+      "red": "#e46876",
+      "green": "#8abf66",
+      "yellow": "#ddb140",
+      "blue": "#6ac5e2",
+      "magenta": "#bc83e3",
+      "cyan": "#54b3c2"
+    },
+    "dark": {
+      "bg": "#2b303c",
+      "fg": "#c0c5ce",
+      "red": "#e46876",
+      "green": "#8abf66",
+      "yellow": "#ddb140",
+      "blue": "#6ac5e2",
+      "magenta": "#bc83e3",
+      "cyan": "#54b3c2"
+    }
+  },
+  {
+    "theme": "PaperColor",
+    "light": {
+      "bg": "#eeeeee",
+      "fg": "#444444",
+      "red": "#d
+
+**Adding Final Themes**
+
+I'm now integrating the Horizon, Tango, and Alabaster color schemes into the JSON data. I'm focusing on accurately translating each provided hex code, mapping them to the corresponding light and dark versions. This ensures completeness of the schema. Next, I'll be working to finalize the Base16 Default color scheme.
+
+
+**Completing the Integration**
+
+I'm now methodically adding the Base16 Default color scheme, ensuring its data integrates seamlessly into the complete JSON output. I'm taking extreme care to ensure all the final colors are accurately represented. My next task is reviewing the complete, finished data for validation.[
+  {
+    "name": "Solarized",
+    "light": {
+      "name": "Solarized Light",
+      "background": "#fdf6e3",
+      "foreground": "#657b83",
+      "black": "#073642",
+      "red": "#dc322f",
+      "green": "#859900",
+      "yellow": "#b58900",
+      "blue": "#268bd2",
+      "magenta": "#d33682",
+      "cyan": "#2aa198",
+      "white": "#eee8d5"
+    },
+    "dark": {
+      "name": "Solarized Dark",
+      "background": "#002b36",
+      "foreground": "#839496",
+      "black": "#073642",
+      "red": "#dc322f",
+      "green": "#859900",
+      "yellow": "#b58900",
+      "blue": "#268bd2",
+      "magenta": "#d33682",
+      "cyan": "#2aa198",
+      "white": "#fdf6e3"
+    }
+  },
+  {
+    "name": "Gruvbox",
+    "light": {
+      "name": "Gruvbox Light",
+      "background": "#fbf1c7",
+      "foreground": "#3c3836",
+      "black": "#282828",
+      "red": "#cc241d",
+      "green": "#98971a",
+      "yellow": "#d79921",
+      "blue": "#458588",
+      "magenta": "#b16286",
+      "cyan": "#689d6a",
+      "white": "#7c6f64"
+    },
+    "dark": {
+      "name": "Gruvbox Dark",
+      "background": "#282828",
+      "foreground": "#ebdbb2",
+      "black": "#928374",
+      "red": "#fb4934",
+      "green": "#b8bb26",
+      "yellow": "#fabd2f",
+      "blue": "#83a598",
+      "magenta": "#d3869b",
+      "cyan": "#8ec07c",
+      "white": "#ebdbb2"
+    }
+  },
+  {
+    "name": "Atom One",
+    "light": {
+      "name": "One Light",
+      "background": "#fafafa",
+      "foreground": "#383a42",
+      "black": "#383a42",
+      "red": "#e45649",
+      "green": "#50a14f",
+      "yellow": "#c18401",
+      "blue": "#4078f2",
+      "magenta": "#a626a4",
+      "cyan": "#0184bc",
+      "white": "#fafafa"
+    },
+    "dark": {
+      "name": "One Dark",
+      "background": "#282c34",
+      "foreground": "#abb2bf",
+      "black": "#282c34",
+      "red": "#e06c75",
+      "green": "#98c379",
+      "yellow": "#e5c07b",
+      "blue": "#61afef",
+      "magenta": "#c678dd",
+      "cyan": "#56b6c2",
+      "white": "#abb2bf"
+    }
+  },
+  {
+    "name": "GitHub",
+    "light": {
+      "name": "GitHub Light",
+      "background": "#ffffff",
+      "foreground": "#24292e",
+      "black": "#24292e",
+      "red": "#d73a49",
+      "green": "#22863a",
+      "yellow": "#b08800",
+      "blue": "#0366d6",
+      "magenta": "#6f42c1",
+      "cyan": "#1b7c83",
+      "white": "#ffffff"
+    },
+    "dark": {
+      "name": "GitHub Dark",
+      "background": "#0d1117",
+      "foreground": "#c9d1d9",
+      "black": "#484f58",
+      "red": "#ff7b72",
+      "green": "#7ee787",
+      "yellow": "#d2a8ff",
+      "blue": "#79c0ff",
+      "magenta": "#d2a8ff",
+      "cyan": "#a5d6ff",
+      "white": "#b1bac4"
+    }
+  },
+  {
+    "name": "Material",
+    "light": {
+      "name": "Material Light",
+      "background": "#fafafa",
+      "foreground": "#90a4ae",
+      "black": "#90a4ae",
+      "red": "#e53935",
+      "green": "#91b859",
+      "yellow": "#f6a434",
+      "blue": "#39adb5",
+      "magenta": "#7c4dff",
+      "cyan": "#39adb5",
+      "white": "#ffffff"
+    },
+    "dark": {
+      "name": "Material Dark",
+      "background": "#263238",
+      "foreground": "#eeffff",
+      "black": "#546e7a",
+      "red": "#f07178",
+      "green": "#c3e88d",
+      "yellow": "#ffcb6b",
+      "blue": "#82aaff",
+      "magenta": "#c792ea",
+      "cyan": "#89ddff",
+      "white": "#ffffff"
+    }
+  },
+  {
+    "name": "Ayu",
+    "light": {
+      "name": "Ayu Light",
+      "background": "#fafafa",
+      "foreground": "#5c6166",
+      "black": "#5c6166",
+      "red": "#f07178",
+      "green": "#86b300",
+      "yellow": "#f2ae49",
+      "blue": "#36a3d9",
+      "magenta": "#a37acc",
+      "cyan": "#4cbf99",
+      "white": "#ffffff"
+    },
+    "dark": {
+      "name": "Ayu Dark",
+      "background": "#0a0e14",
+      "foreground": "#b3b1ad",
+      "black": "#01060e",
+      "red": "#ea6c73",
+      "green": "#91b362",
+      "yellow": "#e9b143",
+      "blue": "#53bdfa",
+      "magenta": "#caeaca",
+      "cyan": "#90e1c6",
+      "white": "#ffffff"
+    }
+  },
+  {
+    "name": "Catppuccin",
+    "light": {
+      "name": "Catppuccin Latte",
+      "background": "#eff1f5",
+      "foreground": "#4c4f69",
+      "black": "#5c5f77",
+      "red": "#d20f39",
+      "green": "#40a02b",
+      "yellow": "#df8e1d",
+      "blue": "#1e66f5",
+      "magenta": "#ea76cb",
+      "cyan": "#04a5e5",
+      "white": "#acb0be"
+    },
+    "dark": {
+      "name": "Catppuccin Mocha",
+      "background": "#1e1e2e",
+      "foreground": "#cdd6f4",
+      "black": "#45475a",
+      "red": "#f38ba8",
+      "green": "#a6e3a1",
+      "yellow": "#f9e2af",
+      "blue": "#89b4fa",
+      "magenta": "#cba6f7",
+      "cyan": "#89dceb",
+      "white": "#a6adc8"
+    }
+  },
+  {
+    "name": "Rosé Pine",
+    "light": {
+      "name": "Rosé Pine Dawn",
+      "background": "#faf4ed",
+      "foreground": "#575279",
+      "black": "#575279",
+      "red": "#b4637a",
+      "green": "#286983",
+      "yellow": "#ea9d34",
+      "blue": "#56949f",
+      "magenta": "#907aa9",
+      "cyan": "#d7827e",
+      "white": "#fffaf3"
+    },
+    "dark": {
+      "name": "Rosé Pine Main",
+      "background": "#191724",
+      "foreground": "#e0def4",
+      "black": "#26233a",
+      "red": "#eb6f92",
+      "green": "#31748f",
+      "yellow": "#f6c177",
+      "blue": "#9ccfd8",
+      "magenta": "#c4a7e7",
+      "cyan": "#ebbcba",
+      "white": "#e0def4"
+    }
+  },
+  {
+    "name": "Everforest",
+    "light": {
+      "name": "Everforest Light",
+      "background": "#fdf6e3",
+      "foreground": "#5c6a72",
+      "black": "#5c6a72",
+      "red": "#f85552",
+      "green": "#8da101",
+      "yellow": "#dfa000",
+      "blue": "#3a94c5",
+      "magenta": "#df69ba",
+      "cyan": "#35a77c",
+      "white": "#fdf6e3"
+    },
+    "dark": {
+      "name": "Everforest Dark",
+      "background": "#2b3339",
+      "foreground": "#d3c6aa",
+      "black": "#4b565c",
+      "red": "#e67e80",
+      "green": "#a7c080",
+      "yellow": "#dbbc7f",
+      "blue": "#7fbbb3",
+      "magenta": "#d699b6",
+      "cyan": "#83c092",
+      "white": "#d3c6aa"
+    }
+  },
+  {
+    "name": "Tokyo Night",
+    "light": {
+      "name": "Tokyo Night Day",
+      "background": "#e1e2e7",
+      "foreground": "#3760bf",
+      "black": "#3760bf",
+      "red": "#f52a65",
+      "green": "#587539",
+      "yellow": "#8c6c3e",
+      "blue": "#2e7de9",
+      "magenta": "#9854f1",
+      "cyan": "#007197",
+      "white": "#ffffff"
+    },
+    "dark": {
+      "name": "Tokyo Night Night",
+      "background": "#1a1b26",
+      "foreground": "#c0caf5",
+      "black": "#414868",
+      "red": "#f7768e",
+      "green": "#9ece6a",
+      "yellow": "#e0af68",
+      "blue": "#7aa2f7",
+      "magenta": "#bb9af7",
+      "cyan": "#7dcfff",
+      "white": "#c0caf5"
+    }
+  },
+  {
+    "name": "Night Owl",
+    "light": {
+      "name": "Light Owl",
+      "background": "#fbfbfb",
+      "foreground": "#403f53",
+      "black": "#403f53",
+      "red": "#de3d3b",
+      "green": "#08916a",
+      "yellow": "#e6b450",
+      "blue": "#288ed7",
+      "magenta": "#d60a84",
+      "cyan": "#0c969b",
+      "white": "#ffffff"
+    },
+    "dark": {
+      "name": "Night Owl",
+      "background": "#011627",
+      "foreground": "#d6deeb",
+      "black": "#011627",
+      "red": "#ef5350",
+      "green": "#22da6e",
+      "yellow": "#addb67",
+      "blue": "#82aaff",
+      "magenta": "#c792ea",
+      "cyan": "#21c7a8",
+      "white": "#ffffff"
+    }
+  },
+  {
+    "name": "Modus",
+    "light": {
+      "name": "Modus Operandi",
+      "background": "#ffffff",
+      "foreground": "#000000",
+      "black": "#000000",
+      "red": "#a60000",
+      "green": "#005e00",
+      "yellow": "#813e00",
+      "blue": "#0031a9",
+      "magenta": "#721045",
+      "cyan": "#00538b",
+      "white": "#ffffff"
+    },
+    "dark": {
+      "name": "Modus Vivendi",
+      "background": "#000000",
+      "foreground": "#ffffff",
+      "black": "#000000",
+      "red": "#ff5f59",
+      "green": "#44bc44",
+      "yellow": "#d0bc00",
+      "blue": "#2fafff",
+      "magenta": "#feacd0",
+      "cyan": "#00d3d0",
+      "white": "#ffffff"
+    }
+  },
+  {
+    "name": "Iceberg",
+    "light": {
+      "name": "Iceberg Light",
+      "background": "#e8e9ec",
+      "foreground": "#33374c",
+      "black": "#33374c",
+      "red": "#cc517a",
+      "green": "#668e3d",
+      "yellow": "#c57339",
+      "blue": "#2d539e",
+      "magenta": "#775dff",
+      "cyan": "#3b8992",
+      "white": "#e8e9ec"
+    },
+    "dark": {
+      "name": "Iceberg Dark",
+      "background": "#161821",
+      "foreground": "#c6c8d1",
+      "black": "#161821",
+      "red": "#e27878",
+      "green": "#b4be82",
+      "yellow": "#e2a478",
+      "blue": "#84a0c6",
+      "magenta": "#a093c7",
+      "cyan": "#89b8c2",
+      "white": "#c6c8d1"
+    }
+  },
+  {
+    "name": "PaperColor",
+    "light": {
+      "name": "PaperColor Light",
+      "background": "#eeeeee",
+      "foreground": "#444444",
+      "black": "#444444",
+      "red": "#d7005f",
+      "green": "#008700",
+      "yellow": "#d75f00",
+      "blue": "#005faf",
+      "magenta": "#d70087",
+      "cyan": "#0087af",
+      "white": "#eeeeee"
+    },
+    "dark": {
+      "name": "PaperColor Dark",
+      "background": "#1c1c1c",
+      "foreground": "#d0d0d0",
+      "black": "#1c1c1c",
+      "red": "#5fafd7",
+      "green": "#af87d7",
+      "yellow": "#ff5faf",
+      "blue": "#00afaf",
+      "magenta": "#5f8787",
+      "cyan": "#ff8700",
+      "white": "#d0d0d0"
+    }
+  },
+  {
+    "name": "Edge",
+    "light": {
+      "name": "Edge Light",
+      "background": "#fafafa",
+      "foreground": "#4b505b",
+      "black": "#4b505b",
+      "red": "#d05858",
+      "green": "#608e32",
+      "yellow": "#bf75d6",
+      "blue": "#5079be",
+      "magenta": "#b05ccc",
+      "cyan": "#3a8b84",
+      "white": "#fafafa"
+    },
+    "dark": {
+      "name": "Edge Dark",
+      "background": "#2b2d37",
+      "foreground": "#c5cdd9",
+      "black": "#2b2d37",
+      "red": "#e37170",
+      "green": "#7abfb5",
+      "yellow": "#dbb774",
+      "blue": "#6cb6eb",
+      "magenta": "#d38aea",
+      "cyan": "#5dbbc1",
+      "white": "#c5cdd9"
+    }
+  },
+  {
+    "name": "Kanagawa",
+    "light": {
+      "name": "Kanagawa Lotus",
+      "background": "#f2ecbc",
+      "foreground": "#545464",
+      "black": "#545464",
+      "red": "#c84053",
+      "green": "#6f894e",
+      "yellow": "#77713f",
+      "blue": "#4d699b",
+      "magenta": "#b35b79",
+      "cyan": "#597b75",
+      "white": "#f2ecbc"
+    },
+    "dark": {
+      "name": "Kanagawa Wave",
+      "background": "#1f1f28",
+      "foreground": "#dcd7ba",
+      "black": "#090618",
+      "red": "#c34043",
+      "green": "#76946a",
+      "yellow": "#c0a36e",
+      "blue": "#7e9cd8",
+      "magenta": "#957fb8",
+      "cyan": "#6a9589",
+      "white": "#dcd7ba"
+    }
+  },
+  {
+    "name": "Horizon",
+    "light": {
+      "name": "Horizon Light",
+      "background": "#fdf0ed",
+      "foreground": "#1c1e26",
+      "black": "#1c1e26",
+      "red": "#f43e5c",
+      "green": "#05a698",
+      "yellow": "#fab795",
+      "blue": "#118c74",
+      "magenta": "#892b51",
+      "cyan": "#09f7a0",
+      "white": "#fdf0ed"
+    },
+    "dark": {
+      "name": "Horizon Dark",
+      "background": "#1c1e26",
+      "foreground": "#fac29a",
+      "black": "#1c1e26",
+      "red": "#e95678",
+      "green": "#29b8db",
+      "yellow": "#fab387",
+      "blue": "#26bbd9",
+      "magenta": "#ee64ac",
+      "cyan": "#59e1e3",
+      "white": "#fac29a"
+    }
+  },
+  {
+    "name": "Tango",
+    "light": {
+      "name": "Tango Light",
+      "background": "#ffffff",
+      "foreground": "#2e3436",
+      "black": "#2e3436",
+      "red": "#cc0000",
+      "green": "#4e9a06",
+      "yellow": "#c4a000",
+      "blue": "#3465a4",
+      "magenta": "#75507b",
+      "cyan": "#06989a",
+      "white": "#d3d7cf"
+    },
+    "dark": {
+      "name": "Tango Dark",
+      "background": "#2e3436",
+      "foreground": "#d3d7cf",
+      "black": "#000000",
+      "red": "#ef2929",
+      "green": "#8ae234",
+      "yellow": "#fce94f",
+      "blue": "#729fcf",
+      "magenta": "#ad7fa8",
+      "cyan": "#34e2e2",
+      "white": "#eeeeec"
+    }
+  },
+  {
+    "name": "Alabaster",
+    "light": {
+      "name": "Alabaster Light",
+      "background": "#f7f7f7",
+      "foreground": "#000000",
+      "black": "#000000",
+      "red": "#aa3731",
+      "green": "#448c27",
+      "yellow": "#cb9000",
+      "blue": "#325cc0",
+      "magenta": "#7a3e9d",
+      "cyan": "#0083b2",
+      "white": "#ffffff"
+    },
+    "dark": {
+      "name": "Alabaster Dark",
+      "background": "#0e1415",
+      "foreground": "#cecece",
+      "black": "#000000",
+      "red": "#e25d56",
+      "green": "#71b53e",
+      "yellow": "#febb4a",
+      "blue": "#4b7bd2",
+      "magenta": "#8d5eb2",
+      "cyan": "#00a8e0",
+      "white": "#ffffff"
+    }
+  },
+  {
+    "name": "Base16 Default",
+    "light": {
+      "name": "Base16 Default Light",
+      "background": "#f8f8f8",
+      "foreground": "#383838",
+      "black": "#181818",
+      "red": "#ab4642",
+      "green": "#a1b56c",
+      "yellow": "#f7ca88",
+      "blue": "#7cafc2",
+      "magenta": "#ba8baf",
+      "cyan": "#86c1b9",
+      "white": "#f8f8f8"
+    },
+    "dark": {
+      "name": "Base16 Default Dark",
+      "background": "#181818",
+      "foreground": "#d8d8d8",
+      "black": "#181818",
+      "red": "#ab4642",
+      "green": "#a1b56c",
+      "yellow": "#f7ca88",
+      "blue": "#7cafc2",
+      "magenta": "#ba8baf",
+      "cyan": "#86c1b9",
+      "white": "#f8f8f8"
+    }
+  }
+]

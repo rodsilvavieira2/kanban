@@ -138,6 +138,22 @@ export function KanbanBoard() {
                                 </p>
                               )}
 
+                              {task.tags && task.tags.length > 0 && (
+                                <div className="task-tags-preview mt-2" style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                                  {task.tags.map(tag => (
+                                    <span key={tag} className="tag-chip text-xs" style={{ 
+                                      backgroundColor: '#333', 
+                                      padding: '2px 6px', 
+                                      borderRadius: '4px',
+                                      color: '#fff',
+                                      fontSize: '10px'
+                                    }}>
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
                               <div className="task-meta mt-3">
                                 <div className="task-meta-right">
                                   {task.dueDate && (

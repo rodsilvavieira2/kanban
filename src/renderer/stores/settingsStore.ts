@@ -19,6 +19,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     shortBreakTime: "5",
     longBreakTime: "15",
     theme: "system",
+    colorScheme: "Base16 Default",
     notificationsEnabled: "true",
   },
   isLoading: false,

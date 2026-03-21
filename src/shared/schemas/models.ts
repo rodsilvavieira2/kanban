@@ -34,6 +34,7 @@ export const TaskSchema = z.object({
   dueDate: z.string().optional(),
   order: z.number(),
   timeSpentMinutes: z.number().default(0),
+  tags: z.array(z.string()).optional(),
   createdAt: z.string().optional(),
   updatedAt: z.string().optional(),
 });
