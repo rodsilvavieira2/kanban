@@ -113,7 +113,13 @@ export function ActivityFeed() {
     <div className="activity-feed">
       <h3>Recent Activity</h3>
       {activities.length === 0 ? (
-        <p className="text-accents-5 text-sm">No recent activity.</p>
+        <div className="empty-state" style={{border: 'none', background: 'none', padding: '0'}}>
+          <div className="empty-state-illustration">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <h3>No activity yet</h3>
+          <p>Start working on your projects to see your history here.</p>
+        </div>
       ) : (
         <div className="activity-feed-content">
           <div className="activity-timeline">

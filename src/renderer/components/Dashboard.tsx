@@ -1,3 +1,4 @@
+import { useOutletContext } from "react-router-dom";
 import {
   SummaryCards,
   PriorityBreakdown,
@@ -5,6 +6,8 @@ import {
 } from "../features/dashboard";
 
 export function Dashboard() {
+  const { openModal } = useOutletContext<{ openModal: () => void }>();
+
   return (
     <main className="main-content">
       <div className="top-header">
@@ -13,7 +16,7 @@ export function Dashboard() {
       <div className="dashboard-content">
         <SummaryCards />
         <div className="dashboard-lower">
-          <PriorityBreakdown />
+          <PriorityBreakdown openModal={openModal} />
           <ActivityFeed />
         </div>
       </div>

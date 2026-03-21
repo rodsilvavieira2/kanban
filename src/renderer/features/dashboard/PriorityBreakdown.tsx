@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import { useOutletContext } from "react-router-dom";
 
 import { useKanbanStore } from "../../stores/kanbanStore";
 import { useSettingsStore } from "../../stores/settingsStore";
@@ -48,7 +49,7 @@ function calcCompletionPercent(priorities: ColumnStat[], total: number): number 
   return completed ? Math.round((completed.value / total) * 100) : 0;
 }
 
-export function PriorityBreakdown() {
+export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
   const { tasks, columns } = useKanbanStore();
   const { projects, loadProjects } = useProjectStore();
   const { settings } = useSettingsStore();
@@ -103,38 +104,52 @@ export function PriorityBreakdown() {
     <div className="priority-breakdown">
       <h3>Project Status</h3>
 
-      <div className="priority-chart-container">
-        <div className="donut-chart">
-          {total === 0 ? (
-            <div className="empty-chart text-accents-5 text-sm p-4 text-center">
-              No tasks
-            </div>
-          ) : (
+      {projects.length === 0 ? (
+        <div className="empty-state" style={{border: 'none', background: 'none', padding: '0'}}>
+          <div className="empty-state-illustration">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <h3>No projects yet</h3>
+          <p>Create a project to start tracking your status.</p>
+          <button className="btn-primary" onClick={openModal}>
+            Create your first project
+          </button>
+        </div>
+      ) : total === 0 ? (
+        <div className="empty-state" style={{border: 'none', background: 'none', padding: '0'}}>
+          <div className="empty-state-illustration">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          </div>
+          <h3>No tasks yet</h3>
+          <p>Add tasks to your project to start tracking progress.</p>
+        </div>
+      ) : (
+        <div className="priority-chart-container">
+          <div className="donut-chart">
             <Doughnut data={chartData} options={chartOptions} />
-          )}
-          <div className="donut-center-text">
-            <span className="donut-number">{completionPercent}%</span>
-            <span className="donut-label">COMPLETE</span>
+            <div className="donut-center-text">
+              <span className="donut-number">{completionPercent}%</span>
+              <span className="donut-label">COMPLETE</span>
+            </div>
+          </div>
+          <div className="priority-legend">
+            {priorities.map(({ label, value, color }) => {
+              const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+              return (
+                <div key={label} className="legend-item">
+                  <span className="dot" style={{ backgroundColor: color }} />
+                  <span className="legend-label">{label}:</span>
+                  <span className="legend-value">
+                    {value} ({pct}%)
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
+      )}
 
-        <div className="priority-legend">
-          {priorities.map(({ label, value, color }) => {
-            const pct = total > 0 ? Math.round((value / total) * 100) : 0;
-            return (
-              <div key={label} className="legend-item">
-                <span className="dot" style={{ backgroundColor: color }} />
-                <span className="legend-label">{label}:</span>
-                <span className="legend-value">
-                  {value} ({pct}%)
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {topProjects.length > 0 && (
+      {total > 0 && topProjects.length > 0 && (
         <div className="top-projects-section">
           <h4 className="top-projects-title">Top active projects</h4>
           {topProjects.map((project) => (
