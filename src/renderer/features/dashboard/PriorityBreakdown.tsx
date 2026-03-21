@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 
 import { useKanbanStore } from "../../stores/kanbanStore";
 import { useSettingsStore } from "../../stores/settingsStore";
+import { useProjectStore } from "../../stores/projectStore";
 import { themes } from "../../../shared/themes";
 import { getThemeColor } from "../../utils/themeUtils";
 
@@ -17,7 +18,15 @@ interface Priority {
 
 export function PriorityBreakdown() {
   const { tasks, columns } = useKanbanStore();
-  const { themeName, isDarkMode } = useSettingsStore();
+  const { projects, loadProjects } = useProjectStore();
+  const { settings } = useSettingsStore();
+  
+  useEffect(() => {
+    loadProjects();
+  }, [loadProjects]);
+
+  const themeName = settings.colorScheme || "Base16 Default";
+  const isDarkMode = settings.theme === "dark" || (settings.theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
   
   const theme = themes.find((t) => t.name === themeName);
   const colors = isDarkMode ? theme?.dark : theme?.light;
@@ -48,6 +57,10 @@ export function PriorityBreakdown() {
   }));
 
   const total = tasks.length;
+  
+  // Calculate overall completion percentage
+  const completedTasks = priorities.find(p => p.label.toLowerCase().includes('complete') || p.label.toLowerCase().includes('done'))?.value || 0;
+  const completionPercentage = total > 0 ? Math.round((completedTasks / total) * 100) : 0;
 
   const chartData = {
     labels: priorities.map((p) => p.label),
@@ -62,7 +75,7 @@ export function PriorityBreakdown() {
   };
 
   const chartOptions = {
-    cutout: "80%",
+    cutout: "75%",
     responsive: true,
     maintainAspectRatio: true,
     plugins: {
@@ -75,13 +88,26 @@ export function PriorityBreakdown() {
     },
   };
 
-  const sortedPriorities = [...priorities].sort((a, b) => b.value - a.value);
-  const topPriority =
-    sortedPriorities.length > 0 ? sortedPriorities[0].label : "None";
+  // Top active projects (sort by progress descending, take top 3)
+  const topProjects = [...projects]
+    .filter(p => p.status !== "Completed")
+    .sort((a, b) => b.progress - a.progress)
+    .slice(0, 3);
+
+  // Theme colors for progress bars
+  const projectColors = [
+    colors?.green || "#00C853", 
+    colors?.yellow || "#FFAB00", 
+    colors?.blue || "#0070F3"
+  ];
 
   return (
     <div className="priority-breakdown">
-      <h3>Project Status</h3>
+      <div className="priority-header">
+        <h3>Project Status</h3>
+        <p className="priority-subtitle">Variant 1: Visual Breakdown</p>
+      </div>
+      
       <div className="priority-chart-container">
         <div className="donut-chart">
           {total === 0 ? (
@@ -92,24 +118,50 @@ export function PriorityBreakdown() {
             <Doughnut data={chartData} options={chartOptions} />
           )}
           <div className="donut-center-text">
-            <span className="donut-number">{total}</span>
-            <span className="donut-label">TOTAL TASKS</span>
+            <span className="donut-number">{completionPercentage}%</span>
           </div>
         </div>
 
         <div className="priority-legend">
-          {priorities.map(({ label, value, color }) => (
-            <div key={label} className="legend-item">
-              <span className="dot" style={{ backgroundColor: color }} />
-              <span className="legend-label">{label}</span>
-              <span className="legend-value">{value}</span>
-            </div>
-          ))}
-          <p className="priority-note">
-            Most tasks are currently in <strong>{topPriority}</strong>.
-          </p>
+          {priorities.map(({ label, value, color }) => {
+            const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+            return (
+              <div key={label} className="legend-item">
+                <span className="dot" style={{ backgroundColor: color }} />
+                <span className="legend-label">{label}:</span>
+                <span className="legend-value">{value} ({percentage}%)</span>
+              </div>
+            );
+          })}
         </div>
       </div>
+
+      {topProjects.length > 0 && (
+        <div className="top-projects-section">
+          <h4>Top active projects</h4>
+          <div className="top-projects-list">
+            {topProjects.map((project, index) => {
+              const barColor = projectColors[index % projectColors.length];
+              return (
+                <div key={project.id} className="top-project-item">
+                  <div className="top-project-header">
+                    <span className="top-project-name">{project.name}: {project.progress}% Completed</span>
+                  </div>
+                  <div className="progress-bar-container">
+                    <div 
+                      className="progress-bar-fill" 
+                      style={{ 
+                        width: `${project.progress}%`,
+                        backgroundColor: barColor
+                      }} 
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
