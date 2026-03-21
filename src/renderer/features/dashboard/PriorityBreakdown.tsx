@@ -3,6 +3,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 
 import { useKanbanStore } from "../../stores/kanbanStore";
+import { useSettingsStore } from "../../stores/settingsStore";
+import { themes } from "../../../shared/themes";
 import { getThemeColor } from "../../utils/themeUtils";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -15,17 +17,21 @@ interface Priority {
 
 export function PriorityBreakdown() {
   const { tasks, columns } = useKanbanStore();
+  const { themeName, isDarkMode } = useSettingsStore();
+  
+  const theme = themes.find((t) => t.name === themeName);
+  const colors = isDarkMode ? theme?.dark : theme?.light;
 
   // Group tasks by column title to aggregate across projects
   const columnStats = new Map<string, { value: number; color: string }>();
   
   tasks.forEach((task) => {
     const column = columns.find((c) => c.id === task.columnId);
-    if (column) {
+    if (column && colors) {
       const title = column.title;
       // Use the color key from the column to get the theme-aware color
       const colorKey = column.color || "gray";
-      const color = getThemeColor(colorKey);
+      const color = getThemeColor(colorKey, colors);
       
       const current = columnStats.get(title) || { value: 0, color };
       columnStats.set(title, {

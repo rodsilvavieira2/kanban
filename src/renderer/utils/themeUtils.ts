@@ -1,14 +1,6 @@
-import { useSettingsStore } from "../stores/settingsStore";
-import { themes } from "../../shared/themes";
+import { ThemeColors } from "../../shared/themes";
 
-export const getThemeColor = (colorKey: string) => {
-  const { themeName, isDarkMode } = useSettingsStore();
-  const theme = themes.find((t) => t.name === themeName);
-  
-  if (!theme) return "#888888"; // Fallback
-  
-  const colors = isDarkMode ? theme.dark : theme.light;
-  
+export const getThemeColor = (colorKey: string, colors: ThemeColors) => {
   // Mapeia as chaves de cor para as propriedades do tema
   const colorMap: Record<string, string> = {
     "todo": colors.black,
