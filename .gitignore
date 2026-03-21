@@ -98,3 +98,5 @@ out/
 *.sqlite
 *.sqlite-journal
 *.sqlite-wal
+data/*.sqlite-shm
+data/*.sqlite-wal
