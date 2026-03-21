@@ -48,11 +48,20 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
     try {
       const projects = await kanbanApi.getProjects();
       let allTasks: Task[] = [];
+      const allColumns: Column[] = [];
+      
       for (const project of projects) {
-        const { tasks } = await kanbanApi.getProjectData(project.id);
+        const { tasks, columns } = await kanbanApi.getProjectData(project.id);
         allTasks = [...allTasks, ...tasks.map(t => ({ ...t, projectId: project.id }))];
+        
+        // Add columns that we don't already have
+        for (const col of columns) {
+          if (!allColumns.find(c => c.id === col.id)) {
+            allColumns.push(col);
+          }
+        }
       }
-      set({ tasks: allTasks, isLoading: false });
+      set({ tasks: allTasks, columns: allColumns, isLoading: false });
     } catch (error: unknown) {
       set({ error: error instanceof Error ? error.message : "Failed to load tasks", isLoading: false });
     }

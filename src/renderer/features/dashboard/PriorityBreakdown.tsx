@@ -15,10 +15,25 @@ interface Priority {
 export function PriorityBreakdown() {
   const { tasks, columns } = useKanbanStore();
 
-  const priorities: Priority[] = columns.map((col) => ({
-    label: col.title,
-    value: tasks.filter((t) => t.columnId === col.id).length,
-    color: col.color || "#888888",
+  // Group tasks by column title to aggregate across projects
+  const columnStats = new Map<string, { value: number; color: string }>();
+  
+  tasks.forEach((task) => {
+    const column = columns.find((c) => c.id === task.columnId);
+    if (column) {
+      const title = column.title;
+      const current = columnStats.get(title) || { value: 0, color: column.color || "#888888" };
+      columnStats.set(title, {
+        value: current.value + 1,
+        color: current.color
+      });
+    }
+  });
+
+  const priorities: Priority[] = Array.from(columnStats.entries()).map(([label, data]) => ({
+    label,
+    value: data.value,
+    color: data.color,
   }));
 
   const total = tasks.length;
