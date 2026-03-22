@@ -2683,3 +2683,310 @@ input:checked + .toggle-slider:before {
     background: var(--bg-secondary);
   }
 }
+
+// ── Project Select (Radix UI) ────────────────────────────────────────────────
+
+.project-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  white-space: nowrap;
+  outline: none;
+
+  &:hover {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+  }
+
+  &[data-state="open"] {
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+
+    .project-select-chevron {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.project-select-trigger-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+
+  span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.project-select-icon {
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.project-select-chevron {
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+  margin-left: 2px;
+}
+
+.project-select-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.project-select-content {
+  z-index: 9999;
+  min-width: 180px;
+  max-width: 260px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+
+  &[data-state="open"] {
+    animation: project-select-in 0.15s ease;
+  }
+
+  &[data-state="closed"] {
+    animation: project-select-out 0.1s ease;
+  }
+}
+
+@keyframes project-select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes project-select-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.project-select-viewport {
+  padding: 4px;
+}
+
+.project-select-item {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 7px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: background 0.1s, color 0.1s;
+
+  &[data-highlighted] {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+  }
+
+  &[data-state="checked"] {
+    color: var(--text-primary);
+  }
+}
+
+.project-select-item-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.project-select-indicator {
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--accent-color);
+}
+
+.project-select-separator {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}
+
+.project-select-scroll-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  color: var(--text-tertiary);
+  cursor: default;
+}
+
+// ── Generic Radix Select ─────────────────────────────────────────────────────
+
+.radix-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  outline: none;
+  min-width: 140px;
+
+  &:hover {
+    border-color: var(--border-hover);
+  }
+
+  &:focus {
+    border-color: var(--text-secondary);
+  }
+
+  &[data-placeholder] {
+    color: var(--text-tertiary);
+  }
+
+  &[data-state="open"] {
+    border-color: var(--text-secondary);
+
+    .radix-select-chevron {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.radix-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.radix-select-chevron {
+  flex-shrink: 0;
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.radix-select-content {
+  z-index: 9999;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  min-width: var(--radix-select-trigger-width);
+
+  &[data-state="open"] {
+    animation: radix-select-in 0.15s ease;
+  }
+}
+
+@keyframes radix-select-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.radix-select-viewport {
+  padding: 4px;
+}
+
+.radix-select-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  padding-left: 32px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  position: relative;
+  transition: background 0.1s, color 0.1s;
+
+  &[data-highlighted] {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary);
+  }
+
+  &[data-state="checked"] {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.03);
+  }
+}
+
+.radix-select-indicator {
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-color);
+}
+
+.radix-select-scroll-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  color: var(--text-tertiary);
+  cursor: default;
+  background: var(--bg-secondary);
+}
+
+.radix-select-separator {
+  height: 1px;
+  background: var(--border-color);
+  margin: 4px 0;
+}

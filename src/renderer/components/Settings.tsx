@@ -1,4 +1,5 @@
 import React from "react";
+import * as Select from "@radix-ui/react-select";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useSettingsStore } from "../stores/settingsStore";
 import { kanbanApi } from "../api";
@@ -13,7 +14,65 @@ import {
   AlertTriangle,
   Info,
   Box,
+  ChevronDown,
+  ChevronUp,
+  Check,
 } from "lucide-react";
+
+interface RadixSelectProps {
+  value: string;
+  onValueChange: (value: string) => void;
+  options: { value: string; label: string }[];
+  ariaLabel?: string;
+  placeholder?: string;
+}
+
+function RadixSelect({
+  value,
+  onValueChange,
+  options,
+  ariaLabel,
+  placeholder,
+}: RadixSelectProps) {
+  return (
+    <Select.Root value={value} onValueChange={onValueChange}>
+      <Select.Trigger className="radix-select-trigger" aria-label={ariaLabel}>
+        <Select.Value placeholder={placeholder} />
+        <Select.Icon asChild>
+          <ChevronDown className="radix-select-chevron" size={14} />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Content
+          className="radix-select-content"
+          position="popper"
+          sideOffset={5}
+        >
+          <Select.ScrollUpButton className="radix-select-scroll-btn">
+            <ChevronUp size={14} />
+          </Select.ScrollUpButton>
+          <Select.Viewport className="radix-select-viewport">
+            {options.map((opt) => (
+              <Select.Item
+                key={opt.value}
+                value={opt.value}
+                className="radix-select-item"
+              >
+                <Select.ItemIndicator className="radix-select-indicator">
+                  <Check size={14} />
+                </Select.ItemIndicator>
+                <Select.ItemText>{opt.label}</Select.ItemText>
+              </Select.Item>
+            ))}
+          </Select.Viewport>
+          <Select.ScrollDownButton className="radix-select-scroll-btn">
+            <ChevronDown size={14} />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  );
+}
 
 export function Settings() {
   const {
@@ -103,15 +162,16 @@ export function Settings() {
                   <p>Choose between light and dark mode.</p>
                 </div>
                 <div className="settings-card-actions">
-                  <select
-                    className="form-input"
+                  <RadixSelect
                     value={settings.theme || "system"}
-                    onChange={(e) => updateSetting("theme", e.target.value)}
-                  >
-                    <option value="dark">Dark Mode</option>
-                    <option value="light">Light Mode</option>
-                    <option value="system">System Default</option>
-                  </select>
+                    onValueChange={(val) => updateSetting("theme", val)}
+                    options={[
+                      { value: "dark", label: "Dark Mode" },
+                      { value: "light", label: "Light Mode" },
+                      { value: "system", label: "System Default" },
+                    ]}
+                    ariaLabel="App Theme"
+                  />
                 </div>
               </div>
               <div className="settings-divider"></div>
@@ -121,19 +181,15 @@ export function Settings() {
                   <p>Choose your preferred color palette.</p>
                 </div>
                 <div className="settings-card-actions">
-                  <select
-                    className="form-input"
+                  <RadixSelect
                     value={settings.colorScheme || "Base16 Default"}
-                    onChange={(e) =>
-                      updateSetting("colorScheme", e.target.value)
-                    }
-                  >
-                    {themes.map((t) => (
-                      <option key={t.name} value={t.name}>
-                        {t.name}
-                      </option>
-                    ))}
-                  </select>
+                    onValueChange={(val) => updateSetting("colorScheme", val)}
+                    options={themes.map((t) => ({
+                      value: t.name,
+                      label: t.name,
+                    }))}
+                    ariaLabel="Color Scheme"
+                  />
                 </div>
               </div>
               <div className="settings-divider"></div>
@@ -143,11 +199,16 @@ export function Settings() {
                   <p>Choose your preferred language.</p>
                 </div>
                 <div className="settings-card-actions">
-                  <select className="form-input">
-                    <option>English</option>
-                    <option>Spanish</option>
-                    <option>Portuguese</option>
-                  </select>
+                  <RadixSelect
+                    value="English"
+                    onValueChange={() => {}}
+                    options={[
+                      { value: "English", label: "English" },
+                      { value: "Spanish", label: "Spanish" },
+                      { value: "Portuguese", label: "Portuguese" },
+                    ]}
+                    ariaLabel="Language Selection"
+                  />
                 </div>
               </div>
             </div>
@@ -249,10 +310,15 @@ export function Settings() {
                   className="settings-card-actions"
                   style={{ marginTop: "16px" }}
                 >
-                  <select className="form-input">
-                    <option>Kanban Board</option>
-                    <option>List View</option>
-                  </select>
+                  <RadixSelect
+                    value="Kanban Board"
+                    onValueChange={() => {}}
+                    options={[
+                      { value: "Kanban Board", label: "Kanban Board" },
+                      { value: "List View", label: "List View" },
+                    ]}
+                    ariaLabel="Default Board View"
+                  />
                 </div>
               </div>
             </div>

@@ -1,7 +1,75 @@
 import React, { useState, useRef, useEffect, useActionState } from "react";
+import * as Select from "@radix-ui/react-select";
 import { useNavigate, useParams } from "react-router-dom";
 import { useKanbanStore } from "../stores/kanbanStore";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, ChevronDown, ChevronUp, Check } from "lucide-react";
+
+interface RadixSelectProps {
+  value: string;
+  onValueChange?: (value: string) => void;
+  options: { value: string; label: string }[];
+  ariaLabel?: string;
+  placeholder?: string;
+  name?: string;
+  required?: boolean;
+  disabled?: boolean;
+}
+
+function RadixSelect({
+  value,
+  onValueChange,
+  options,
+  ariaLabel,
+  placeholder,
+  name,
+  required,
+  disabled,
+}: RadixSelectProps) {
+  return (
+    <Select.Root
+      value={value}
+      onValueChange={onValueChange}
+      name={name}
+      required={required}
+      disabled={disabled}
+    >
+      <Select.Trigger className="radix-select-trigger" aria-label={ariaLabel}>
+        <Select.Value placeholder={placeholder} />
+        <Select.Icon asChild>
+          <ChevronDown className="radix-select-chevron" size={14} />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Content
+          className="radix-select-content"
+          position="popper"
+          sideOffset={5}
+        >
+          <Select.ScrollUpButton className="radix-select-scroll-btn">
+            <ChevronUp size={14} />
+          </Select.ScrollUpButton>
+          <Select.Viewport className="radix-select-viewport">
+            {options.map((opt) => (
+              <Select.Item
+                key={opt.value}
+                value={opt.value}
+                className="radix-select-item"
+              >
+                <Select.ItemIndicator className="radix-select-indicator">
+                  <Check size={14} />
+                </Select.ItemIndicator>
+                <Select.ItemText>{opt.label}</Select.ItemText>
+              </Select.Item>
+            ))}
+          </Select.Viewport>
+          <Select.ScrollDownButton className="radix-select-scroll-btn">
+            <ChevronDown size={14} />
+          </Select.ScrollDownButton>
+        </Select.Content>
+      </Select.Portal>
+    </Select.Root>
+  );
+}
 
 export function EditTask() {
   const navigate = useNavigate();
@@ -224,19 +292,17 @@ export function EditTask() {
                     </div>
                     <div className="form-group">
                       <label>Column</label>
-                      <select
+                      <RadixSelect
                         name="columnId"
-                        className="form-input"
-                        defaultValue={task.columnId}
+                        value={task.columnId}
+                        options={columns.map((col) => ({
+                          value: col.id,
+                          label: col.title,
+                        }))}
                         required
                         disabled={isPending}
-                      >
-                        {columns.map((col) => (
-                          <option key={col.id} value={col.id}>
-                            {col.title}
-                          </option>
-                        ))}
-                      </select>
+                        ariaLabel="Column"
+                      />
                     </div>
                     <div className="form-group">
                       <label>Due Date</label>

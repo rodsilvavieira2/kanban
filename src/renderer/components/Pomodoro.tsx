@@ -4,6 +4,7 @@ import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { useSettingsStore } from "../stores/settingsStore";
 import { useProjectStore } from "../stores/projectStore";
+import { ProjectSelect } from "./ProjectSelect";
 import {
   RotateCcw,
   Pause,
@@ -302,28 +303,11 @@ export function Pomodoro() {
                 className="header-actions"
                 style={{ display: "flex", gap: "8px", alignItems: "center" }}
               >
-                <select
-                  className="project-select"
+                <ProjectSelect
                   value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value)}
-                  style={{
-                    background: "transparent",
-                    border: "1px solid var(--accents-2)",
-                    color: "var(--accents-8)",
-                    borderRadius: "4px",
-                    padding: "4px 8px",
-                    fontSize: "12px",
-                    outline: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <option value="all">All Projects</option>
-                  {projects.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                  onChange={setSelectedProjectId}
+                  projects={projects}
+                />
                 <button
                   className="icon-button"
                   onClick={() => loadAllTasks()}
