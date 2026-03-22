@@ -1,0 +1,26 @@
+pkgbase = taskmaster-kanban
+	pkgdesc = Offline-first Kanban board with embedded MCP server
+	pkgver = 1.0.4
+	pkgrel = 1
+	url = https://github.com/rodsilvavieira2/kanban
+	arch = x86_64
+	license = MIT
+	makedepends = nodejs
+	makedepends = yarn
+	makedepends = python
+	makedepends = gcc
+	makedepends = make
+	depends = glibc
+	depends = gcc-libs
+	depends = libx11
+	depends = nss
+	depends = atk
+	depends = gtk3
+	depends = alsa-lib
+	provides = kanban
+	conflicts = kanban
+	options = !strip
+	source = kanban-1.0.4.tar.gz::https://github.com/rodsilvavieira2/kanban/archive/v1.0.4.tar.gz
+	sha256sums = fe957abd471be14e0318cc92ce41739e2f31945d0afbdd3a0024f8b8413af667
+
+pkgname = taskmaster-kanban

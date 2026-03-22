@@ -14,7 +14,7 @@ provides=("$_appname")
 conflicts=("$_appname")
 options=(!strip)
 source=("$_appname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('fe957abd471be14e0318cc92ce41739e2f31945d0afbdd3a0024f8b8413af667')
 
 build() {
   cd "$srcdir/$_appname-$pkgver"
