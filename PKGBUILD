@@ -1,20 +1,23 @@
-# Maintainer: rodrigo
-pkgname=kanban
-pkgver=1.0.3
+# Maintainer: Rodrigo Silva <rodsilvavieira2@gmail.com>
+pkgname=taskmaster-kanban
+_appname=kanban
+pkgver=1.0.4
 pkgrel=1
-pkgdesc="TaskMaster — offline-first Kanban board with embedded MCP server"
+pkgdesc="Offline-first Kanban board with embedded MCP server"
 arch=('x86_64')
+url="https://github.com/rodsilvavieira2/kanban"
 license=('MIT')
-# No system electron needed — Electron Forge bundles the runtime in the output
+# Electron runtime is bundled by electron-forge — no system electron dep needed
 depends=('glibc' 'gcc-libs' 'libx11' 'nss' 'atk' 'gtk3' 'alsa-lib')
 makedepends=('nodejs' 'yarn' 'python' 'gcc' 'make')
+provides=("$_appname")
+conflicts=("$_appname")
 options=(!strip)
-
-# No remote source — built directly from the project directory.
-# Run: yarn make:arch  (or: makepkg -si) from the project root.
+source=("$_appname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
+sha256sums=('SKIP')
 
 build() {
-  cd "$startdir"
+  cd "$srcdir/$_appname-$pkgver"
 
   export npm_config_build_from_source=true
   yarn install --immutable
@@ -22,24 +25,24 @@ build() {
 }
 
 package() {
-  local _outdir="$startdir/out/$pkgname-linux-x64"
+  local _outdir="$srcdir/$_appname-$pkgver/out/$_appname-linux-x64"
 
   # Install app files to /usr/lib/kanban
-  install -dm755 "$pkgdir/usr/lib/$pkgname"
-  cp -r "$_outdir/." "$pkgdir/usr/lib/$pkgname/"
-  chmod 755 "$pkgdir/usr/lib/$pkgname/$pkgname"
+  install -dm755 "$pkgdir/usr/lib/$_appname"
+  cp -r "$_outdir/." "$pkgdir/usr/lib/$_appname/"
+  chmod 755 "$pkgdir/usr/lib/$_appname/$_appname"
 
   # Launcher script at /usr/bin/kanban
   install -dm755 "$pkgdir/usr/bin"
-  cat > "$pkgdir/usr/bin/$pkgname" << LAUNCHER
+  cat > "$pkgdir/usr/bin/$_appname" << 'LAUNCHER'
 #!/bin/sh
-exec /usr/lib/$pkgname/$pkgname "\$@"
+exec /usr/lib/kanban/kanban "$@"
 LAUNCHER
-  chmod 755 "$pkgdir/usr/bin/$pkgname"
+  chmod 755 "$pkgdir/usr/bin/$_appname"
 
   # .desktop entry
   install -dm755 "$pkgdir/usr/share/applications"
-  cat > "$pkgdir/usr/share/applications/$pkgname.desktop" << DESKTOP
+  cat > "$pkgdir/usr/share/applications/$_appname.desktop" << 'DESKTOP'
 [Desktop Entry]
 Name=TaskMaster Kanban
 Comment=Offline-first Kanban board with embedded MCP server
@@ -48,11 +51,10 @@ Icon=kanban
 Terminal=false
 Type=Application
 Categories=Office;ProjectManagement;
-Keywords=kanban;tasks;productivity;board;
+Keywords=kanban;tasks;productivity;board;mcp;
 DESKTOP
 
   # License
-  if [[ -f "$startdir/LICENSE" ]]; then
-    install -Dm644 "$startdir/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  fi
+  install -Dm644 "$srcdir/$_appname-$pkgver/LICENSE" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
