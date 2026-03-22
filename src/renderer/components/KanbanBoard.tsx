@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   DragDropContext,
@@ -8,7 +8,9 @@ import {
 } from "@hello-pangea/dnd";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { useProjectStore } from "../stores/projectStore";
-import { Plus, MoreHorizontal, Search, ArrowLeft } from "lucide-react";
+import { Plus, MoreHorizontal, Search, ArrowLeft, MoreVertical, Eye, Edit2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -23,6 +25,9 @@ export function KanbanBoard() {
     moveTask,
     initUpdateListener,
   } = useKanbanStore();
+
+  const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (projectId) {
@@ -55,6 +60,19 @@ export function KanbanBoard() {
     });
   };
 
+  const handleMenuClick = (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setMenuPosition({ x: rect.left, y: rect.top + rect.height });
+    setOpenMenuTaskId(taskId === openMenuTaskId ? null : taskId);
+  };
+
+  useEffect(() => {
+    const handleClick = () => setOpenMenuTaskId(null);
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
   if (isLoading && columns.length === 0)
     return (
       <div className="p-8 text-center text-accents-5">Loading board...</div>
@@ -62,6 +80,16 @@ export function KanbanBoard() {
 
   return (
     <div className="kanban-view">
+      {openMenuTaskId && (
+        <div className="task-menu-dropdown" style={{ left: menuPosition.x, top: menuPosition.y }}>
+          <div className="task-menu-item" onClick={() => navigate(`/projects/${projectId}/tasks/${openMenuTaskId}/view`)}>
+            <Eye size={16} /> View
+          </div>
+          <div className="task-menu-item" onClick={() => navigate(`/projects/${projectId}/tasks/${openMenuTaskId}/edit`)}>
+            <Edit2 size={16} /> Edit
+          </div>
+        </div>
+      )}
       <div className="kanban-header">
         <div className="kanban-header-left">
           <button
@@ -129,13 +157,18 @@ export function KanbanBoard() {
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              onClick={() => navigate(`/projects/${projectId}/tasks/${task.id}/edit`)}
+                              onClick={() => navigate(`/projects/${projectId}/tasks/${task.id}/view`)}
                             >
-                              <h4 className="task-title">{task.title}</h4>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                                <h4 className="task-title" style={{ margin: 0 }}>{task.title}</h4>
+                                <button className="icon-button" onClick={(e) => handleMenuClick(e, task.id)} style={{ padding: 0 }}>
+                                  <MoreVertical size={16} />
+                                </button>
+                              </div>
                               {task.description && (
-                                <p className="task-description-preview text-accents-5 text-sm mt-1 line-clamp-2">
-                                  {task.description}
-                                </p>
+                                <div className="task-description-preview text-accents-5 text-sm mt-1 markdown-preview">
+                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{task.description}</ReactMarkdown>
+                                </div>
                               )}
 
                               {task.tags && task.tags.length > 0 && (

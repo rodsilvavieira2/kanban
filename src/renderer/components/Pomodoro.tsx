@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { useSettingsStore } from "../stores/settingsStore";
@@ -11,9 +12,16 @@ import {
   Coffee,
   RefreshCw,
   Clock,
+  MoreVertical,
+  Eye,
+  Edit2,
+  CheckCircle,
 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export function Pomodoro() {
+  const navigate = useNavigate();
   const {
     selectedTaskId,
     setSelectedTaskId,
@@ -39,13 +47,14 @@ export function Pomodoro() {
   const { projects, loadProjects } = useProjectStore();
 
   const [selectedProjectId, setSelectedProjectId] = useState<string>("all");
+  const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     loadAllTasks();
     loadProjects();
   }, [loadAllTasks, loadProjects]);
 
-  // Sync timer display when settings change while the timer is paused
   useEffect(() => {
     syncSettingsIfPaused();
   }, [focusTime, breakTime, syncSettingsIfPaused]);
@@ -60,6 +69,19 @@ export function Pomodoro() {
     [tasks, selectedTaskId],
   );
 
+  const handleMenuClick = (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setMenuPosition({ x: rect.left, y: rect.top + rect.height });
+    setOpenMenuTaskId(taskId === openMenuTaskId ? null : taskId);
+  };
+
+  useEffect(() => {
+    const handleClick = () => setOpenMenuTaskId(null);
+    document.addEventListener("click", handleClick);
+    return () => document.removeEventListener("click", handleClick);
+  }, []);
+
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
@@ -70,6 +92,19 @@ export function Pomodoro() {
 
   return (
     <div className="pomodoro-view" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {openMenuTaskId && (
+        <div className="task-menu-dropdown" style={{ left: menuPosition.x, top: menuPosition.y }}>
+          <div className="task-menu-item" onClick={() => navigate(`/projects/${tasks.find(t=>t.id === openMenuTaskId)?.projectId}/tasks/${openMenuTaskId}/view`)}>
+            <Eye size={16} /> View
+          </div>
+          <div className="task-menu-item" onClick={() => navigate(`/projects/${tasks.find(t=>t.id === openMenuTaskId)?.projectId}/tasks/${openMenuTaskId}/edit`)}>
+            <Edit2 size={16} /> Edit
+          </div>
+          <div className="task-menu-item" onClick={() => { setSelectedTaskId(openMenuTaskId); setOpenMenuTaskId(null); }}>
+            <CheckCircle size={16} /> Select for Pomodoro
+          </div>
+        </div>
+      )}
       {(projects.length === 0 || tasks.length === 0) ? (
         <div className="empty-state" style={{ flexGrow: 1, border: 'none', background: 'none' }}>
           <div className="empty-state-illustration">
@@ -236,20 +271,27 @@ export function Pomodoro() {
                 <div
                   key={task.id}
                   className={`pomodoro-task-card ${selectedTaskId === task.id ? "active" : ""}`}
-                  onClick={() => !isActive && setSelectedTaskId(task.id)}
-                  style={{ cursor: isActive ? "not-allowed" : "pointer" }}
+                  onClick={() => navigate(`/projects/${task.projectId}/tasks/${task.id}/view`)}
+                  style={{ cursor: "pointer" }}
                 >
-                  <div className="task-labels">
-                    <span className="task-label">TASK</span>
-                    {task.timeSpentMinutes > 0 && (
-                      <span className="task-label priority-low">
-                        {task.timeSpentMinutes}m spent
-                      </span>
-                    )}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div className="task-labels">
+                        <span className="task-label">TASK</span>
+                        {task.timeSpentMinutes > 0 && (
+                        <span className="task-label priority-low">
+                            {task.timeSpentMinutes}m spent
+                        </span>
+                        )}
+                    </div>
+                    <button className="icon-button" onClick={(e) => handleMenuClick(e, task.id)} style={{ padding: 0 }}>
+                        <MoreVertical size={16} />
+                    </button>
                   </div>
                   <h4 className="task-title">{task.title}</h4>
                   {task.description && (
-                    <p className="task-desc line-clamp-2">{task.description}</p>
+                    <div className="task-description-preview text-accents-5 text-sm mt-1 markdown-preview">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{task.description}</ReactMarkdown>
+                    </div>
                   )}
                   <div className="task-meta">
                     <div className="task-meta-left">
@@ -270,5 +312,4 @@ export function Pomodoro() {
       )}
     </div>
   );
-
 }

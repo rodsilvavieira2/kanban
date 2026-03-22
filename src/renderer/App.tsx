@@ -5,6 +5,7 @@ import { ProjectsList } from "./components/ProjectsList";
 import { KanbanBoard } from "./components/KanbanBoard";
 import { CreateTask } from "./components/CreateTask";
 import { EditTask } from "./components/EditTask";
+import { ViewTask } from "./components/ViewTask";
 import { Settings } from "./components/Settings";
 import { Pomodoro } from "./components/Pomodoro";
 
@@ -36,6 +37,10 @@ const router = createHashRouter([
       {
         path: "projects/:projectId/tasks/:taskId/edit",
         element: <EditTask />,
+      },
+      {
+        path: "projects/:projectId/tasks/:taskId/view",
+        element: <ViewTask />,
       },
       {
         path: "settings",
