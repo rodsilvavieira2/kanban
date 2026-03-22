@@ -15,12 +15,12 @@ export function CreateProjectModal({
   const navigate = useNavigate();
 
   const [, formAction, isPending] = useActionState(
-    async (previousState: any, formData: FormData) => {
+    async (previousState: unknown, formData: FormData) => {
       const name = formData.get("name") as string;
       const description = formData.get("description") as string;
-      
+
       if (!name?.trim()) return null;
-      
+
       try {
         await createProject({
           name: name.trim(),
@@ -41,7 +41,11 @@ export function CreateProjectModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <form action={formAction} className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <form
+        action={formAction}
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-header">
           <div className="modal-title">
             <div className="modal-title-icon">
@@ -106,11 +110,7 @@ export function CreateProjectModal({
           <button type="button" className="btn-secondary" onClick={onClose}>
             Cancel
           </button>
-          <button
-            type="submit"
-            className="btn-primary"
-            disabled={isPending}
-          >
+          <button type="submit" className="btn-primary" disabled={isPending}>
             {isPending ? "Creating…" : "Create Project"}
           </button>
         </div>
