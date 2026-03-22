@@ -2,13 +2,19 @@ import React from "react";
 import { TaskDetailsContent } from "./TaskDetailsContent";
 import { X } from "lucide-react";
 import { Task } from "../../shared/schemas/models";
+import { usePomodoroStore } from "../stores/pomodoroStore";
 
 interface ViewTaskModalProps {
-  task: Task;
+  task: Task | undefined;
   onClose: () => void;
+  onEdit?: () => void; // Added back if needed
 }
 
 export function ViewTaskModal({ task, onClose }: ViewTaskModalProps) {
+  const { setSelectedTaskId } = usePomodoroStore();
+
+  if (!task) return null;
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -26,13 +32,20 @@ export function ViewTaskModal({ task, onClose }: ViewTaskModalProps) {
             display: "flex",
             justifyContent: "flex-end",
             padding: "16px",
+            borderBottom: "1px solid var(--border-color)",
           }}
         >
           <button className="icon-button" onClick={onClose}>
             <X size={20} />
           </button>
         </div>
-        <TaskDetailsContent task={task} />
+        <TaskDetailsContent
+          task={task}
+          onSelectForPomodoro={() => {
+            setSelectedTaskId(task.id);
+            onClose();
+          }}
+        />
       </div>
     </div>
   );

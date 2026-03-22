@@ -136,7 +136,7 @@ export function Pomodoro() {
               setOpenMenuTaskId(null);
             }}
           >
-            <Eye size={16} /> View
+            <Eye size={16} /> View Details
           </div>
           <div
             className="task-menu-item"
@@ -155,7 +155,7 @@ export function Pomodoro() {
               setOpenMenuTaskId(null);
             }}
           >
-            <CheckCircle size={16} /> Select for Pomodoro
+            <CheckCircle size={16} /> Select & Continue
           </div>
         </div>
       )}
@@ -332,7 +332,7 @@ export function Pomodoro() {
                 <div
                   key={task.id}
                   className={`pomodoro-task-card ${selectedTaskId === task.id ? "active" : ""}`}
-                  onClick={() => setViewTaskId(task.id)}
+                  onClick={() => setSelectedTaskId(task.id)}
                   style={{ cursor: "pointer" }}
                 >
                   <div
@@ -350,13 +350,33 @@ export function Pomodoro() {
                         </span>
                       )}
                     </div>
-                    <button
-                      className="icon-button"
-                      onClick={(e) => handleMenuClick(e, task.id)}
-                      style={{ padding: 0 }}
-                    >
-                      <MoreVertical size={16} />
-                    </button>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <button
+                        className="btn-secondary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setViewTaskId(task.id);
+                        }}
+                        style={{
+                          padding: "2px 8px",
+                          fontSize: "11px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          height: "24px",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <Eye size={12} /> View Details
+                      </button>
+                      <button
+                        className="icon-button"
+                        onClick={(e) => handleMenuClick(e, task.id)}
+                        style={{ padding: 0 }}
+                      >
+                        <MoreVertical size={16} />
+                      </button>
+                    </div>
                   </div>
                   <h4 className="task-title">{task.title}</h4>
                   {task.description && (

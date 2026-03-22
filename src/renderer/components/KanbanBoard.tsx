@@ -16,9 +16,11 @@ import {
   MoreVertical,
   Eye,
   Edit2,
+  CheckCircle,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { usePomodoroStore } from "../stores/pomodoroStore";
 
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -99,7 +101,7 @@ export function KanbanBoard() {
               navigate(`/projects/${projectId}/tasks/${openMenuTaskId}/view`)
             }
           >
-            <Eye size={16} /> View
+            <Eye size={16} /> View Details
           </div>
           <div
             className="task-menu-item"
@@ -108,6 +110,17 @@ export function KanbanBoard() {
             }
           >
             <Edit2 size={16} /> Edit
+          </div>
+          <div
+            className="task-menu-item"
+            onClick={() => {
+              if (openMenuTaskId) {
+                usePomodoroStore.getState().setSelectedTaskId(openMenuTaskId);
+                navigate("/pomodoro");
+              }
+            }}
+          >
+            <CheckCircle size={16} /> Select & Continue
           </div>
         </div>
       )}

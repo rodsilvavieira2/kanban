@@ -1,18 +1,39 @@
 import React from "react";
-import { Clock, Calendar, Tag } from "lucide-react";
+import { Clock, Calendar, Tag, Play } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Task } from "../../shared/schemas/models";
 
 interface TaskDetailsContentProps {
   task: Task;
-  // Removed onEdit and onBack as requested for modal view
+  onSelectForPomodoro?: () => void;
 }
 
-export function TaskDetailsContent({ task }: TaskDetailsContentProps) {
+export function TaskDetailsContent({
+  task,
+  onSelectForPomodoro,
+}: TaskDetailsContentProps) {
   return (
     <div className="task-details-content" style={{ padding: "24px" }}>
-      <h1 style={{ fontSize: "24px", marginBottom: "16px" }}>{task.title}</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          marginBottom: "16px",
+        }}
+      >
+        <h1 style={{ fontSize: "24px", margin: 0 }}>{task.title}</h1>
+        {onSelectForPomodoro && (
+          <button
+            className="btn-primary"
+            onClick={onSelectForPomodoro}
+            style={{ display: "flex", alignItems: "center", gap: "8px" }}
+          >
+            <Play size={16} fill="currentColor" /> Select & Continue
+          </button>
+        )}
+      </div>
 
       <div
         style={{
