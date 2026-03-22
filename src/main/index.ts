@@ -53,6 +53,8 @@ const createWindow = () => {
     mainWindow.loadFile(
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
+    // Remove the default menu bar in production
+    mainWindow.setMenu(null);
   }
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

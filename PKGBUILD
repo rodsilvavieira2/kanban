@@ -1,6 +1,6 @@
 # Maintainer: rodrigo
 pkgname=kanban
-pkgver=1.0.0
+pkgver=1.0.3
 pkgrel=1
 pkgdesc="TaskMaster — offline-first Kanban board with embedded MCP server"
 arch=('x86_64')
