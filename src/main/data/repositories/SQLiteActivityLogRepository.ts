@@ -1,15 +1,17 @@
-import { DatabaseSync } from 'node:sqlite';
-import { v4 as uuidv4 } from 'uuid';
-import { ActivityLog } from '../../../shared/schemas/models';
-import { ActivityLogRepository } from '../../core/repositories/ActivityLogRepository';
+import { DatabaseSync } from "node:sqlite";
+import { v4 as uuidv4 } from "uuid";
+import { ActivityLog } from "../../../shared/schemas/models";
+import { ActivityLogRepository } from "../../core/repositories/ActivityLogRepository";
 
 export class SQLiteActivityLogRepository implements ActivityLogRepository {
   constructor(private db: DatabaseSync) {}
 
-  async create(log: Omit<ActivityLog, 'id' | 'createdAt'>): Promise<ActivityLog> {
+  async create(
+    log: Omit<ActivityLog, "id" | "createdAt">,
+  ): Promise<ActivityLog> {
     const id = uuidv4();
     const createdAt = new Date().toISOString();
-    
+
     const stmt = this.db.prepare(`
       INSERT INTO activity_logs (id, action, entity_type, entity_id, details, created_at)
       VALUES (@id, @action, @entityType, @entityId, @details, @createdAt)
@@ -21,13 +23,13 @@ export class SQLiteActivityLogRepository implements ActivityLogRepository {
       entityType: log.entityType,
       entityId: log.entityId,
       details: log.details || null,
-      createdAt
+      createdAt,
     });
 
     return {
       id,
       ...log,
-      createdAt
+      createdAt,
     };
   }
 
@@ -44,12 +46,15 @@ export class SQLiteActivityLogRepository implements ActivityLogRepository {
       ORDER BY created_at DESC
       LIMIT ?
     `);
-    
+
     return stmt.all(limit) as ActivityLog[];
   }
 
-  async getByEntity(entityType: string, entityId: string): Promise<ActivityLog[]> {
-     const stmt = this.db.prepare(`
+  async getByEntity(
+    entityType: string,
+    entityId: string,
+  ): Promise<ActivityLog[]> {
+    const stmt = this.db.prepare(`
       SELECT 
         id, 
         action, 
@@ -61,7 +66,7 @@ export class SQLiteActivityLogRepository implements ActivityLogRepository {
       WHERE entity_type = ? AND entity_id = ?
       ORDER BY created_at DESC
     `);
-    
+
     return stmt.all(entityType, entityId) as ActivityLog[];
   }
 }

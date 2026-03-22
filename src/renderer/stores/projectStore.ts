@@ -31,7 +31,8 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     } catch (error: unknown) {
       console.error("Failed to load projects:", error);
       set({
-        error: error instanceof Error ? error.message : "Failed to load projects",
+        error:
+          error instanceof Error ? error.message : "Failed to load projects",
         isLoading: false,
       });
     }
@@ -43,7 +44,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       // Re-fetch to stay in sync with SQLite
       await get().loadProjects();
     } catch (error: unknown) {
-      set({ error: error instanceof Error ? error.message : "Failed to create project" });
+      set({
+        error:
+          error instanceof Error ? error.message : "Failed to create project",
+      });
       throw error;
     }
   },
@@ -55,7 +59,10 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       await get().loadProjects();
     } catch (error: unknown) {
       console.error("Failed to delete project:", error);
-      set({ error: error instanceof Error ? error.message : "Failed to delete project" });
+      set({
+        error:
+          error instanceof Error ? error.message : "Failed to delete project",
+      });
       throw error;
     }
   },

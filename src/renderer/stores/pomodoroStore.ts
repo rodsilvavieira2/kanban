@@ -12,7 +12,13 @@ let _intervalId: ReturnType<typeof setInterval> | null = null;
 
 // Captured during store creation so module-level functions can read/write state.
 let _get: (() => PomodoroState) | null = null;
-let _set: ((partial: Partial<PomodoroState> | ((s: PomodoroState) => Partial<PomodoroState>)) => void) | null = null;
+let _set:
+  | ((
+      partial:
+        | Partial<PomodoroState>
+        | ((s: PomodoroState) => Partial<PomodoroState>),
+    ) => void)
+  | null = null;
 
 function _stopInterval() {
   if (_intervalId !== null) {
@@ -59,11 +65,12 @@ function _startInterval() {
       if (!state.isBreak && state.selectedTaskId) {
         const elapsed = state.totalTime - newTimeLeft;
         if (elapsed > 0 && elapsed % 60 === 0) {
-          useKanbanStore.getState().updateTaskTime(state.selectedTaskId, 1).catch(
-            (err: unknown) => {
+          useKanbanStore
+            .getState()
+            .updateTaskTime(state.selectedTaskId, 1)
+            .catch((err: unknown) => {
               console.error("Failed to update task time:", err);
-            },
-          );
+            });
         }
       }
     } else {
@@ -149,7 +156,8 @@ export const usePomodoroStore = create<PomodoroState>()(
         setFocusTime: (time) => set({ focusTime: time }),
         setBreakTime: (time) => set({ breakTime: time }),
         setTotalRounds: (rounds) => set({ totalRounds: rounds }),
-        setNotificationsEnabled: (enabled) => set({ notificationsEnabled: enabled }),
+        setNotificationsEnabled: (enabled) =>
+          set({ notificationsEnabled: enabled }),
         setSelectedTaskId: (id) => set({ selectedTaskId: id }),
 
         // Timer actions
@@ -206,7 +214,13 @@ export const usePomodoroStore = create<PomodoroState>()(
           const { breakTime } = _getTimerSettings();
           const time = breakTime * 60;
           _stopInterval();
-          set({ isActive: autoStart, isBreak: true, timeLeft: time, totalTime: time, _savedAt: Date.now() });
+          set({
+            isActive: autoStart,
+            isBreak: true,
+            timeLeft: time,
+            totalTime: time,
+            _savedAt: Date.now(),
+          });
           _sendNotification("Focus Session Complete", "Time for a break!");
           if (autoStart) _startInterval();
         },
@@ -229,7 +243,11 @@ export const usePomodoroStore = create<PomodoroState>()(
 
         resetCurrentSession: () => {
           _stopInterval();
-          set((state) => ({ isActive: false, timeLeft: state.totalTime, _savedAt: Date.now() }));
+          set((state) => ({
+            isActive: false,
+            timeLeft: state.totalTime,
+            _savedAt: Date.now(),
+          }));
         },
 
         resetRounds: () => {
@@ -254,7 +272,11 @@ export const usePomodoroStore = create<PomodoroState>()(
           if (!isActive && timeLeft === totalTime) {
             const { focusTime, breakTime } = _getTimerSettings();
             const newTime = (isBreak ? breakTime : focusTime) * 60;
-            set({ timeLeft: newTime, totalTime: newTime, _savedAt: Date.now() });
+            set({
+              timeLeft: newTime,
+              totalTime: newTime,
+              _savedAt: Date.now(),
+            });
           }
         },
       };

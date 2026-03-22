@@ -1,37 +1,39 @@
-import { DatabaseSync } from 'node:sqlite';
-import path from 'path';
-import { app } from 'electron';
-import fs from 'fs';
+import { DatabaseSync } from "node:sqlite";
+import path from "path";
+import { app } from "electron";
+import fs from "fs";
 
 // Determine the database path (in userData folder for production, local data folder for dev)
-const isDev = process.env.NODE_ENV === 'development';
+const isDev = process.env.NODE_ENV === "development";
 const dataDir = isDev
-  ? path.join(process.cwd(), 'data')
-  : path.join(app.getPath('userData'), 'database');
+  ? path.join(process.cwd(), "data")
+  : path.join(app.getPath("userData"), "database");
 
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-const dbPath = path.join(dataDir, 'kanban.sqlite');
+const dbPath = path.join(dataDir, "kanban.sqlite");
 
 const db = new DatabaseSync(dbPath);
 
 // Enable WAL mode for better concurrency and performance
-db.exec('PRAGMA journal_mode = WAL');
-db.exec('PRAGMA foreign_keys = ON');
+db.exec("PRAGMA journal_mode = WAL");
+db.exec("PRAGMA foreign_keys = ON");
 
 export function initDatabase() {
-  console.log('Initializing Database at:', dbPath);
+  console.log("Initializing Database at:", dbPath);
 
   // Read current user_version
-  const versionRow = db.prepare('PRAGMA user_version').get() as { user_version: number };
+  const versionRow = db.prepare("PRAGMA user_version").get() as {
+    user_version: number;
+  };
   let currentVersion = versionRow.user_version || 0;
 
   // Run migrations
   try {
     if (currentVersion < 1) {
-      console.log('Running Migration 1: Initial Schema');
+      console.log("Running Migration 1: Initial Schema");
       db.exec(`
         BEGIN TRANSACTION;
 
@@ -96,7 +98,7 @@ export function initDatabase() {
 
     // Migration 2: Activity Logs
     if (currentVersion < 2) {
-      console.log('Running Migration 2: Activity Logs');
+      console.log("Running Migration 2: Activity Logs");
       db.exec(`
         BEGIN TRANSACTION;
 
@@ -115,9 +117,8 @@ export function initDatabase() {
       `);
       currentVersion = 2;
     }
-
   } catch (err) {
-    console.error('Migration failed:', err);
+    console.error("Migration failed:", err);
     throw err;
   }
 }

@@ -1,18 +1,20 @@
-import { DatabaseSync } from 'node:sqlite';
-import { Column } from '../../../shared/schemas/models';
-import { IColumnRepository } from '../../core/domain/repositories/IColumnRepository';
+import { DatabaseSync } from "node:sqlite";
+import { Column } from "../../../shared/schemas/models";
+import { IColumnRepository } from "../../core/domain/repositories/IColumnRepository";
 
 export class SQLiteColumnRepository implements IColumnRepository {
   constructor(private db: DatabaseSync) {}
 
   async findAllByProjectId(projectId: string): Promise<Column[]> {
-    const stmt = this.db.prepare('SELECT * FROM columns WHERE project_id = ? ORDER BY "order" ASC');
+    const stmt = this.db.prepare(
+      'SELECT * FROM columns WHERE project_id = ? ORDER BY "order" ASC',
+    );
     const rows = stmt.all(projectId) as Record<string, unknown>[];
-    return rows.map(row => this.mapToEntity(row));
+    return rows.map((row) => this.mapToEntity(row));
   }
 
   async findById(id: string): Promise<Column | undefined> {
-    const stmt = this.db.prepare('SELECT * FROM columns WHERE id = ?');
+    const stmt = this.db.prepare("SELECT * FROM columns WHERE id = ?");
     const row = stmt.get(id) as Record<string, unknown>;
 
     if (!row) return undefined;
@@ -45,21 +47,23 @@ export class SQLiteColumnRepository implements IColumnRepository {
   }
 
   async delete(id: string): Promise<void> {
-    const stmt = this.db.prepare('DELETE FROM columns WHERE id = ?');
+    const stmt = this.db.prepare("DELETE FROM columns WHERE id = ?");
     stmt.run(id);
   }
 
   async reorder(columns: { id: string; order: number }[]): Promise<void> {
-    const updateStmt = this.db.prepare('UPDATE columns SET "order" = ? WHERE id = ?');
+    const updateStmt = this.db.prepare(
+      'UPDATE columns SET "order" = ? WHERE id = ?',
+    );
 
-    this.db.exec('BEGIN');
+    this.db.exec("BEGIN");
     try {
       for (const item of columns) {
         updateStmt.run(item.order, item.id);
       }
-      this.db.exec('COMMIT');
+      this.db.exec("COMMIT");
     } catch (err) {
-      this.db.exec('ROLLBACK');
+      this.db.exec("ROLLBACK");
       throw err;
     }
   }

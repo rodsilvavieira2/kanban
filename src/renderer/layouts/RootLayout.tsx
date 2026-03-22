@@ -10,7 +10,8 @@ export function RootLayout() {
   const location = useLocation();
   const loadSettings = useSettingsStore((state) => state.loadSettings);
   const themeMode = useSettingsStore((state) => state.settings.theme);
-  const colorScheme = useSettingsStore((state) => state.settings.colorScheme) || "Base16 Default";
+  const colorScheme =
+    useSettingsStore((state) => state.settings.colorScheme) || "Base16 Default";
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   React.useEffect(() => {
@@ -36,23 +37,44 @@ export function RootLayout() {
     const root = document.documentElement;
 
     root.style.setProperty("--bg-main", colors.background);
-    root.style.setProperty("--bg-secondary", `color-mix(in srgb, ${colors.background} 94%, ${colors.foreground})`);
-    root.style.setProperty("--bg-sidebar", `color-mix(in srgb, ${colors.background} 97%, ${colors.foreground})`);
-    
-    root.style.setProperty("--border-color", `color-mix(in srgb, ${colors.background} 85%, ${colors.foreground})`);
-    root.style.setProperty("--border-hover", `color-mix(in srgb, ${colors.background} 75%, ${colors.foreground})`);
-    
+    root.style.setProperty(
+      "--bg-secondary",
+      `color-mix(in srgb, ${colors.background} 94%, ${colors.foreground})`,
+    );
+    root.style.setProperty(
+      "--bg-sidebar",
+      `color-mix(in srgb, ${colors.background} 97%, ${colors.foreground})`,
+    );
+
+    root.style.setProperty(
+      "--border-color",
+      `color-mix(in srgb, ${colors.background} 85%, ${colors.foreground})`,
+    );
+    root.style.setProperty(
+      "--border-hover",
+      `color-mix(in srgb, ${colors.background} 75%, ${colors.foreground})`,
+    );
+
     root.style.setProperty("--text-primary", colors.foreground);
-    root.style.setProperty("--text-secondary", `color-mix(in srgb, ${colors.foreground} 70%, ${colors.background})`);
-    root.style.setProperty("--text-tertiary", `color-mix(in srgb, ${colors.foreground} 40%, ${colors.background})`);
-    
+    root.style.setProperty(
+      "--text-secondary",
+      `color-mix(in srgb, ${colors.foreground} 70%, ${colors.background})`,
+    );
+    root.style.setProperty(
+      "--text-tertiary",
+      `color-mix(in srgb, ${colors.foreground} 40%, ${colors.background})`,
+    );
+
     root.style.setProperty("--accent-color", colors.blue);
-    root.style.setProperty("--accent-transparent", `color-mix(in srgb, ${colors.blue} 15%, transparent)`);
-    
+    root.style.setProperty(
+      "--accent-transparent",
+      `color-mix(in srgb, ${colors.blue} 15%, transparent)`,
+    );
+
     root.style.setProperty("--success", colors.green);
     root.style.setProperty("--warning", colors.yellow);
     root.style.setProperty("--error", colors.red);
-    
+
     root.style.setProperty("--button-bg", colors.foreground);
     root.style.setProperty("--button-text", colors.background);
   }, [themeMode, colorScheme]);

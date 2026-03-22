@@ -1,6 +1,6 @@
-import { DatabaseSync } from 'node:sqlite';
-import { Project } from '../../../shared/schemas/models';
-import { IProjectRepository } from '../../core/domain/repositories/IProjectRepository';
+import { DatabaseSync } from "node:sqlite";
+import { Project } from "../../../shared/schemas/models";
+import { IProjectRepository } from "../../core/domain/repositories/IProjectRepository";
 
 export class SQLiteProjectRepository implements IProjectRepository {
   constructor(private db: DatabaseSync) {}
@@ -14,9 +14,9 @@ export class SQLiteProjectRepository implements IProjectRepository {
         (SELECT COUNT(t.id) FROM tasks t INNER JOIN columns c ON t.column_id = c.id WHERE c.project_id = p.id AND c."order" = (SELECT MAX("order") FROM columns WHERE project_id = p.id)) as completedCount
       FROM projects p
     `);
-    
+
     const rows = stmt.all() as Record<string, unknown>[];
-    return rows.map(row => this.mapToEntity(row));
+    return rows.map((row) => this.mapToEntity(row));
   }
 
   async findById(id: string): Promise<Project | undefined> {
@@ -30,16 +30,16 @@ export class SQLiteProjectRepository implements IProjectRepository {
       WHERE p.id = ?
     `);
     const row = stmt.get(id) as Record<string, unknown>;
-    
+
     if (!row) return undefined;
     return this.mapToEntity(row);
   }
 
   async save(project: Project): Promise<Project> {
     const { id, name, description, status, dueDate } = project;
-    
+
     const existing = await this.findById(id);
-    
+
     if (existing) {
       const stmt = this.db.prepare(`
         UPDATE projects 
@@ -54,14 +54,14 @@ export class SQLiteProjectRepository implements IProjectRepository {
       `);
       stmt.run(id, name, description ?? null, status, dueDate ?? null);
     }
-    
+
     const output = await this.findById(id);
     if (!output) throw new Error("Project not found");
     return output;
   }
 
   async delete(id: string): Promise<void> {
-    const stmt = this.db.prepare('DELETE FROM projects WHERE id = ?');
+    const stmt = this.db.prepare("DELETE FROM projects WHERE id = ?");
     stmt.run(id);
   }
 
@@ -75,7 +75,7 @@ export class SQLiteProjectRepository implements IProjectRepository {
 
     if (tasksCount > 0) {
       calculatedProgress = Math.round((completedCount / tasksCount) * 100);
-      
+
       if (completedCount === tasksCount) {
         calculatedStatus = "Completed";
       } else if (todoCount === tasksCount) {
@@ -86,7 +86,11 @@ export class SQLiteProjectRepository implements IProjectRepository {
     } else {
       // If no tasks, fallback to the status stored in DB or default to Planning
       const dbStatus = row.status as string;
-      if (dbStatus === "Completed" || dbStatus === "In Progress" || dbStatus === "Planning") {
+      if (
+        dbStatus === "Completed" ||
+        dbStatus === "In Progress" ||
+        dbStatus === "Planning"
+      ) {
         calculatedStatus = dbStatus as "Planning" | "In Progress" | "Completed";
       }
     }
@@ -94,7 +98,7 @@ export class SQLiteProjectRepository implements IProjectRepository {
     return {
       id: row.id as string,
       name: row.name as string,
-      description: (row.description as string) || '',
+      description: (row.description as string) || "",
       status: calculatedStatus,
       dueDate: (row.due_date as string) || undefined,
       progress: calculatedProgress,

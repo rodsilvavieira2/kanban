@@ -1,5 +1,8 @@
 import http from "node:http";
-import { McpServer as McpSdkServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+import {
+  McpServer as McpSdkServer,
+  ResourceTemplate,
+} from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { z } from "zod";
 
@@ -41,26 +44,30 @@ export class McpServer {
   private setupHandlers(server: McpSdkServer) {
     // ── Resources ──────────────────────────────────────────────────────────────
 
-    const boardTemplate = new ResourceTemplate("kanban://projects/{projectId}/board", {
-      list: async () => {
-        const projects = await this.getProjectsUseCase.execute();
-        return {
-          resources: projects.map((p) => ({
-            uri: `kanban://projects/${p.id}/board`,
-            name: `${p.name} Board State`,
-            mimeType: "application/json",
-            description: `Full state of the ${p.name} board including columns and tasks.`,
-          })),
-        };
+    const boardTemplate = new ResourceTemplate(
+      "kanban://projects/{projectId}/board",
+      {
+        list: async () => {
+          const projects = await this.getProjectsUseCase.execute();
+          return {
+            resources: projects.map((p) => ({
+              uri: `kanban://projects/${p.id}/board`,
+              name: `${p.name} Board State`,
+              mimeType: "application/json",
+              description: `Full state of the ${p.name} board including columns and tasks.`,
+            })),
+          };
+        },
       },
-    });
+    );
 
     server.registerResource(
       "board",
       boardTemplate,
       {
         mimeType: "application/json",
-        description: "Full state of a project board including columns and tasks.",
+        description:
+          "Full state of a project board including columns and tasks.",
       },
       async (uri) => {
         const projectId = uri.pathname.split("/")[1];
@@ -109,19 +116,31 @@ export class McpServer {
       "create_project",
       {
         title: "Create Project",
-        description: "Create a new Kanban project board. Returns the created project including its generated ID.",
+        description:
+          "Create a new Kanban project board. Returns the created project including its generated ID.",
         inputSchema: {
           name: z.string().describe("The name of the project"),
-          description: z.string().optional().describe("An optional description of the project"),
+          description: z
+            .string()
+            .optional()
+            .describe("An optional description of the project"),
           status: z
             .enum(["Planning", "In Progress", "Completed"])
             .optional()
             .describe("Initial project status (defaults to Planning)"),
-          dueDate: z.string().optional().describe("Optional due date for the project (YYYY-MM-DD)"),
+          dueDate: z
+            .string()
+            .optional()
+            .describe("Optional due date for the project (YYYY-MM-DD)"),
         },
       },
       async ({ name, description, status, dueDate }) => {
-        const project = await this.createProjectUseCase.execute({ name, description, status, dueDate });
+        const project = await this.createProjectUseCase.execute({
+          name,
+          description,
+          status,
+          dueDate,
+        });
         this.onDataUpdated();
         return {
           content: [
@@ -138,7 +157,8 @@ export class McpServer {
       "delete_project",
       {
         title: "Delete Project",
-        description: "Permanently delete a project and all its columns and tasks.",
+        description:
+          "Permanently delete a project and all its columns and tasks.",
         inputSchema: {
           projectId: z.string().describe("The ID of the project to delete"),
         },
@@ -147,7 +167,9 @@ export class McpServer {
         await this.deleteProjectUseCase.execute(projectId);
         this.onDataUpdated();
         return {
-          content: [{ type: "text", text: `Project ${projectId} deleted successfully` }],
+          content: [
+            { type: "text", text: `Project ${projectId} deleted successfully` },
+          ],
         };
       },
     );
@@ -162,19 +184,40 @@ export class McpServer {
           "Create a new task in a project column. Use get_projects first to obtain valid projectId and columnId values.",
         inputSchema: {
           projectId: z.string().describe("The ID of the project"),
-          columnId: z.string().describe("The ID of the column to place the task in"),
+          columnId: z
+            .string()
+            .describe("The ID of the column to place the task in"),
           title: z.string().describe("The title of the task"),
-          description: z.string().optional().describe("An optional description of the task"),
-          dueDate: z.string().optional().describe("Optional due date (YYYY-MM-DD)"),
-          tags: z.array(z.string()).optional().describe("Optional list of tag labels for the task"),
+          description: z
+            .string()
+            .optional()
+            .describe("An optional description of the task"),
+          dueDate: z
+            .string()
+            .optional()
+            .describe("Optional due date (YYYY-MM-DD)"),
+          tags: z
+            .array(z.string())
+            .optional()
+            .describe("Optional list of tag labels for the task"),
         },
       },
       async ({ projectId, columnId, title, description, dueDate, tags }) => {
-        const task = await this.createTaskUseCase.execute({ projectId, columnId, title, description, dueDate, tags });
+        const task = await this.createTaskUseCase.execute({
+          projectId,
+          columnId,
+          title,
+          description,
+          dueDate,
+          tags,
+        });
         this.onDataUpdated();
         return {
           content: [
-            { type: "text", text: `Task created successfully: ${JSON.stringify(task, null, 2)}` },
+            {
+              type: "text",
+              text: `Task created successfully: ${JSON.stringify(task, null, 2)}`,
+            },
           ],
         };
       },
@@ -184,14 +227,26 @@ export class McpServer {
       "update_task",
       {
         title: "Update Task",
-        description: "Update one or more fields of an existing task. Only supplied fields are changed.",
+        description:
+          "Update one or more fields of an existing task. Only supplied fields are changed.",
         inputSchema: {
           taskId: z.string().describe("The ID of the task to update"),
           title: z.string().optional().describe("New title for the task"),
-          description: z.string().optional().describe("New description for the task"),
-          columnId: z.string().optional().describe("Move the task to a different column by its ID"),
+          description: z
+            .string()
+            .optional()
+            .describe("New description for the task"),
+          columnId: z
+            .string()
+            .optional()
+            .describe("Move the task to a different column by its ID"),
           dueDate: z.string().optional().describe("New due date (YYYY-MM-DD)"),
-          tags: z.array(z.string()).optional().describe("Replacement list of tag labels (overwrites existing tags)"),
+          tags: z
+            .array(z.string())
+            .optional()
+            .describe(
+              "Replacement list of tag labels (overwrites existing tags)",
+            ),
         },
       },
       async ({ taskId, ...taskData }) => {
@@ -199,7 +254,10 @@ export class McpServer {
         this.onDataUpdated();
         return {
           content: [
-            { type: "text", text: `Task updated successfully: ${JSON.stringify(task, null, 2)}` },
+            {
+              type: "text",
+              text: `Task updated successfully: ${JSON.stringify(task, null, 2)}`,
+            },
           ],
         };
       },
@@ -214,10 +272,26 @@ export class McpServer {
           "Use index 0 for the top of the column.",
         inputSchema: {
           taskId: z.string().describe("The ID of the task to move"),
-          sourceColumnId: z.string().describe("The ID of the column the task is currently in"),
-          destinationColumnId: z.string().describe("The ID of the column to move the task to (same as sourceColumnId for reorder)"),
-          sourceIndex: z.number().int().min(0).describe("Current zero-based position of the task in the source column"),
-          destinationIndex: z.number().int().min(0).describe("Target zero-based position in the destination column"),
+          sourceColumnId: z
+            .string()
+            .describe("The ID of the column the task is currently in"),
+          destinationColumnId: z
+            .string()
+            .describe(
+              "The ID of the column to move the task to (same as sourceColumnId for reorder)",
+            ),
+          sourceIndex: z
+            .number()
+            .int()
+            .min(0)
+            .describe(
+              "Current zero-based position of the task in the source column",
+            ),
+          destinationIndex: z
+            .number()
+            .int()
+            .min(0)
+            .describe("Target zero-based position in the destination column"),
         },
       },
       async (moveRequest) => {
@@ -233,10 +307,14 @@ export class McpServer {
       "update_task_time",
       {
         title: "Update Task Time",
-        description: "Add minutes to the time spent on a task. Use positive values only.",
+        description:
+          "Add minutes to the time spent on a task. Use positive values only.",
         inputSchema: {
           taskId: z.string().describe("The ID of the task"),
-          minutes: z.number().positive().describe("Number of minutes to add to the task's time spent"),
+          minutes: z
+            .number()
+            .positive()
+            .describe("Number of minutes to add to the task's time spent"),
         },
       },
       async ({ taskId, minutes }) => {
@@ -269,11 +347,15 @@ export class McpServer {
             .min(1)
             .max(200)
             .optional()
-            .describe("Maximum number of entries to return (default: 50, max: 200)"),
+            .describe(
+              "Maximum number of entries to return (default: 50, max: 200)",
+            ),
         },
       },
       async ({ limit }) => {
-        const activity = await this.getRecentActivityUseCase.execute(limit ?? 50);
+        const activity = await this.getRecentActivityUseCase.execute(
+          limit ?? 50,
+        );
         return {
           content: [
             {
@@ -289,8 +371,14 @@ export class McpServer {
   async start(port = 3282) {
     const httpServer = http.createServer(async (req, res) => {
       res.setHeader("Access-Control-Allow-Origin", "*");
-      res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type, mcp-session-id");
+      res.setHeader(
+        "Access-Control-Allow-Methods",
+        "GET, POST, DELETE, OPTIONS",
+      );
+      res.setHeader(
+        "Access-Control-Allow-Headers",
+        "Content-Type, mcp-session-id",
+      );
 
       if (req.method === "OPTIONS") {
         res.writeHead(204).end();
@@ -316,7 +404,13 @@ export class McpServer {
           console.error("MCP request error:", error);
           if (!res.headersSent) {
             res.writeHead(500, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ jsonrpc: "2.0", error: { code: -32603, message: "Internal server error" }, id: null }));
+            res.end(
+              JSON.stringify({
+                jsonrpc: "2.0",
+                error: { code: -32603, message: "Internal server error" },
+                id: null,
+              }),
+            );
           }
         }
       } else {
@@ -324,7 +418,9 @@ export class McpServer {
       }
     });
 
-    await new Promise<void>((resolve) => httpServer.listen(port, "127.0.0.1", resolve));
+    await new Promise<void>((resolve) =>
+      httpServer.listen(port, "127.0.0.1", resolve),
+    );
 
     console.log(`MCP Server started on http://127.0.0.1:${port}/mcp`);
   }

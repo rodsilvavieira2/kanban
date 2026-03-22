@@ -5,7 +5,10 @@ import { ArrowLeft, X } from "lucide-react";
 
 export function EditTask() {
   const navigate = useNavigate();
-  const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>();
+  const { projectId, taskId } = useParams<{
+    projectId: string;
+    taskId: string;
+  }>();
 
   const { columns, tasks, updateTask, loadProjectData } = useKanbanStore();
 
@@ -43,14 +46,15 @@ export function EditTask() {
     navigate(`/projects/${projectId}`);
   };
 
-  const updateAction = async (prevState: any, formData: FormData) => {
+  const updateAction = async (prevState: unknown, formData: FormData) => {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const columnId = formData.get("columnId") as string;
     const dueDate = formData.get("dueDate") as string;
     const tags = formData.getAll("tags") as string[];
 
-    if (!title || !columnId || !taskId) return { error: "Missing required fields" };
+    if (!title || !columnId || !taskId)
+      return { error: "Missing required fields" };
 
     try {
       await updateTask(taskId, {
@@ -121,7 +125,11 @@ export function EditTask() {
       <div className="create-task-view">
         <div className="kanban-header">
           <div className="kanban-header-left">
-            <button className="icon-button back-button" onClick={handleCancel} type="button">
+            <button
+              className="icon-button back-button"
+              onClick={handleCancel}
+              type="button"
+            >
               <ArrowLeft size={20} />
             </button>
           </div>
@@ -137,7 +145,11 @@ export function EditTask() {
     <div className="create-task-view">
       <div className="kanban-header">
         <div className="kanban-header-left">
-          <button className="icon-button back-button" onClick={handleCancel} type="button">
+          <button
+            className="icon-button back-button"
+            onClick={handleCancel}
+            type="button"
+          >
             <ArrowLeft size={20} />
           </button>
         </div>
@@ -152,7 +164,12 @@ export function EditTask() {
                 <p>Modify task details</p>
               </div>
               <div className="header-actions">
-                <button className="btn-danger" onClick={handleCancel} type="button" disabled={isPending}>
+                <button
+                  className="btn-danger"
+                  onClick={handleCancel}
+                  type="button"
+                  disabled={isPending}
+                >
                   Cancel
                 </button>
                 <button
@@ -170,7 +187,18 @@ export function EditTask() {
                 <div className="form-section-card">
                   <div className="form-section-header">
                     <h3>General Info</h3>
-                    {state?.error && <span className="error-text" style={{ color: "red", fontSize: "0.85em", marginLeft: "10px" }}>{state.error}</span>}
+                    {state?.error && (
+                      <span
+                        className="error-text"
+                        style={{
+                          color: "red",
+                          fontSize: "0.85em",
+                          marginLeft: "10px",
+                        }}
+                      >
+                        {state.error}
+                      </span>
+                    )}
                   </div>
                   <div className="form-section-body">
                     <div className="form-group">
@@ -270,7 +298,8 @@ export function EditTask() {
                               ))}
                               {tagInput &&
                                 !availableTags.some(
-                                  (t) => t.toLowerCase() === tagInput.toLowerCase(),
+                                  (t) =>
+                                    t.toLowerCase() === tagInput.toLowerCase(),
                                 ) && (
                                   <div
                                     className="tag-option create-option"

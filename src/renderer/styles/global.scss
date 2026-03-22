@@ -2569,7 +2569,10 @@ input:checked + .toggle-slider:before {
   color: var(--text-primary);
   line-height: 1.6;
 
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     margin-top: 1.5em;
     margin-bottom: 0.5em;
     font-weight: 600;
@@ -2593,7 +2596,8 @@ input:checked + .toggle-slider:before {
     font-family: var(--font-mono);
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin-bottom: 1em;
     padding-left: 20px;
   }
@@ -2615,7 +2619,8 @@ input:checked + .toggle-slider:before {
     }
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin: 4px 0 8px 0;
     padding-left: 18px;
     &:last-child {
@@ -2630,7 +2635,8 @@ input:checked + .toggle-slider:before {
     }
   }
 
-  strong, b {
+  strong,
+  b {
     color: var(--text-primary);
     font-weight: 600;
   }
@@ -2650,7 +2656,7 @@ input:checked + .toggle-slider:before {
   background: var(--bg-main);
   border: 1px solid var(--border-color);
   border-radius: var(--radius);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   padding: 4px 0;
   z-index: 1000;
   min-width: 120px;

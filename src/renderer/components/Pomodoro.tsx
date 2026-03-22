@@ -77,7 +77,9 @@ export function Pomodoro() {
 
   const filteredTasks = useMemo(() => {
     if (selectedProjectId === "all") return tasks;
-    return tasks.filter((t: { projectId?: string }) => t.projectId === selectedProjectId);
+    return tasks.filter(
+      (t: { projectId?: string }) => t.projectId === selectedProjectId,
+    );
   }, [tasks, selectedProjectId]);
 
   const selectedTask = useMemo(
@@ -107,37 +109,77 @@ export function Pomodoro() {
     circumference - (timeLeft / totalTime) * circumference;
 
   return (
-    <div className="pomodoro-view" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <div
+      className="pomodoro-view"
+      style={{ height: "100%", display: "flex", flexDirection: "column" }}
+    >
       {viewTaskId && (
-        <ViewTaskModal 
-          task={tasks.find(t => t.id === viewTaskId)}
+        <ViewTaskModal
+          task={tasks.find((t) => t.id === viewTaskId)}
           onClose={() => setViewTaskId(null)}
           onEdit={() => {
-            const t = tasks.find(t => t.id === viewTaskId);
+            const t = tasks.find((t) => t.id === viewTaskId);
             navigate(`/projects/${t?.projectId}/tasks/${viewTaskId}/edit`);
           }}
         />
       )}
       {openMenuTaskId && (
-        <div className="task-menu-dropdown" style={{ left: menuPosition.x, top: menuPosition.y }}>
-          <div className="task-menu-item" onClick={() => { setViewTaskId(openMenuTaskId); setOpenMenuTaskId(null); }}>
+        <div
+          className="task-menu-dropdown"
+          style={{ left: menuPosition.x, top: menuPosition.y }}
+        >
+          <div
+            className="task-menu-item"
+            onClick={() => {
+              setViewTaskId(openMenuTaskId);
+              setOpenMenuTaskId(null);
+            }}
+          >
             <Eye size={16} /> View
           </div>
-          <div className="task-menu-item" onClick={() => navigate(`/projects/${tasks.find(t=>t.id === openMenuTaskId)?.projectId}/tasks/${openMenuTaskId}/edit`)}>
+          <div
+            className="task-menu-item"
+            onClick={() =>
+              navigate(
+                `/projects/${tasks.find((t) => t.id === openMenuTaskId)?.projectId}/tasks/${openMenuTaskId}/edit`,
+              )
+            }
+          >
             <Edit2 size={16} /> Edit
           </div>
-          <div className="task-menu-item" onClick={() => { setSelectedTaskId(openMenuTaskId); setOpenMenuTaskId(null); }}>
+          <div
+            className="task-menu-item"
+            onClick={() => {
+              setSelectedTaskId(openMenuTaskId);
+              setOpenMenuTaskId(null);
+            }}
+          >
             <CheckCircle size={16} /> Select for Pomodoro
           </div>
         </div>
       )}
-      {(projects.length === 0 || tasks.length === 0) ? (
-        <div className="empty-state" style={{ flexGrow: 1, border: 'none', background: 'none' }}>
+      {projects.length === 0 || tasks.length === 0 ? (
+        <div
+          className="empty-state"
+          style={{ flexGrow: 1, border: "none", background: "none" }}
+        >
           <div className="empty-state-illustration">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
           </div>
           <h3>No projects or tasks to focus on</h3>
-          <p>Create a project and add tasks to start your first focus session.</p>
+          <p>
+            Create a project and add tasks to start your first focus session.
+          </p>
         </div>
       ) : (
         <div className="pomodoro-layout">
@@ -233,12 +275,18 @@ export function Pomodoro() {
                   Reset
                 </button>
                 {isBreak ? (
-                  <button className="btn-secondary" onClick={() => startFocus()}>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => startFocus()}
+                  >
                     <Layers size={16} strokeWidth={2} />
                     Focus
                   </button>
                 ) : (
-                  <button className="btn-secondary" onClick={() => startBreak()}>
+                  <button
+                    className="btn-secondary"
+                    onClick={() => startBreak()}
+                  >
                     <Coffee size={16} strokeWidth={2} />
                     Break
                   </button>
@@ -250,7 +298,10 @@ export function Pomodoro() {
           <div className="tasks-panel">
             <div className="tasks-panel-header">
               <h3>Kanban Tasks</h3>
-              <div className="header-actions" style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+              <div
+                className="header-actions"
+                style={{ display: "flex", gap: "8px", alignItems: "center" }}
+              >
                 <select
                   className="project-select"
                   value={selectedProjectId}
@@ -263,7 +314,7 @@ export function Pomodoro() {
                     padding: "4px 8px",
                     fontSize: "12px",
                     outline: "none",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   <option value="all">All Projects</option>
@@ -300,23 +351,35 @@ export function Pomodoro() {
                   onClick={() => setViewTaskId(task.id)}
                   style={{ cursor: "pointer" }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                    }}
+                  >
                     <div className="task-labels">
-                        <span className="task-label">TASK</span>
-                        {task.timeSpentMinutes > 0 && (
+                      <span className="task-label">TASK</span>
+                      {task.timeSpentMinutes > 0 && (
                         <span className="task-label priority-low">
-                            {task.timeSpentMinutes}m spent
+                          {task.timeSpentMinutes}m spent
                         </span>
-                        )}
+                      )}
                     </div>
-                    <button className="icon-button" onClick={(e) => handleMenuClick(e, task.id)} style={{ padding: 0 }}>
-                        <MoreVertical size={16} />
+                    <button
+                      className="icon-button"
+                      onClick={(e) => handleMenuClick(e, task.id)}
+                      style={{ padding: 0 }}
+                    >
+                      <MoreVertical size={16} />
                     </button>
                   </div>
                   <h4 className="task-title">{task.title}</h4>
                   {task.description && (
                     <div className="task-description-preview text-accents-5 text-sm mt-1 markdown-preview">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{task.description}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {task.description}
+                      </ReactMarkdown>
                     </div>
                   )}
                   <div className="task-meta">

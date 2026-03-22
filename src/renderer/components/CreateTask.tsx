@@ -29,14 +29,15 @@ export function CreateTask() {
     navigate(`/projects/${projectId}`);
   };
 
-  const createAction = async (prevState: any, formData: FormData) => {
+  const createAction = async (prevState: unknown, formData: FormData) => {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
     const columnId = formData.get("columnId") as string;
     const dueDate = formData.get("dueDate") as string;
     const tags = formData.getAll("tags") as string[];
 
-    if (!title || !columnId || !projectId) return { error: "Missing required fields" };
+    if (!title || !columnId || !projectId)
+      return { error: "Missing required fields" };
 
     try {
       await createTask(projectId, {
@@ -106,7 +107,11 @@ export function CreateTask() {
     <div className="create-task-view">
       <div className="kanban-header">
         <div className="kanban-header-left">
-          <button className="icon-button back-button" onClick={handleCancel} type="button">
+          <button
+            className="icon-button back-button"
+            onClick={handleCancel}
+            type="button"
+          >
             <ArrowLeft size={20} />
           </button>
         </div>
@@ -120,7 +125,12 @@ export function CreateTask() {
               <p>Add a new task to your workspace</p>
             </div>
             <div className="header-actions">
-              <button className="btn-danger" onClick={handleCancel} type="button" disabled={isPending}>
+              <button
+                className="btn-danger"
+                onClick={handleCancel}
+                type="button"
+                disabled={isPending}
+              >
                 Cancel
               </button>
               <button
@@ -138,7 +148,18 @@ export function CreateTask() {
               <div className="form-section-card">
                 <div className="form-section-header">
                   <h3>General Info</h3>
-                  {state?.error && <span className="error-text" style={{ color: "red", fontSize: "0.85em", marginLeft: "10px" }}>{state.error}</span>}
+                  {state?.error && (
+                    <span
+                      className="error-text"
+                      style={{
+                        color: "red",
+                        fontSize: "0.85em",
+                        marginLeft: "10px",
+                      }}
+                    >
+                      {state.error}
+                    </span>
+                  )}
                 </div>
                 <div className="form-section-body">
                   <div className="form-group">
@@ -165,7 +186,10 @@ export function CreateTask() {
                     <select
                       name="columnId"
                       className="form-input"
-                      defaultValue={stateColumnId || (columns.length > 0 ? columns[0].id : "")}
+                      defaultValue={
+                        stateColumnId ||
+                        (columns.length > 0 ? columns[0].id : "")
+                      }
                       key={columns.length ? "loaded" : "loading"}
                       required
                       disabled={isPending}
@@ -236,7 +260,8 @@ export function CreateTask() {
                             ))}
                             {tagInput &&
                               !availableTags.some(
-                                (t) => t.toLowerCase() === tagInput.toLowerCase(),
+                                (t) =>
+                                  t.toLowerCase() === tagInput.toLowerCase(),
                               ) && (
                                 <div
                                   className="tag-option create-option"

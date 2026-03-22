@@ -43,10 +43,7 @@ export function ProjectsList() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(target)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(target)) {
         setOpenDropdownId(null);
       }
       if (filterRef.current && !filterRef.current.contains(target)) {
@@ -100,8 +97,11 @@ export function ProjectsList() {
   // Filter and Sort logic
   const filteredAndSortedProjects = projects
     .filter((project) => {
-      const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesStatus = filterStatus === "All" || project.status === filterStatus;
+      const matchesSearch = project.name
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        filterStatus === "All" || project.status === filterStatus;
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
@@ -489,7 +489,9 @@ export function ProjectsList() {
                             style={{ width: `${project.progress}%` }}
                           ></div>
                         </div>
-                        <span className="progress-text">{project.progress}%</span>
+                        <span className="progress-text">
+                          {project.progress}%
+                        </span>
                       </div>
                     </div>
                     <div className="table-cell col-due">
@@ -578,8 +580,8 @@ export function ProjectsList() {
 
           <div className="projects-pagination">
             <span className="pagination-info">
-              Showing <b>{filteredAndSortedProjects.length}</b> of <b>{projects.length}</b>{" "}
-              projects
+              Showing <b>{filteredAndSortedProjects.length}</b> of{" "}
+              <b>{projects.length}</b> projects
             </span>
             <div className="pagination-controls">
               <button className="pagination-btn disabled">

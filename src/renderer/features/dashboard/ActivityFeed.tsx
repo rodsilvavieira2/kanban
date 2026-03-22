@@ -72,9 +72,22 @@ function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
 
   if (activities.length === 0) {
     return (
-      <div className="empty-state" style={{border: 'none', background: 'none', padding: '0'}}>
+      <div
+        className="empty-state"
+        style={{ border: "none", background: "none", padding: "0" }}
+      >
         <div className="empty-state-illustration">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
         </div>
         <h3>No activity yet</h3>
         <p>Start working on your projects to see your history here.</p>
@@ -87,9 +100,7 @@ function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
       <div className="activity-timeline">
         {activities.map((activity) => (
           <div key={activity.id} className="timeline-item">
-            <div
-              className={`timeline-icon ${getActionClass(activity.action)}`}
-            >
+            <div className={`timeline-icon ${getActionClass(activity.action)}`}>
               {getIcon(activity.action)}
             </div>
             <div className="timeline-content">
@@ -113,7 +124,9 @@ function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
 }
 
 export function ActivityFeed() {
-  const [activitiesPromise, setActivitiesPromise] = useState(() => kanbanApi.getRecentActivity(10));
+  const [activitiesPromise, setActivitiesPromise] = useState(() =>
+    kanbanApi.getRecentActivity(10),
+  );
 
   useEffect(() => {
     let unsubscribe: (() => void) | void;
@@ -125,7 +138,7 @@ export function ActivityFeed() {
       });
     }
     return () => {
-      if (typeof unsubscribe === 'function') {
+      if (typeof unsubscribe === "function") {
         unsubscribe();
       }
     };
@@ -134,7 +147,9 @@ export function ActivityFeed() {
   return (
     <div className="activity-feed">
       <h3>Recent Activity</h3>
-      <Suspense fallback={<p className="text-accents-5 text-sm">Loading activity...</p>}>
+      <Suspense
+        fallback={<p className="text-accents-5 text-sm">Loading activity...</p>}
+      >
         <ActivityFeedContent promise={activitiesPromise} />
       </Suspense>
     </div>

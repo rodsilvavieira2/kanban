@@ -35,7 +35,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       }));
     } catch (error: unknown) {
       set({
-        error: error instanceof Error ? error.message : "Failed to load settings",
+        error:
+          error instanceof Error ? error.message : "Failed to load settings",
         isLoading: false,
       });
     }
@@ -55,7 +56,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       // Revert on failure
       set({
         settings: currentSettings,
-        error: error instanceof Error ? error.message : "Failed to update setting",
+        error:
+          error instanceof Error ? error.message : "Failed to update setting",
       });
     }
   },
@@ -74,7 +76,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       // Revert on failure
       set({
         settings: currentSettings,
-        error: error instanceof Error ? error.message : "Failed to update settings",
+        error:
+          error instanceof Error ? error.message : "Failed to update settings",
       });
     }
   },

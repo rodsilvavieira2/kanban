@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
-import { useOutletContext } from "react-router-dom";
 
 import { useKanbanStore } from "../../stores/kanbanStore";
 import { useSettingsStore } from "../../stores/settingsStore";
@@ -20,7 +19,7 @@ interface ColumnStat {
 function buildColumnStats(
   tasks: { columnId: string }[],
   columns: { id: string; title: string; color?: string }[],
-  colors: ThemeColors
+  colors: ThemeColors,
 ): ColumnStat[] {
   const statsMap = new Map<string, { value: number; color: string }>();
 
@@ -41,10 +40,15 @@ function buildColumnStats(
   }));
 }
 
-function calcCompletionPercent(priorities: ColumnStat[], total: number): number {
+function calcCompletionPercent(
+  priorities: ColumnStat[],
+  total: number,
+): number {
   if (total === 0) return 0;
-  const completed = priorities.find((p) =>
-    p.label.toLowerCase().includes("complet") || p.label.toLowerCase().includes("done")
+  const completed = priorities.find(
+    (p) =>
+      p.label.toLowerCase().includes("complet") ||
+      p.label.toLowerCase().includes("done"),
   );
   return completed ? Math.round((completed.value / total) * 100) : 0;
 }
@@ -105,9 +109,22 @@ export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
       <h3>Project Status</h3>
 
       {projects.length === 0 ? (
-        <div className="empty-state" style={{border: 'none', background: 'none', padding: '0'}}>
+        <div
+          className="empty-state"
+          style={{ border: "none", background: "none", padding: "0" }}
+        >
           <div className="empty-state-illustration">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
           </div>
           <h3>No projects yet</h3>
           <p>Create a project to start tracking your status.</p>
@@ -116,9 +133,22 @@ export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
           </button>
         </div>
       ) : total === 0 ? (
-        <div className="empty-state" style={{border: 'none', background: 'none', padding: '0'}}>
+        <div
+          className="empty-state"
+          style={{ border: "none", background: "none", padding: "0" }}
+        >
           <div className="empty-state-illustration">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
           </div>
           <h3>No tasks yet</h3>
           <p>Add tasks to your project to start tracking progress.</p>

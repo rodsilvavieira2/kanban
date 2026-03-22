@@ -57,11 +57,7 @@ export class MoveTaskUseCase {
       // Update other tasks in destination
       const taskToMove = await this.taskRepository.findById(taskId);
       if (taskToMove) {
-        destinationTasks.splice(
-          destinationIndex,
-          0,
-          taskToMove,
-        );
+        destinationTasks.splice(destinationIndex, 0, taskToMove);
       }
       await this.taskRepository.reorder(
         destinationTasks.map((task, index) => ({ id: task.id, order: index })),

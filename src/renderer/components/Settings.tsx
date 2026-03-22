@@ -124,7 +124,9 @@ export function Settings() {
                   <select
                     className="form-input"
                     value={settings.colorScheme || "Base16 Default"}
-                    onChange={(e) => updateSetting("colorScheme", e.target.value)}
+                    onChange={(e) =>
+                      updateSetting("colorScheme", e.target.value)
+                    }
                   >
                     {themes.map((t) => (
                       <option key={t.name} value={t.name}>

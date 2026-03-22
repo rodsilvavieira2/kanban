@@ -32,7 +32,7 @@ export const themes: Theme[] = [
       blue: "#268bd2",
       magenta: "#d33682",
       cyan: "#2aa198",
-      white: "#eee8d5"
+      white: "#eee8d5",
     },
     dark: {
       name: "Solarized Dark",
@@ -45,8 +45,8 @@ export const themes: Theme[] = [
       blue: "#268bd2",
       magenta: "#d33682",
       cyan: "#2aa198",
-      white: "#fdf6e3"
-    }
+      white: "#fdf6e3",
+    },
   },
   {
     name: "Gruvbox",
@@ -61,7 +61,7 @@ export const themes: Theme[] = [
       blue: "#458588",
       magenta: "#b16286",
       cyan: "#689d6a",
-      white: "#7c6f64"
+      white: "#7c6f64",
     },
     dark: {
       name: "Gruvbox Dark",
@@ -73,9 +73,9 @@ export const themes: Theme[] = [
       yellow: "#fabd2f",
       blue: "#83a598",
       magenta: "#d3869b",
-      "cyan": "#8ec07c",
-      "white": "#ebdbb2"
-    }
+      cyan: "#8ec07c",
+      white: "#ebdbb2",
+    },
   },
   {
     name: "Atom One",
@@ -90,7 +90,7 @@ export const themes: Theme[] = [
       blue: "#4078f2",
       magenta: "#a626a4",
       cyan: "#0184bc",
-      white: "#fafafa"
+      white: "#fafafa",
     },
     dark: {
       name: "One Dark",
@@ -103,8 +103,8 @@ export const themes: Theme[] = [
       blue: "#61afef",
       magenta: "#c678dd",
       cyan: "#56b6c2",
-      white: "#abb2bf"
-    }
+      white: "#abb2bf",
+    },
   },
   {
     name: "GitHub",
@@ -119,7 +119,7 @@ export const themes: Theme[] = [
       blue: "#0366d6",
       magenta: "#6f42c1",
       cyan: "#1b7c83",
-      white: "#ffffff"
+      white: "#ffffff",
     },
     dark: {
       name: "GitHub Dark",
@@ -132,8 +132,8 @@ export const themes: Theme[] = [
       blue: "#79c0ff",
       magenta: "#d2a8ff",
       cyan: "#a5d6ff",
-      white: "#b1bac4"
-    }
+      white: "#b1bac4",
+    },
   },
   {
     name: "Material",
@@ -148,7 +148,7 @@ export const themes: Theme[] = [
       blue: "#39adb5",
       magenta: "#7c4dff",
       cyan: "#39adb5",
-      white: "#ffffff"
+      white: "#ffffff",
     },
     dark: {
       name: "Material Dark",
@@ -161,8 +161,8 @@ export const themes: Theme[] = [
       blue: "#82aaff",
       magenta: "#c792ea",
       cyan: "#89ddff",
-      white: "#ffffff"
-    }
+      white: "#ffffff",
+    },
   },
   {
     name: "Ayu",
@@ -177,7 +177,7 @@ export const themes: Theme[] = [
       blue: "#36a3d9",
       magenta: "#a37acc",
       cyan: "#4cbf99",
-      white: "#ffffff"
+      white: "#ffffff",
     },
     dark: {
       name: "Ayu Dark",
@@ -190,8 +190,8 @@ export const themes: Theme[] = [
       blue: "#53bdfa",
       magenta: "#caeaca",
       cyan: "#90e1c6",
-      white: "#ffffff"
-    }
+      white: "#ffffff",
+    },
   },
   {
     name: "Catppuccin",
@@ -206,7 +206,7 @@ export const themes: Theme[] = [
       blue: "#1e66f5",
       magenta: "#ea76cb",
       cyan: "#04a5e5",
-      white: "#acb0be"
+      white: "#acb0be",
     },
     dark: {
       name: "Catppuccin Mocha",
@@ -219,8 +219,8 @@ export const themes: Theme[] = [
       blue: "#89b4fa",
       magenta: "#cba6f7",
       cyan: "#89dceb",
-      white: "#a6adc8"
-    }
+      white: "#a6adc8",
+    },
   },
   {
     name: "Rosé Pine",
@@ -235,7 +235,7 @@ export const themes: Theme[] = [
       blue: "#56949f",
       magenta: "#907aa9",
       cyan: "#d7827e",
-      white: "#fffaf3"
+      white: "#fffaf3",
     },
     dark: {
       name: "Rosé Pine Main",
@@ -248,8 +248,8 @@ export const themes: Theme[] = [
       blue: "#9ccfd8",
       magenta: "#c4a7e7",
       cyan: "#ebbcba",
-      white: "#e0def4"
-    }
+      white: "#e0def4",
+    },
   },
   {
     name: "Everforest",
@@ -264,7 +264,7 @@ export const themes: Theme[] = [
       blue: "#3a94c5",
       magenta: "#df69ba",
       cyan: "#35a77c",
-      white: "#fdf6e3"
+      white: "#fdf6e3",
     },
     dark: {
       name: "Everforest Dark",
@@ -277,8 +277,8 @@ export const themes: Theme[] = [
       blue: "#7fbbb3",
       magenta: "#d699b6",
       cyan: "#83c092",
-      white: "#d3c6aa"
-    }
+      white: "#d3c6aa",
+    },
   },
   {
     name: "Tokyo Night",
@@ -293,7 +293,7 @@ export const themes: Theme[] = [
       blue: "#2e7de9",
       magenta: "#9854f1",
       cyan: "#007197",
-      white: "#ffffff"
+      white: "#ffffff",
     },
     dark: {
       name: "Tokyo Night Night",
@@ -306,8 +306,8 @@ export const themes: Theme[] = [
       blue: "#7aa2f7",
       magenta: "#bb9af7",
       cyan: "#7dcfff",
-      white: "#c0caf5"
-    }
+      white: "#c0caf5",
+    },
   },
   {
     name: "Night Owl",
@@ -322,7 +322,7 @@ export const themes: Theme[] = [
       blue: "#288ed7",
       magenta: "#d60a84",
       cyan: "#0c969b",
-      white: "#ffffff"
+      white: "#ffffff",
     },
     dark: {
       name: "Night Owl",
@@ -335,8 +335,8 @@ export const themes: Theme[] = [
       blue: "#82aaff",
       magenta: "#c792ea",
       cyan: "#21c7a8",
-      white: "#ffffff"
-    }
+      white: "#ffffff",
+    },
   },
   {
     name: "Modus",
@@ -351,7 +351,7 @@ export const themes: Theme[] = [
       blue: "#0031a9",
       magenta: "#721045",
       cyan: "#00538b",
-      white: "#ffffff"
+      white: "#ffffff",
     },
     dark: {
       name: "Modus Vivendi",
@@ -364,8 +364,8 @@ export const themes: Theme[] = [
       blue: "#2fafff",
       magenta: "#feacd0",
       cyan: "#00d3d0",
-      white: "#ffffff"
-    }
+      white: "#ffffff",
+    },
   },
   {
     name: "Iceberg",
@@ -380,7 +380,7 @@ export const themes: Theme[] = [
       blue: "#2d539e",
       magenta: "#775dff",
       cyan: "#3b8992",
-      white: "#e8e9ec"
+      white: "#e8e9ec",
     },
     dark: {
       name: "Iceberg Dark",
@@ -393,8 +393,8 @@ export const themes: Theme[] = [
       blue: "#84a0c6",
       magenta: "#a093c7",
       cyan: "#89b8c2",
-      white: "#c6c8d1"
-    }
+      white: "#c6c8d1",
+    },
   },
   {
     name: "PaperColor",
@@ -409,7 +409,7 @@ export const themes: Theme[] = [
       blue: "#005faf",
       magenta: "#d70087",
       cyan: "#0087af",
-      white: "#eeeeee"
+      white: "#eeeeee",
     },
     dark: {
       name: "PaperColor Dark",
@@ -422,8 +422,8 @@ export const themes: Theme[] = [
       blue: "#00afaf",
       magenta: "#5f8787",
       cyan: "#ff8700",
-      white: "#d0d0d0"
-    }
+      white: "#d0d0d0",
+    },
   },
   {
     name: "Edge",
@@ -438,7 +438,7 @@ export const themes: Theme[] = [
       blue: "#5079be",
       magenta: "#b05ccc",
       cyan: "#3a8b84",
-      white: "#fafafa"
+      white: "#fafafa",
     },
     dark: {
       name: "Edge Dark",
@@ -451,8 +451,8 @@ export const themes: Theme[] = [
       blue: "#6cb6eb",
       magenta: "#d38aea",
       cyan: "#5dbbc1",
-      white: "#c5cdd9"
-    }
+      white: "#c5cdd9",
+    },
   },
   {
     name: "Kanagawa",
@@ -467,7 +467,7 @@ export const themes: Theme[] = [
       blue: "#4d699b",
       magenta: "#b35b79",
       cyan: "#597b75",
-      white: "#f2ecbc"
+      white: "#f2ecbc",
     },
     dark: {
       name: "Kanagawa Wave",
@@ -480,8 +480,8 @@ export const themes: Theme[] = [
       blue: "#7e9cd8",
       magenta: "#957fb8",
       cyan: "#6a9589",
-      white: "#dcd7ba"
-    }
+      white: "#dcd7ba",
+    },
   },
   {
     name: "Horizon",
@@ -496,7 +496,7 @@ export const themes: Theme[] = [
       blue: "#118c74",
       magenta: "#892b51",
       cyan: "#09f7a0",
-      white: "#fdf0ed"
+      white: "#fdf0ed",
     },
     dark: {
       name: "Horizon Dark",
@@ -509,8 +509,8 @@ export const themes: Theme[] = [
       blue: "#26bbd9",
       magenta: "#ee64ac",
       cyan: "#59e1e3",
-      white: "#fac29a"
-    }
+      white: "#fac29a",
+    },
   },
   {
     name: "Tango",
@@ -525,7 +525,7 @@ export const themes: Theme[] = [
       blue: "#3465a4",
       magenta: "#75507b",
       cyan: "#06989a",
-      white: "#d3d7cf"
+      white: "#d3d7cf",
     },
     dark: {
       name: "Tango Dark",
@@ -538,8 +538,8 @@ export const themes: Theme[] = [
       blue: "#729fcf",
       magenta: "#ad7fa8",
       cyan: "#34e2e2",
-      white: "#eeeeec"
-    }
+      white: "#eeeeec",
+    },
   },
   {
     name: "Alabaster",
@@ -554,7 +554,7 @@ export const themes: Theme[] = [
       blue: "#325cc0",
       magenta: "#7a3e9d",
       cyan: "#0083b2",
-      white: "#ffffff"
+      white: "#ffffff",
     },
     dark: {
       name: "Alabaster Dark",
@@ -567,8 +567,8 @@ export const themes: Theme[] = [
       blue: "#4b7bd2",
       magenta: "#8d5eb2",
       cyan: "#00a8e0",
-      white: "#ffffff"
-    }
+      white: "#ffffff",
+    },
   },
   {
     name: "Base16 Default",
@@ -583,7 +583,7 @@ export const themes: Theme[] = [
       blue: "#7cafc2",
       magenta: "#ba8baf",
       cyan: "#86c1b9",
-      white: "#f8f8f8"
+      white: "#f8f8f8",
     },
     dark: {
       name: "Base16 Default Dark",
@@ -596,7 +596,7 @@ export const themes: Theme[] = [
       blue: "#7cafc2",
       magenta: "#ba8baf",
       cyan: "#86c1b9",
-      white: "#f8f8f8"
-    }
-  }
+      white: "#f8f8f8",
+    },
+  },
 ];

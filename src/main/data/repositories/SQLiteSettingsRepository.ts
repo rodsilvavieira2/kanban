@@ -1,11 +1,11 @@
-import { DatabaseSync } from 'node:sqlite';
-import { SettingsRepository } from '../../core/repositories/SettingsRepository';
+import { DatabaseSync } from "node:sqlite";
+import { SettingsRepository } from "../../core/repositories/SettingsRepository";
 
 export class SQLiteSettingsRepository implements SettingsRepository {
   constructor(private db: DatabaseSync) {}
 
   async get(key: string): Promise<string | null> {
-    const stmt = this.db.prepare('SELECT value FROM settings WHERE key = ?');
+    const stmt = this.db.prepare("SELECT value FROM settings WHERE key = ?");
     const result = stmt.get(key) as { value: string } | undefined;
     return result ? result.value : null;
   }
@@ -20,9 +20,9 @@ export class SQLiteSettingsRepository implements SettingsRepository {
   }
 
   async getAll(): Promise<Record<string, string>> {
-    const stmt = this.db.prepare('SELECT key, value FROM settings');
+    const stmt = this.db.prepare("SELECT key, value FROM settings");
     const rows = stmt.all() as { key: string; value: string }[];
-    
+
     const settings: Record<string, string> = {};
     for (const row of rows) {
       settings[row.key] = row.value;

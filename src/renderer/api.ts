@@ -1,3 +1,4 @@
 import { KanbanApiType } from "../preload";
 
-export const kanbanApi = (window as unknown as { kanbanApi: KanbanApiType }).kanbanApi;
+export const kanbanApi = (window as unknown as { kanbanApi: KanbanApiType })
+  .kanbanApi;
