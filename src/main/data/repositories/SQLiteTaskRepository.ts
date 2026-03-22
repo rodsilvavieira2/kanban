@@ -1,10 +1,10 @@
-import { Database } from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { Task } from '../../../shared/schemas/models';
 import { ITaskRepository } from '../../core/domain/repositories/ITaskRepository';
 import crypto from 'crypto';
 
 export class SQLiteTaskRepository implements ITaskRepository {
-  constructor(private db: Database) {}
+  constructor(private db: DatabaseSync) {}
 
   private getTagsForTask(taskId: string): string[] {
     const stmt = this.db.prepare(`
@@ -53,13 +53,13 @@ export class SQLiteTaskRepository implements ITaskRepository {
         SET column_id = ?, title = ?, description = ?, due_date = ?, "order" = ?, time_spent_minutes = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `);
-      stmt.run(columnId, title, description, dueDate, order, timeSpentMinutes, id);
+      stmt.run(columnId, title, description ?? null, dueDate ?? null, order, timeSpentMinutes, id);
     } else {
       const stmt = this.db.prepare(`
         INSERT INTO tasks (id, column_id, title, description, due_date, "order", time_spent_minutes)
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `);
-      stmt.run(id, columnId, title, description, dueDate, order, timeSpentMinutes);
+      stmt.run(id, columnId, title, description ?? null, dueDate ?? null, order, timeSpentMinutes);
     }
 
     if (tags) {
@@ -100,14 +100,17 @@ export class SQLiteTaskRepository implements ITaskRepository {
 
   async reorder(tasks: { id: string; order: number }[]): Promise<void> {
     const updateStmt = this.db.prepare('UPDATE tasks SET "order" = ? WHERE id = ?');
-    
-    const transaction = this.db.transaction((data) => {
-      for (const item of data) {
+
+    this.db.exec('BEGIN');
+    try {
+      for (const item of tasks) {
         updateStmt.run(item.order, item.id);
       }
-    });
-
-    transaction(tasks);
+      this.db.exec('COMMIT');
+    } catch (err) {
+      this.db.exec('ROLLBACK');
+      throw err;
+    }
   }
 
   async incrementTimeSpent(taskId: string, minutes: number): Promise<void> {

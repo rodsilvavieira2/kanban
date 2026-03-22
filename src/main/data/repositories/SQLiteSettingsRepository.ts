@@ -1,8 +1,8 @@
-import { Database } from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { SettingsRepository } from '../../core/repositories/SettingsRepository';
 
 export class SQLiteSettingsRepository implements SettingsRepository {
-  constructor(private db: Database) {}
+  constructor(private db: DatabaseSync) {}
 
   async get(key: string): Promise<string | null> {
     const stmt = this.db.prepare('SELECT value FROM settings WHERE key = ?');

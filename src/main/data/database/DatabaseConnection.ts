@@ -1,12 +1,12 @@
-import Database from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import path from 'path';
 import { app } from 'electron';
 import fs from 'fs';
 
 // Determine the database path (in userData folder for production, local data folder for dev)
 const isDev = process.env.NODE_ENV === 'development';
-const dataDir = isDev 
-  ? path.join(process.cwd(), 'data') // Using process.cwd() instead of __dirname to be more robust
+const dataDir = isDev
+  ? path.join(process.cwd(), 'data')
   : path.join(app.getPath('userData'), 'database');
 
 if (!fs.existsSync(dataDir)) {
@@ -15,20 +15,18 @@ if (!fs.existsSync(dataDir)) {
 
 const dbPath = path.join(dataDir, 'kanban.sqlite');
 
-const db = new Database(dbPath, {
-  verbose: isDev ? console.log : undefined
-});
+const db = new DatabaseSync(dbPath);
 
 // Enable WAL mode for better concurrency and performance
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+db.exec('PRAGMA journal_mode = WAL');
+db.exec('PRAGMA foreign_keys = ON');
 
 export function initDatabase() {
   console.log('Initializing Database at:', dbPath);
 
   // Read current user_version
-  const versionRow = db.pragma('user_version', { simple: true }) as number;
-  let currentVersion = versionRow || 0;
+  const versionRow = db.prepare('PRAGMA user_version').get() as { user_version: number };
+  let currentVersion = versionRow.user_version || 0;
 
   // Run migrations
   try {
@@ -95,7 +93,7 @@ export function initDatabase() {
       `);
       currentVersion = 1;
     }
-    
+
     // Migration 2: Activity Logs
     if (currentVersion < 2) {
       console.log('Running Migration 2: Activity Logs');

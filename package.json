@@ -10,6 +10,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
+    "make:arch": "makepkg -si",
     "lint": "eslint --ext .ts,.tsx .",
     "format": "prettier --write \"src/**/*.{ts,tsx,json,css,scss}\""
   },
@@ -38,14 +39,11 @@
     "sass": "^1.98.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.0",
-    "vite": "^8.0.0",
-    "vite-plugin-native": "^2.2.2"
+    "vite": "^8.0.0"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "@modelcontextprotocol/sdk": "^1.27.1",
-    "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^12.8.0",
     "chart.js": "^4.5.1",
     "electron-squirrel-startup": "^1.0.1",
     "geist": "^1.7.0",

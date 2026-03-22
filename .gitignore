@@ -100,3 +100,7 @@ out/
 *.sqlite-wal
 data/*.sqlite-shm
 data/*.sqlite-wal
+
+# Arch Linux Package Artifacts
+*.pkg.tar.zst
+pkg/

@@ -1,10 +1,10 @@
-import { Database } from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { v4 as uuidv4 } from 'uuid';
 import { ActivityLog } from '../../../shared/schemas/models';
 import { ActivityLogRepository } from '../../core/repositories/ActivityLogRepository';
 
 export class SQLiteActivityLogRepository implements ActivityLogRepository {
-  constructor(private db: Database) {}
+  constructor(private db: DatabaseSync) {}
 
   async create(log: Omit<ActivityLog, 'id' | 'createdAt'>): Promise<ActivityLog> {
     const id = uuidv4();

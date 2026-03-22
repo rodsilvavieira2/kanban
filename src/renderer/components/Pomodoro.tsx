@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useKanbanStore } from "../stores/kanbanStore";
@@ -57,8 +57,22 @@ export function Pomodoro() {
     loadProjects();
   }, [loadAllTasks, loadProjects]);
 
+  // Sync timer display when focus/break duration settings change — but NOT on
+  // initial mount and NOT when the component simply remounts after navigation.
+  // We track the previous values with refs: if they're null it means this is
+  // the first render of this mount cycle, so we skip the sync.
+  const prevFocusTimeRef = useRef<number | null>(null);
+  const prevBreakTimeRef = useRef<number | null>(null);
   useEffect(() => {
-    syncSettingsIfPaused();
+    if (
+      prevFocusTimeRef.current !== null &&
+      (focusTime !== prevFocusTimeRef.current ||
+        breakTime !== prevBreakTimeRef.current)
+    ) {
+      syncSettingsIfPaused();
+    }
+    prevFocusTimeRef.current = focusTime;
+    prevBreakTimeRef.current = breakTime;
   }, [focusTime, breakTime, syncSettingsIfPaused]);
 
   const filteredTasks = useMemo(() => {

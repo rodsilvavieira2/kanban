@@ -1,9 +1,9 @@
-import { Database } from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { Column } from '../../../shared/schemas/models';
 import { IColumnRepository } from '../../core/domain/repositories/IColumnRepository';
 
 export class SQLiteColumnRepository implements IColumnRepository {
-  constructor(private db: Database) {}
+  constructor(private db: DatabaseSync) {}
 
   async findAllByProjectId(projectId: string): Promise<Column[]> {
     const stmt = this.db.prepare('SELECT * FROM columns WHERE project_id = ? ORDER BY "order" ASC');
@@ -30,13 +30,13 @@ export class SQLiteColumnRepository implements IColumnRepository {
         SET title = ?, color = ?, "order" = ?
         WHERE id = ?
       `);
-      stmt.run(title, color, order, id);
+      stmt.run(title, color ?? null, order, id);
     } else {
       const stmt = this.db.prepare(`
         INSERT INTO columns (id, project_id, title, color, "order")
         VALUES (?, ?, ?, ?, ?)
       `);
-      stmt.run(id, projectId, title, color, order);
+      stmt.run(id, projectId, title, color ?? null, order);
     }
 
     const col = await this.findById(id);
@@ -51,24 +51,27 @@ export class SQLiteColumnRepository implements IColumnRepository {
 
   async reorder(columns: { id: string; order: number }[]): Promise<void> {
     const updateStmt = this.db.prepare('UPDATE columns SET "order" = ? WHERE id = ?');
-    
-    const transaction = this.db.transaction((data) => {
-      for (const item of data) {
+
+    this.db.exec('BEGIN');
+    try {
+      for (const item of columns) {
         updateStmt.run(item.order, item.id);
       }
-    });
-
-    transaction(columns);
+      this.db.exec('COMMIT');
+    } catch (err) {
+      this.db.exec('ROLLBACK');
+      throw err;
+    }
   }
 
   private mapToEntity(row: Record<string, unknown>): Column {
     return {
-      id: row.id,
-      projectId: row.project_id,
-      title: row.title,
-      color: row.color || undefined,
-      order: row.order,
-      createdAt: row.created_at,
+      id: row.id as string,
+      projectId: row.project_id as string,
+      title: row.title as string,
+      color: (row.color as string) || undefined,
+      order: row.order as number,
+      createdAt: row.created_at as string | undefined,
     };
   }
 }

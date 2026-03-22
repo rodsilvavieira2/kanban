@@ -1,9 +1,9 @@
-import { Database } from 'better-sqlite3';
+import { DatabaseSync } from 'node:sqlite';
 import { Project } from '../../../shared/schemas/models';
 import { IProjectRepository } from '../../core/domain/repositories/IProjectRepository';
 
 export class SQLiteProjectRepository implements IProjectRepository {
-  constructor(private db: Database) {}
+  constructor(private db: DatabaseSync) {}
 
   async findAll(): Promise<Project[]> {
     const stmt = this.db.prepare(`
@@ -46,13 +46,13 @@ export class SQLiteProjectRepository implements IProjectRepository {
         SET name = ?, description = ?, status = ?, due_date = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `);
-      stmt.run(name, description, status, dueDate, id);
+      stmt.run(name, description ?? null, status, dueDate ?? null, id);
     } else {
       const stmt = this.db.prepare(`
         INSERT INTO projects (id, name, description, status, due_date)
         VALUES (?, ?, ?, ?, ?)
       `);
-      stmt.run(id, name, description, status, dueDate);
+      stmt.run(id, name, description ?? null, status, dueDate ?? null);
     }
     
     const output = await this.findById(id);
