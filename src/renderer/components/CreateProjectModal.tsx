@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProjectStore } from "../stores/projectStore";
 
@@ -11,42 +11,37 @@ export function CreateProjectModal({
   isOpen,
   onClose,
 }: CreateProjectModalProps) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const createProject = useProjectStore((state) => state.createProject);
   const navigate = useNavigate();
 
+  const [, formAction, isPending] = useActionState(
+    async (previousState: any, formData: FormData) => {
+      const name = formData.get("name") as string;
+      const description = formData.get("description") as string;
+      
+      if (!name?.trim()) return null;
+      
+      try {
+        await createProject({
+          name: name.trim(),
+          description: description?.trim() || "",
+        });
+        onClose();
+        navigate("/projects");
+        return { success: true };
+      } catch (err) {
+        console.error("Failed to create project:", err);
+        return { error: "Failed to create project" };
+      }
+    },
+    null,
+  );
+
   if (!isOpen) return null;
 
-  const handleCreate = async () => {
-    if (!name.trim() || isSubmitting) return;
-    setIsSubmitting(true);
-    try {
-      await createProject({
-        name: name.trim(),
-        description: description.trim(),
-      });
-      setName("");
-      setDescription("");
-      onClose();
-      navigate("/projects");
-    } catch (err) {
-      console.error("Failed to create project:", err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleClose = () => {
-    setName("");
-    setDescription("");
-    onClose();
-  };
-
   return (
-    <div className="modal-overlay" onClick={handleClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-overlay" onClick={onClose}>
+      <form action={formAction} className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div className="modal-title">
             <div className="modal-title-icon">
@@ -67,7 +62,7 @@ export function CreateProjectModal({
             </div>
             <h2>Create New Project</h2>
           </div>
-          <button className="icon-button" onClick={handleClose}>
+          <button type="button" className="icon-button" onClick={onClose}>
             <svg
               width="14"
               height="14"
@@ -89,38 +84,37 @@ export function CreateProjectModal({
             <label>Project Name</label>
             <input
               type="text"
+              name="name"
               placeholder="e.g. Mobile App Development"
               className="form-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               autoFocus
+              required
             />
           </div>
 
           <div className="form-group">
             <label>Description</label>
             <textarea
+              name="description"
               placeholder="What's this project about? Define goals and scope..."
               className="form-textarea"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
             ></textarea>
           </div>
         </div>
 
         <div className="modal-footer">
-          <button className="btn-secondary" onClick={handleClose}>
+          <button type="button" className="btn-secondary" onClick={onClose}>
             Cancel
           </button>
           <button
+            type="submit"
             className="btn-primary"
-            onClick={handleCreate}
-            disabled={!name.trim() || isSubmitting}
+            disabled={isPending}
           >
-            {isSubmitting ? "Creating…" : "Create Project"}
+            {isPending ? "Creating…" : "Create Project"}
           </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

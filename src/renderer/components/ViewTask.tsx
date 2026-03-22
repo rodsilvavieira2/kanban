@@ -1,42 +1,74 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use, Suspense, startTransition } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { TaskDetailsContent } from "./TaskDetailsContent";
 import { ArrowLeft, Edit2 } from "lucide-react";
+import { kanbanApi } from "../api";
 
-export function ViewTask() {
+function ViewTaskContent({ promise }: { promise: Promise<any> }) {
+  const task = use(promise);
   const navigate = useNavigate();
-  const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>();
-  const { tasks, loadProjectData } = useKanbanStore();
-  const [task, setTask] = useState<any>(null);
+  const { projectId } = useParams<{ projectId: string }>();
 
-  useEffect(() => {
-    if (tasks.length === 0 && projectId) {
-      loadProjectData(projectId);
-    }
-  }, [tasks.length, projectId, loadProjectData]);
-
-  useEffect(() => {
-    const foundTask = tasks.find((t) => t.id === taskId);
-    if (foundTask) {
-      setTask(foundTask);
-    }
-  }, [tasks, taskId]);
-
-  if (!task) return <div>Loading...</div>;
+  if (!task) return <div>Task not found</div>;
 
   return (
-    <div className="view-task-container" style={{ padding: "24px", maxWidth: "800px", margin: "0 auto", height: "100%", overflowY: "auto" }}>
+    <>
       <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px" }}>
         <button className="btn-secondary" onClick={() => navigate(`/projects/${projectId}`)}>
           <ArrowLeft size={16} /> Back
         </button>
-        <button className="btn-primary" onClick={() => navigate(`/projects/${projectId}/tasks/${taskId}/edit`)}>
+        <button className="btn-primary" onClick={() => navigate(`/projects/${projectId}/tasks/${task.id}/edit`)}>
           <Edit2 size={16} /> Edit Task
         </button>
       </header>
 
       <TaskDetailsContent task={task} />
+    </>
+  );
+}
+
+export function ViewTask() {
+  const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>();
+  const { loadProjectData } = useKanbanStore();
+
+  const [taskPromise, setTaskPromise] = useState<Promise<any>>(() => {
+    if (projectId && taskId) {
+      return kanbanApi.getProjectData(projectId).then(res => res.tasks.find(t => t.id === taskId));
+    }
+    return Promise.resolve(null);
+  });
+
+  useEffect(() => {
+    if (projectId) {
+      loadProjectData(projectId);
+    }
+  }, [projectId, loadProjectData]);
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | void;
+    if (kanbanApi?.onKanbanUpdated) {
+      unsubscribe = kanbanApi.onKanbanUpdated(() => {
+        startTransition(() => {
+          if (projectId && taskId) {
+             setTaskPromise(kanbanApi.getProjectData(projectId).then(res => res.tasks.find(t => t.id === taskId)));
+             loadProjectData(projectId);
+          }
+        });
+      });
+    }
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
+  }, [projectId, taskId, loadProjectData]);
+
+  return (
+    <div className="view-task-container" style={{ padding: "24px", maxWidth: "800px", margin: "0 auto", height: "100%", overflowY: "auto" }}>
+      <Suspense fallback={<div>Loading task...</div>}>
+        <ViewTaskContent promise={taskPromise} />
+      </Suspense>
     </div>
   );
 }

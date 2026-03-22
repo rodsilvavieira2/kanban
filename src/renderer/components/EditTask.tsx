@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useActionState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { ArrowLeft, X } from "lucide-react";
@@ -8,11 +8,6 @@ export function EditTask() {
   const { projectId, taskId } = useParams<{ projectId: string; taskId: string }>();
 
   const { columns, tasks, updateTask, loadProjectData } = useKanbanStore();
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [columnId, setColumnId] = useState("");
-  const [dueDate, setDueDate] = useState("");
 
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -27,16 +22,14 @@ export function EditTask() {
     }
   }, [tasks.length, projectId, loadProjectData]);
 
+  const task = tasks.find((t) => t.id === taskId);
+
+  // Update selectedTags when task loads
   useEffect(() => {
-    const task = tasks.find((t) => t.id === taskId);
-    if (task) {
-      setTitle(task.title);
-      setDescription(task.description || "");
-      setColumnId(task.columnId);
-      setDueDate(task.dueDate || "");
-      setSelectedTags(task.tags || []);
+    if (task && task.tags) {
+      setSelectedTags(task.tags);
     }
-  }, [tasks, taskId]);
+  }, [task]);
 
   useEffect(() => {
     const allTags = new Set<string>();
@@ -50,8 +43,14 @@ export function EditTask() {
     navigate(`/projects/${projectId}`);
   };
 
-  const handleUpdate = async () => {
-    if (!title || !columnId || !taskId) return;
+  const updateAction = async (prevState: any, formData: FormData) => {
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
+    const columnId = formData.get("columnId") as string;
+    const dueDate = formData.get("dueDate") as string;
+    const tags = formData.getAll("tags") as string[];
+
+    if (!title || !columnId || !taskId) return { error: "Missing required fields" };
 
     try {
       await updateTask(taskId, {
@@ -59,13 +58,17 @@ export function EditTask() {
         description,
         columnId,
         dueDate: dueDate || undefined,
-        tags: selectedTags,
+        tags,
       });
       navigate(`/projects/${projectId}`);
+      return { success: true };
     } catch (error) {
       console.error("Failed to update task:", error);
+      return { error: "Failed to update task" };
     }
   };
+
+  const [state, formAction, isPending] = useActionState(updateAction, null);
 
   const addTag = (tag: string) => {
     const normalizedTag = tag.trim();
@@ -84,9 +87,11 @@ export function EditTask() {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && tagInput) {
+    if (e.key === "Enter") {
       e.preventDefault();
-      addTag(tagInput);
+      if (tagInput) {
+        addTag(tagInput);
+      }
     } else if (e.key === "Backspace" && !tagInput && selectedTags.length > 0) {
       removeTag(selectedTags[selectedTags.length - 1]);
     }
@@ -111,148 +116,183 @@ export function EditTask() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  if (!task && tasks.length > 0) {
+    return (
+      <div className="create-task-view">
+        <div className="kanban-header">
+          <div className="kanban-header-left">
+            <button className="icon-button back-button" onClick={handleCancel} type="button">
+              <ArrowLeft size={20} />
+            </button>
+          </div>
+        </div>
+        <div style={{ padding: "2rem", textAlign: "center", color: "#888" }}>
+          Task not found
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="create-task-view">
       <div className="kanban-header">
         <div className="kanban-header-left">
-          <button className="icon-button back-button" onClick={handleCancel}>
+          <button className="icon-button back-button" onClick={handleCancel} type="button">
             <ArrowLeft size={20} />
           </button>
         </div>
       </div>
 
       <div className="create-task-content">
-        <div className="create-task-page-header">
-          <div className="title-section">
-            <h1>Edit Task</h1>
-            <p>Modify task details</p>
-          </div>
-          <div className="header-actions">
-            <button className="btn-danger" onClick={handleCancel}>
-              Cancel
-            </button>
-            <button
-              className="btn-primary"
-              onClick={handleUpdate}
-              disabled={!title || !columnId}
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-
-        <div className="create-task-form-layout">
-          <div className="form-main-column">
-            <div className="form-section-card">
-              <div className="form-section-header">
-                <h3>General Info</h3>
+        {task ? (
+          <form action={formAction}>
+            <div className="create-task-page-header">
+              <div className="title-section">
+                <h1>Edit Task</h1>
+                <p>Modify task details</p>
               </div>
-              <div className="form-section-body">
-                <div className="form-group">
-                  <input
-                    type="text"
-                    className="form-input large-input"
-                    placeholder="Task Name"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea
-                    className="form-textarea"
-                    placeholder="Provide details about this task..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  ></textarea>
-                </div>
-                <div className="form-group">
-                  <label>Column</label>
-                  <select
-                    className="form-input"
-                    value={columnId}
-                    onChange={(e) => setColumnId(e.target.value)}
-                  >
-                    {columns.map((col) => (
-                      <option key={col.id} value={col.id}>
-                        {col.title}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Due Date</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                  />
-                </div>
-                <div className="form-group" ref={dropdownRef}>
-                  <label>Tags</label>
-                  <div className="tag-system-container">
-                    <div className="tag-input-wrapper">
-                      {selectedTags.map((tag) => (
-                        <span key={tag} className="tag-chip">
-                          {tag}
-                          <button
-                            type="button"
-                            className="remove-tag"
-                            onClick={() => removeTag(tag)}
-                          >
-                            <X size={12} strokeWidth={3} />
-                          </button>
-                        </span>
-                      ))}
+              <div className="header-actions">
+                <button className="btn-danger" onClick={handleCancel} type="button" disabled={isPending}>
+                  Cancel
+                </button>
+                <button
+                  className="btn-primary"
+                  type="submit"
+                  disabled={isPending}
+                >
+                  {isPending ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+
+            <div className="create-task-form-layout">
+              <div className="form-main-column">
+                <div className="form-section-card">
+                  <div className="form-section-header">
+                    <h3>General Info</h3>
+                    {state?.error && <span className="error-text" style={{ color: "red", fontSize: "0.85em", marginLeft: "10px" }}>{state.error}</span>}
+                  </div>
+                  <div className="form-section-body">
+                    <div className="form-group">
                       <input
+                        name="title"
                         type="text"
-                        className="tag-bare-input"
-                        placeholder={
-                          selectedTags.length === 0
-                            ? "Select or create tags..."
-                            : ""
-                        }
-                        value={tagInput}
-                        onChange={(e) => {
-                          setTagInput(e.target.value);
-                          setIsDropdownOpen(true);
-                        }}
-                        onFocus={() => setIsDropdownOpen(true)}
-                        onKeyDown={handleKeyDown}
+                        className="form-input large-input"
+                        placeholder="Task Name"
+                        defaultValue={task.title}
+                        required
+                        disabled={isPending}
                       />
                     </div>
-                    {isDropdownOpen &&
-                      (tagInput || filteredTags.length > 0) && (
-                        <div className="tags-dropdown">
-                          {filteredTags.map((tag) => (
-                            <div
-                              key={tag}
-                              className="tag-option"
-                              onClick={() => addTag(tag)}
-                            >
+                    <div className="form-group">
+                      <label>Description</label>
+                      <textarea
+                        name="description"
+                        className="form-textarea"
+                        placeholder="Provide details about this task..."
+                        defaultValue={task.description || ""}
+                        disabled={isPending}
+                      ></textarea>
+                    </div>
+                    <div className="form-group">
+                      <label>Column</label>
+                      <select
+                        name="columnId"
+                        className="form-input"
+                        defaultValue={task.columnId}
+                        required
+                        disabled={isPending}
+                      >
+                        {columns.map((col) => (
+                          <option key={col.id} value={col.id}>
+                            {col.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Due Date</label>
+                      <input
+                        name="dueDate"
+                        type="date"
+                        className="form-input"
+                        defaultValue={task.dueDate || ""}
+                        disabled={isPending}
+                      />
+                    </div>
+                    <div className="form-group" ref={dropdownRef}>
+                      <label>Tags</label>
+                      <div className="tag-system-container">
+                        <div className="tag-input-wrapper">
+                          {selectedTags.map((tag) => (
+                            <span key={tag} className="tag-chip">
                               {tag}
-                            </div>
-                          ))}
-                          {tagInput &&
-                            !availableTags.some(
-                              (t) => t.toLowerCase() === tagInput.toLowerCase(),
-                            ) && (
-                              <div
-                                className="tag-option create-option"
-                                onClick={() => addTag(tagInput)}
+                              <input type="hidden" name="tags" value={tag} />
+                              <button
+                                type="button"
+                                className="remove-tag"
+                                onClick={() => removeTag(tag)}
+                                disabled={isPending}
                               >
-                                Create "<span>{tagInput}</span>"
-                              </div>
-                            )}
+                                <X size={12} strokeWidth={3} />
+                              </button>
+                            </span>
+                          ))}
+                          <input
+                            type="text"
+                            className="tag-bare-input"
+                            placeholder={
+                              selectedTags.length === 0
+                                ? "Select or create tags..."
+                                : ""
+                            }
+                            value={tagInput}
+                            onChange={(e) => {
+                              setTagInput(e.target.value);
+                              setIsDropdownOpen(true);
+                            }}
+                            onFocus={() => setIsDropdownOpen(true)}
+                            onKeyDown={handleKeyDown}
+                            disabled={isPending}
+                          />
                         </div>
-                      )}
+                        {isDropdownOpen &&
+                          (tagInput || filteredTags.length > 0) && (
+                            <div className="tags-dropdown">
+                              {filteredTags.map((tag) => (
+                                <div
+                                  key={tag}
+                                  className="tag-option"
+                                  onClick={() => addTag(tag)}
+                                >
+                                  {tag}
+                                </div>
+                              ))}
+                              {tagInput &&
+                                !availableTags.some(
+                                  (t) => t.toLowerCase() === tagInput.toLowerCase(),
+                                ) && (
+                                  <div
+                                    className="tag-option create-option"
+                                    onClick={() => addTag(tagInput)}
+                                  >
+                                    Create "<span>{tagInput}</span>"
+                                  </div>
+                                )}
+                            </div>
+                          )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          </form>
+        ) : (
+          <div style={{ padding: "2rem", textAlign: "center", color: "#888" }}>
+            Loading task...
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
