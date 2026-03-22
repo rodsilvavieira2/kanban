@@ -3,6 +3,7 @@ import { Clock, Calendar, Tag, Play } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Task } from "../../shared/schemas/models";
+import { usePomodoroStore } from "../stores/pomodoroStore";
 
 interface TaskDetailsContentProps {
   task: Task;
@@ -13,6 +14,8 @@ export function TaskDetailsContent({
   task,
   onSelectForPomodoro,
 }: TaskDetailsContentProps) {
+  const { isActive } = usePomodoroStore();
+
   return (
     <div className="task-details-content" style={{ padding: "24px" }}>
       <div
@@ -26,9 +29,17 @@ export function TaskDetailsContent({
         <h1 style={{ fontSize: "24px", margin: 0 }}>{task.title}</h1>
         {onSelectForPomodoro && (
           <button
-            className="btn-primary"
-            onClick={onSelectForPomodoro}
-            style={{ display: "flex", alignItems: "center", gap: "8px" }}
+            className={`btn-primary ${isActive ? "disabled" : ""}`}
+            onClick={() => !isActive && onSelectForPomodoro()}
+            disabled={isActive}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              opacity: isActive ? 0.6 : 1,
+              cursor: isActive ? "not-allowed" : "pointer",
+            }}
+            title={isActive ? "Cannot change task while session is active" : ""}
           >
             <Play size={16} fill="currentColor" /> Select & Continue
           </button>

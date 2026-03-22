@@ -28,13 +28,15 @@ export function KanbanBoard() {
 
   const { projects, loadProjects } = useProjectStore();
   const {
-    columns,
-    tasks,
     isLoading,
     loadProjectData,
     moveTask,
     initUpdateListener,
+    columns,
+    tasks,
   } = useKanbanStore();
+
+  const { isActive } = usePomodoroStore();
 
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
@@ -112,13 +114,19 @@ export function KanbanBoard() {
             <Edit2 size={16} /> Edit
           </div>
           <div
-            className="task-menu-item"
+            className={`task-menu-item ${isActive ? "disabled" : ""}`}
             onClick={() => {
-              if (openMenuTaskId) {
+              if (openMenuTaskId && !isActive) {
                 usePomodoroStore.getState().setSelectedTaskId(openMenuTaskId);
                 navigate("/pomodoro");
               }
             }}
+            style={{
+              opacity: isActive ? 0.5 : 1,
+              cursor: isActive ? "not-allowed" : "pointer",
+              pointerEvents: isActive ? "none" : "auto",
+            }}
+            title={isActive ? "Cannot change task while session is active" : ""}
           >
             <CheckCircle size={16} /> Select & Continue
           </div>

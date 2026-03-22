@@ -149,11 +149,19 @@ export function Pomodoro() {
             <Edit2 size={16} /> Edit
           </div>
           <div
-            className="task-menu-item"
+            className={`task-menu-item ${isActive ? "disabled" : ""}`}
             onClick={() => {
-              setSelectedTaskId(openMenuTaskId);
-              setOpenMenuTaskId(null);
+              if (!isActive) {
+                setSelectedTaskId(openMenuTaskId);
+                setOpenMenuTaskId(null);
+              }
             }}
+            style={{
+              opacity: isActive ? 0.5 : 1,
+              cursor: isActive ? "not-allowed" : "pointer",
+              pointerEvents: isActive ? "none" : "auto",
+            }}
+            title={isActive ? "Cannot change task while session is active" : ""}
           >
             <CheckCircle size={16} /> Select & Continue
           </div>
@@ -331,9 +339,15 @@ export function Pomodoro() {
               {filteredTasks.map((task) => (
                 <div
                   key={task.id}
-                  className={`pomodoro-task-card ${selectedTaskId === task.id ? "active" : ""}`}
-                  onClick={() => setSelectedTaskId(task.id)}
-                  style={{ cursor: "pointer" }}
+                  className={`pomodoro-task-card ${selectedTaskId === task.id ? "active" : ""} ${isActive ? "selection-disabled" : ""}`}
+                  onClick={() => !isActive && setSelectedTaskId(task.id)}
+                  style={{
+                    cursor: isActive ? "not-allowed" : "pointer",
+                    opacity: isActive && selectedTaskId !== task.id ? 0.6 : 1,
+                  }}
+                  title={
+                    isActive ? "Cannot change task while session is active" : ""
+                  }
                 >
                   <div
                     style={{
