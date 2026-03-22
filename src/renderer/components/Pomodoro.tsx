@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { useSettingsStore } from "../stores/settingsStore";
@@ -14,28 +14,41 @@ import {
 } from "lucide-react";
 
 export function Pomodoro() {
-  const { selectedTaskId, setSelectedTaskId } = usePomodoroStore();
+  const {
+    selectedTaskId,
+    setSelectedTaskId,
+    timeLeft,
+    totalTime,
+    isActive,
+    roundsCompleted,
+    isBreak,
+    toggleTimer,
+    resetCurrentSession,
+    resetRounds,
+    startFocus,
+    startBreak,
+    syncSettingsIfPaused,
+  } = usePomodoroStore();
 
   const { settings } = useSettingsStore();
   const focusTime = parseInt(settings.focusTime) || 25;
   const breakTime = parseInt(settings.shortBreakTime) || 5;
   const totalRounds = parseInt(settings.totalRounds) || 4;
-  const notificationsEnabled = settings.notificationsEnabled === "true";
 
-  const { tasks, isLoading, loadAllTasks, updateTaskTime } = useKanbanStore();
+  const { tasks, isLoading, loadAllTasks } = useKanbanStore();
   const { projects, loadProjects } = useProjectStore();
 
-  const [timeLeft, setTimeLeft] = useState(focusTime * 60);
-  const [totalTime, setTotalTime] = useState(focusTime * 60);
-  const [isActive, setIsActive] = useState(false);
-  const [roundsCompleted, setRoundsCompleted] = useState(0);
-  const [isBreak, setIsBreak] = useState(false);
   const [selectedProjectId, setSelectedProjectId] = useState<string>("all");
 
   useEffect(() => {
     loadAllTasks();
     loadProjects();
   }, [loadAllTasks, loadProjects]);
+
+  // Sync timer display when settings change while the timer is paused
+  useEffect(() => {
+    syncSettingsIfPaused();
+  }, [focusTime, breakTime, syncSettingsIfPaused]);
 
   const filteredTasks = useMemo(() => {
     if (selectedProjectId === "all") return tasks;
@@ -46,115 +59,6 @@ export function Pomodoro() {
     () => tasks.find((t) => t.id === selectedTaskId),
     [tasks, selectedTaskId],
   );
-
-  // Update timer if settings change while not active
-  useEffect(() => {
-    if (!isActive) {
-      const newTime = (isBreak ? breakTime : focusTime) * 60;
-      setTimeLeft(newTime);
-      setTotalTime(newTime);
-    }
-  }, [focusTime, breakTime, isBreak, isActive]);
-
-  const sendNotification = useCallback(
-    (title: string, body: string) => {
-      if (notificationsEnabled && Notification.permission === "granted") {
-        new Notification(title, { body });
-      } else if (notificationsEnabled && Notification.permission !== "denied") {
-        Notification.requestPermission().then((permission) => {
-          if (permission === "granted") {
-            new Notification(title, { body });
-          }
-        });
-      }
-    },
-    [notificationsEnabled],
-  );
-
-  const startBreak = useCallback(
-    (autoStart = false) => {
-      const time = breakTime * 60;
-      setIsActive(autoStart);
-      setIsBreak(true);
-      setTimeLeft(time);
-      setTotalTime(time);
-      sendNotification("Focus Session Complete", "Time for a break!");
-    },
-    [breakTime, sendNotification],
-  );
-
-  const startFocus = useCallback(
-    (autoStart = false) => {
-      const time = focusTime * 60;
-      setIsActive(autoStart);
-      setIsBreak(false);
-      setTimeLeft(time);
-      setTotalTime(time);
-      setRoundsCompleted((prev) => prev + 1);
-      sendNotification("Break Over", "Back to work!");
-    },
-    [focusTime, sendNotification],
-  );
-
-  const prevTimeLeft = useRef(timeLeft);
-  useEffect(() => {
-    if (isActive && !isBreak) {
-      const timeDiff = prevTimeLeft.current - timeLeft;
-      if (timeDiff > 0 && timeLeft < totalTime) {
-        const elapsed = totalTime - timeLeft;
-        if (elapsed > 0 && elapsed % 60 === 0) {
-          if (selectedTaskId) {
-            updateTaskTime(selectedTaskId, 1);
-          }
-        }
-      }
-    }
-    prevTimeLeft.current = timeLeft;
-  }, [timeLeft, isActive, isBreak, totalTime, selectedTaskId, updateTaskTime]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((time) => time - 1);
-      }, 1000);
-    } else if (timeLeft === 0) {
-      setIsActive(false);
-
-      if (!isBreak) {
-        startBreak(false);
-      } else {
-        startFocus(false);
-      }
-    }
-
-    return () => clearInterval(interval);
-  }, [
-    isActive,
-    timeLeft,
-    isBreak,
-    startBreak,
-    startFocus,
-  ]);
-
-  const toggleTimer = () => {
-    setIsActive(!isActive);
-  };
-
-  const resetCurrentSession = () => {
-    setIsActive(false);
-    setTimeLeft(totalTime);
-  };
-
-  const resetRounds = () => {
-    setRoundsCompleted(0);
-    setIsActive(false);
-    setIsBreak(false);
-    const time = focusTime * 60;
-    setTimeLeft(time);
-    setTotalTime(time);
-  };
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;

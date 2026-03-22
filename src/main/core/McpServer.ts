@@ -14,8 +14,6 @@ import { UpdateTaskTimeUseCase } from "./useCases/task/UpdateTaskTimeUseCase";
 import { GetRecentActivityUseCase } from "./useCases/activity/GetRecentActivityUseCase";
 
 export class McpServer {
-  private server: McpSdkServer;
-
   constructor(
     private getProjectsUseCase: GetProjectsUseCase,
     private createProjectUseCase: CreateProjectUseCase,
@@ -27,16 +25,20 @@ export class McpServer {
     private updateTaskTimeUseCase: UpdateTaskTimeUseCase,
     private getRecentActivityUseCase: GetRecentActivityUseCase,
     private onDataUpdated: () => void,
-  ) {
-    this.server = new McpSdkServer({
+  ) {}
+
+  // Creates a fresh McpSdkServer instance per request — required in stateless mode
+  // because the SDK does not support calling connect() more than once on a single instance.
+  private createSdkServer(): McpSdkServer {
+    const server = new McpSdkServer({
       name: "taskmaster-mcp",
       version: "1.0.0",
     });
-
-    this.setupHandlers();
+    this.setupHandlers(server);
+    return server;
   }
 
-  private setupHandlers() {
+  private setupHandlers(server: McpSdkServer) {
     // ── Resources ──────────────────────────────────────────────────────────────
 
     const boardTemplate = new ResourceTemplate("kanban://projects/{projectId}/board", {
@@ -53,7 +55,7 @@ export class McpServer {
       },
     });
 
-    this.server.registerResource(
+    server.registerResource(
       "board",
       boardTemplate,
       {
@@ -61,7 +63,7 @@ export class McpServer {
         description: "Full state of a project board including columns and tasks.",
       },
       async (uri) => {
-        const projectId = uri.pathname.split("/")[2];
+        const projectId = uri.pathname.split("/")[1];
 
         if (uri.protocol !== "kanban:" || !projectId) {
           throw new Error(`Invalid URI: ${uri.toString()}`);
@@ -83,7 +85,7 @@ export class McpServer {
 
     // ── Project tools ──────────────────────────────────────────────────────────
 
-    this.server.registerTool(
+    server.registerTool(
       "get_projects",
       {
         title: "Get Projects",
@@ -103,7 +105,7 @@ export class McpServer {
       },
     );
 
-    this.server.registerTool(
+    server.registerTool(
       "create_project",
       {
         title: "Create Project",
@@ -132,7 +134,7 @@ export class McpServer {
       },
     );
 
-    this.server.registerTool(
+    server.registerTool(
       "delete_project",
       {
         title: "Delete Project",
@@ -152,7 +154,7 @@ export class McpServer {
 
     // ── Task tools ─────────────────────────────────────────────────────────────
 
-    this.server.registerTool(
+    server.registerTool(
       "create_task",
       {
         title: "Create Task",
@@ -178,7 +180,7 @@ export class McpServer {
       },
     );
 
-    this.server.registerTool(
+    server.registerTool(
       "update_task",
       {
         title: "Update Task",
@@ -203,7 +205,7 @@ export class McpServer {
       },
     );
 
-    this.server.registerTool(
+    server.registerTool(
       "move_task",
       {
         title: "Move Task",
@@ -227,7 +229,7 @@ export class McpServer {
       },
     );
 
-    this.server.registerTool(
+    server.registerTool(
       "update_task_time",
       {
         title: "Update Task Time",
@@ -253,7 +255,7 @@ export class McpServer {
 
     // ── Activity tools ─────────────────────────────────────────────────────────
 
-    this.server.registerTool(
+    server.registerTool(
       "get_recent_activity",
       {
         title: "Get Recent Activity",
@@ -285,10 +287,6 @@ export class McpServer {
   }
 
   async start(port = 3282) {
-    const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: undefined, // stateless — no session tracking needed for a local desktop app
-    });
-
     const httpServer = http.createServer(async (req, res) => {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
@@ -299,14 +297,32 @@ export class McpServer {
         return;
       }
 
-      if (req.url === "/mcp") {
-        await transport.handleRequest(req, res);
+      if (req.url === "/mcp" && req.method === "POST") {
+        // Stateless mode: a fresh server + transport per request.
+        // The SDK forbids calling connect() twice on the same instance, so both
+        // must be created anew for every incoming request (per official SDK example).
+        const sdkServer = this.createSdkServer();
+        const transport = new StreamableHTTPServerTransport({
+          sessionIdGenerator: undefined,
+        });
+        try {
+          await sdkServer.connect(transport);
+          await transport.handleRequest(req, res);
+          res.on("close", () => {
+            transport.close();
+            sdkServer.close();
+          });
+        } catch (error) {
+          console.error("MCP request error:", error);
+          if (!res.headersSent) {
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ jsonrpc: "2.0", error: { code: -32603, message: "Internal server error" }, id: null }));
+          }
+        }
       } else {
         res.writeHead(404).end("Not found");
       }
     });
-
-    await this.server.connect(transport);
 
     await new Promise<void>((resolve) => httpServer.listen(port, "127.0.0.1", resolve));
 
