@@ -1,5 +1,5 @@
 import { DatabaseSync } from "node:sqlite";
-import { v4 as uuidv4 } from "uuid";
+import crypto from "node:crypto";
 import { ActivityLog } from "../../../shared/schemas/models";
 import { ActivityLogRepository } from "../../core/repositories/ActivityLogRepository";
 
@@ -9,7 +9,7 @@ export class SQLiteActivityLogRepository implements ActivityLogRepository {
   async create(
     log: Omit<ActivityLog, "id" | "createdAt">,
   ): Promise<ActivityLog> {
-    const id = uuidv4();
+    const id = crypto.randomUUID();
     const createdAt = new Date().toISOString();
 
     const stmt = this.db.prepare(`

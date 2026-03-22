@@ -1,5 +1,5 @@
 import { IColumnRepository } from "../../domain/repositories/IColumnRepository";
-import { v4 as uuidv4 } from "uuid";
+import crypto from "node:crypto";
 
 export class InitializeProjectColumnsUseCase {
   constructor(private columnRepository: IColumnRepository) {}
@@ -13,7 +13,7 @@ export class InitializeProjectColumnsUseCase {
 
     for (const col of defaultColumns) {
       await this.columnRepository.save({
-        id: uuidv4(),
+        id: crypto.randomUUID(),
         projectId,
         title: col.title,
         order: col.order,

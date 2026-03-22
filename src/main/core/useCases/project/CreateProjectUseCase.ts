@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import crypto from "node:crypto";
 import { Project } from "../../../../shared/schemas/models";
 import { IProjectRepository } from "../../domain/repositories/IProjectRepository";
 import { InitializeProjectColumnsUseCase } from "../column/InitializeProjectColumnsUseCase";
@@ -14,7 +14,7 @@ export class CreateProjectUseCase {
       throw new Error("Project name is required");
     }
 
-    const projectId = uuidv4();
+    const projectId = crypto.randomUUID();
 
     const project: Project = {
       id: projectId,

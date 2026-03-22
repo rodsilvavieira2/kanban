@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
+import crypto from "node:crypto";
 import { Task } from "../../../../shared/schemas/models";
 import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
 import { ActivityLogRepository } from "../../repositories/ActivityLogRepository";
@@ -20,7 +20,7 @@ export class CreateTaskUseCase {
     const order = tasksInColumn.length;
 
     const task: Task = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       columnId: taskData.columnId,
       title: taskData.title,
       description: taskData.description || "",

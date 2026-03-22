@@ -1,7 +1,7 @@
 {
   "name": "kanban",
   "productName": "kanban",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "My Electron application description",
   "main": ".vite/build/index.js",
   "private": true,
@@ -54,7 +54,6 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.13.1",
     "remark-gfm": "^4.0.1",
-    "uuid": "^13.0.0",
     "zod": "^4.3.6",
     "zustand": "^5.0.11"
   },
