@@ -71,7 +71,7 @@ export function KanbanBoard() {
   const handleMenuClick = (e: React.MouseEvent, taskId: string) => {
     e.stopPropagation();
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setMenuPosition({ x: rect.left, y: rect.top + rect.height });
+    setMenuPosition({ x: rect.right, y: rect.top + rect.height });
     setOpenMenuTaskId(taskId === openMenuTaskId ? null : taskId);
   };
 
