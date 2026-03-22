@@ -100,7 +100,7 @@ app.on("ready", async () => {
     taskRepository,
     activityLogRepository,
   );
-  const updateTaskTimeUseCase = new UpdateTaskTimeUseCase(taskRepository);
+  const updateTaskTimeUseCase = new UpdateTaskTimeUseCase(taskRepository, activityLogRepository);
   const getRecentActivityUseCase = new GetRecentActivityUseCase(
     activityLogRepository,
   );

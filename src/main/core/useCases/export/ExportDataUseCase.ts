@@ -9,6 +9,7 @@ export interface ExportedTask {
   dueDate?: string;
   order: number;
   timeSpentMinutes: number;
+  tags: string[];
   createdAt?: string;
 }
 
@@ -64,6 +65,7 @@ export class ExportDataUseCase {
               dueDate: task.dueDate || undefined,
               order: task.order,
               timeSpentMinutes: task.timeSpentMinutes,
+              tags: task.tags ?? [],
               createdAt: task.createdAt || undefined,
             }));
 

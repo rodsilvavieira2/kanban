@@ -22,6 +22,7 @@ export class CreateTaskUseCase {
     const task: Task = {
       id: crypto.randomUUID(),
       columnId: taskData.columnId,
+      projectId: taskData.projectId,
       title: taskData.title,
       description: taskData.description || "",
       dueDate: taskData.dueDate,

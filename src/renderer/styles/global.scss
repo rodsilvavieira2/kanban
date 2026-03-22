@@ -777,6 +777,15 @@ code,
   letter-spacing: 0.05em;
 }
 
+.form-label-hint {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 6px;
+}
+
 .form-input,
 .form-textarea {
   background-color: var(--bg-main);

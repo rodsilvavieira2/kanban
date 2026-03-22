@@ -117,6 +117,41 @@ export function initDatabase() {
       `);
       currentVersion = 2;
     }
+    // Migration 3: Add project_id to tasks
+    if (currentVersion < 3) {
+      console.log("Running Migration 3: Add project_id to tasks");
+      db.exec(`
+        BEGIN TRANSACTION;
+
+        ALTER TABLE tasks ADD COLUMN project_id TEXT REFERENCES projects(id) ON DELETE SET NULL;
+
+        PRAGMA user_version = 3;
+
+        COMMIT;
+      `);
+      currentVersion = 3;
+    }
+
+    // Migration 4: Backfill project_id on existing tasks via columns join
+    if (currentVersion < 4) {
+      console.log("Running Migration 4: Backfill project_id on existing tasks");
+      db.exec(`
+        BEGIN TRANSACTION;
+
+        UPDATE tasks
+        SET project_id = (
+          SELECT columns.project_id
+          FROM columns
+          WHERE columns.id = tasks.column_id
+        )
+        WHERE project_id IS NULL;
+
+        PRAGMA user_version = 4;
+
+        COMMIT;
+      `);
+      currentVersion = 4;
+    }
   } catch (err) {
     console.error("Migration failed:", err);
     throw err;

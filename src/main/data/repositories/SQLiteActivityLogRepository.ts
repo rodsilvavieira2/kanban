@@ -49,24 +49,4 @@ export class SQLiteActivityLogRepository implements ActivityLogRepository {
 
     return stmt.all(limit) as ActivityLog[];
   }
-
-  async getByEntity(
-    entityType: string,
-    entityId: string,
-  ): Promise<ActivityLog[]> {
-    const stmt = this.db.prepare(`
-      SELECT 
-        id, 
-        action, 
-        entity_type as entityType, 
-        entity_id as entityId, 
-        details, 
-        created_at as createdAt
-      FROM activity_logs
-      WHERE entity_type = ? AND entity_id = ?
-      ORDER BY created_at DESC
-    `);
-
-    return stmt.all(entityType, entityId) as ActivityLog[];
-  }
 }

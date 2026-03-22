@@ -213,11 +213,11 @@ export function EditTask() {
                       />
                     </div>
                     <div className="form-group">
-                      <label>Description</label>
+                      <label>Description <span className="form-label-hint">Markdown supported</span></label>
                       <textarea
                         name="description"
                         className="form-textarea"
-                        placeholder="Provide details about this task..."
+                        placeholder="Describe this task... **bold**, _italic_, `code`, - lists"
                         defaultValue={task.description || ""}
                         disabled={isPending}
                       ></textarea>

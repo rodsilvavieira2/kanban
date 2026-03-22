@@ -1,7 +1,11 @@
 import { ITaskRepository } from "../../domain/repositories/ITaskRepository";
+import { ActivityLogRepository } from "../../repositories/ActivityLogRepository";
 
 export class UpdateTaskTimeUseCase {
-  constructor(private taskRepository: ITaskRepository) {}
+  constructor(
+    private taskRepository: ITaskRepository,
+    private activityLogRepository: ActivityLogRepository,
+  ) {}
 
   async execute(taskId: string, minutes: number): Promise<void> {
     if (minutes <= 0) {
@@ -14,5 +18,12 @@ export class UpdateTaskTimeUseCase {
     }
 
     await this.taskRepository.incrementTimeSpent(taskId, minutes);
+
+    await this.activityLogRepository.create({
+      action: "Logged time",
+      entityType: "Task",
+      entityId: taskId,
+      details: `Added ${minutes} minute${minutes === 1 ? "" : "s"} to "${task.title}"`,
+    });
   }
 }

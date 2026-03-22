@@ -41,27 +41,34 @@ export class MoveTaskUseCase {
       const destinationTasks =
         await this.taskRepository.findAllByColumnId(destinationColumnId);
 
-      // Remove from source
-      sourceTasks.splice(sourceIndex, 1);
+      // Remove from source and reorder the remaining source tasks
+      const [movedTask] = sourceTasks.splice(sourceIndex, 1);
       await this.taskRepository.reorder(
         sourceTasks.map((task, index) => ({ id: task.id, order: index })),
       );
 
-      // Update destination order
+      // Update the moved task's column_id and final order via move()
+      // Then reorder all destination tasks (including the moved one) for consistency.
+      // Insert the local movedTask object at the target index to compute correct orders,
+      // avoiding an extra findById() DB round-trip.
+      destinationTasks.splice(destinationIndex, 0, movedTask);
+
+      // move() sets column_id and order for the moved task
       await this.taskRepository.move(
         taskId,
         destinationColumnId,
         destinationIndex,
       );
 
-      // Update other tasks in destination
-      const taskToMove = await this.taskRepository.findById(taskId);
-      if (taskToMove) {
-        destinationTasks.splice(destinationIndex, 0, taskToMove);
-      }
-      await this.taskRepository.reorder(
-        destinationTasks.map((task, index) => ({ id: task.id, order: index })),
-      );
+      // reorder() updates only the *other* destination tasks that shifted positions;
+      // the moved task's order was already set correctly by move() above.
+      const otherDestTasks = destinationTasks
+        .filter((t) => t.id !== taskId)
+        .map((task, index) => ({
+          id: task.id,
+          order: index < destinationIndex ? index : index + 1,
+        }));
+      await this.taskRepository.reorder(otherDestTasks);
     }
     if (sourceColumnId !== destinationColumnId) {
       const task = await this.taskRepository.findById(taskId);

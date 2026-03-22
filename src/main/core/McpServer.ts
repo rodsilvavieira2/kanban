@@ -174,6 +174,32 @@ export class McpServer {
       },
     );
 
+    // ── Board tool ─────────────────────────────────────────────────────────────
+
+    server.registerTool(
+      "get_board",
+      {
+        title: "Get Board",
+        description:
+          "Get the full board state for a project: its columns (with IDs) and all tasks. " +
+          "Use this after get_projects to obtain column IDs needed for create_task and move_task.",
+        inputSchema: {
+          projectId: z.string().describe("The ID of the project"),
+        },
+      },
+      async ({ projectId }) => {
+        const projectData = await this.getProjectDataUseCase.execute(projectId);
+        return {
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify(projectData, null, 2),
+            },
+          ],
+        };
+      },
+    );
+
     // ── Task tools ─────────────────────────────────────────────────────────────
 
     server.registerTool(
@@ -191,7 +217,9 @@ export class McpServer {
           description: z
             .string()
             .optional()
-            .describe("An optional description of the task"),
+            .describe(
+              "An optional description of the task. Markdown syntax is supported and recommended — use **bold**, _italic_, `code`, bullet lists, headings, etc.",
+            ),
           dueDate: z
             .string()
             .optional()
@@ -235,7 +263,9 @@ export class McpServer {
           description: z
             .string()
             .optional()
-            .describe("New description for the task"),
+            .describe(
+              "New description for the task. Markdown syntax is supported and recommended — use **bold**, _italic_, `code`, bullet lists, headings, etc.",
+            ),
           columnId: z
             .string()
             .optional()

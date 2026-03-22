@@ -6,14 +6,27 @@ import crypto from "crypto";
 export class SQLiteTaskRepository implements ITaskRepository {
   constructor(private db: DatabaseSync) {}
 
-  private getTagsForTask(taskId: string): string[] {
+  private getTagsForTasks(taskIds: string[]): Map<string, string[]> {
+    if (taskIds.length === 0) return new Map();
+    const placeholders = taskIds.map(() => "?").join(", ");
     const stmt = this.db.prepare(`
-      SELECT t.name FROM tags t
-      INNER JOIN task_tags tt ON t.id = tt.tag_id
-      WHERE tt.task_id = ?
+      SELECT tt.task_id, tg.name
+      FROM task_tags tt
+      INNER JOIN tags tg ON tg.id = tt.tag_id
+      WHERE tt.task_id IN (${placeholders})
     `);
-    const rows = stmt.all(taskId) as { name: string }[];
-    return rows.map((r) => r.name);
+    const rows = stmt.all(...taskIds) as { task_id: string; name: string }[];
+    const map = new Map<string, string[]>();
+    for (const row of rows) {
+      const list = map.get(row.task_id) ?? [];
+      list.push(row.name);
+      map.set(row.task_id, list);
+    }
+    return map;
+  }
+
+  private getTagsForTask(taskId: string): string[] {
+    return this.getTagsForTasks([taskId]).get(taskId) ?? [];
   }
 
   async findAllByColumnId(columnId: string): Promise<Task[]> {
@@ -21,8 +34,9 @@ export class SQLiteTaskRepository implements ITaskRepository {
       'SELECT * FROM tasks WHERE column_id = ? ORDER BY "order" ASC',
     );
     const rows = stmt.all(columnId) as Record<string, unknown>[];
+    const tagMap = this.getTagsForTasks(rows.map((r) => r.id as string));
     return rows.map((row) =>
-      this.mapToEntity(row, this.getTagsForTask(row.id as string)),
+      this.mapToEntity(row, tagMap.get(row.id as string) ?? []),
     );
   }
 
@@ -35,8 +49,9 @@ export class SQLiteTaskRepository implements ITaskRepository {
       ORDER BY c."order" ASC, t."order" ASC
     `);
     const rows = stmt.all(projectId) as Record<string, unknown>[];
+    const tagMap = this.getTagsForTasks(rows.map((r) => r.id as string));
     return rows.map((row) =>
-      this.mapToEntity(row, this.getTagsForTask(row.id as string)),
+      this.mapToEntity(row, tagMap.get(row.id as string) ?? []),
     );
   }
 
@@ -52,6 +67,7 @@ export class SQLiteTaskRepository implements ITaskRepository {
     const {
       id,
       columnId,
+      projectId,
       title,
       description,
       dueDate,
@@ -65,11 +81,12 @@ export class SQLiteTaskRepository implements ITaskRepository {
     if (existing) {
       const stmt = this.db.prepare(`
         UPDATE tasks
-        SET column_id = ?, title = ?, description = ?, due_date = ?, "order" = ?, time_spent_minutes = ?, updated_at = CURRENT_TIMESTAMP
+        SET column_id = ?, project_id = ?, title = ?, description = ?, due_date = ?, "order" = ?, time_spent_minutes = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = ?
       `);
       stmt.run(
         columnId,
+        projectId ?? null,
         title,
         description ?? null,
         dueDate ?? null,
@@ -79,12 +96,13 @@ export class SQLiteTaskRepository implements ITaskRepository {
       );
     } else {
       const stmt = this.db.prepare(`
-        INSERT INTO tasks (id, column_id, title, description, due_date, "order", time_spent_minutes)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO tasks (id, column_id, project_id, title, description, due_date, "order", time_spent_minutes)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `);
       stmt.run(
         id,
         columnId,
+        projectId ?? null,
         title,
         description ?? null,
         dueDate ?? null,
@@ -163,6 +181,7 @@ export class SQLiteTaskRepository implements ITaskRepository {
     return {
       id: row.id as string,
       columnId: row.column_id as string,
+      projectId: (row.project_id as string) || undefined,
       title: row.title as string,
       description: (row.description as string) || "",
       dueDate: (row.due_date as string) || undefined,

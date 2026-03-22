@@ -226,7 +226,7 @@ interface SomeState {
 
 `McpServer.ts` wraps `@modelcontextprotocol/sdk` with:
 - **Resources**: `kanban://projects/{id}/board` — returns full board JSON
-- **Tools**: `create_task`, `update_task`, `move_task`, `update_task_time`
-- After each tool succeeds, call `this.onDataUpdated()` to push `"kanban-updated"` to the renderer
-- Transport: `StdioServerTransport` (works with Claude Desktop via MCP config)
+- **Tools**: `get_projects`, `create_project`, `delete_project`, `create_task`, `update_task`, `move_task`, `update_task_time`, `get_recent_activity`
+- After each tool succeeds (except `get_recent_activity`), call `this.onDataUpdated()` to push `"kanban-updated"` to the renderer
+- Transport: `StreamableHTTPServerTransport` on `http://127.0.0.1:3282/mcp` — a new `McpSdkServer` instance is created per POST request (stateless mode; `connect()` must not be called twice on the same instance). CORS is fully open.
 - Pass the `onDataUpdated` callback through the constructor — do not couple `McpServer` to the Electron window directly
