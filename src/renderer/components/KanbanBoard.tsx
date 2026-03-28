@@ -16,9 +16,11 @@ import {
   MoreVertical,
   Eye,
   Edit2,
+  Trash,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { ConfirmDeleteTaskDialog } from "./ConfirmDeleteTaskDialog";
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
@@ -35,6 +37,9 @@ export function KanbanBoard() {
 
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (projectId) {
@@ -74,6 +79,21 @@ export function KanbanBoard() {
     setOpenMenuTaskId(taskId === openMenuTaskId ? null : taskId);
   };
 
+  const handleDeleteTaskClick = (e: React.MouseEvent, taskId: string) => {
+    e.stopPropagation();
+    setTaskToDelete(taskId);
+    setDeleteDialogOpen(true);
+    setOpenMenuTaskId(null);
+  };
+
+  const confirmDeleteTask = () => {
+    if (taskToDelete) {
+      useKanbanStore.getState().deleteTask(taskToDelete);
+      setDeleteDialogOpen(false);
+      setTaskToDelete(null);
+    }
+  };
+
   useEffect(() => {
     const handleClick = () => setOpenMenuTaskId(null);
     document.addEventListener("click", handleClick);
@@ -108,8 +128,22 @@ export function KanbanBoard() {
           >
             <Edit2 size={16} /> Edit
           </div>
+          <div
+            className="task-menu-item text-danger"
+            style={{ color: "var(--error)" }}
+            onClick={(e) => {
+              if (openMenuTaskId) handleDeleteTaskClick(e, openMenuTaskId);
+            }}
+          >
+            <Trash size={16} /> Delete
+          </div>
         </div>
       )}
+      <ConfirmDeleteTaskDialog
+        isOpen={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDeleteTask}
+      />
       <div className="kanban-header">
         <div className="kanban-header-left">
           <button

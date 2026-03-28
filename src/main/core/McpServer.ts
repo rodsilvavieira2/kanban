@@ -14,6 +14,7 @@ import { CreateTaskUseCase } from "./useCases/task/CreateTaskUseCase";
 import { UpdateTaskUseCase } from "./useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "./useCases/task/UpdateTaskTimeUseCase";
+import { DeleteTaskUseCase } from "./useCases/kanban/DeleteTaskUseCase";
 import { GetRecentActivityUseCase } from "./useCases/activity/GetRecentActivityUseCase";
 
 export class McpServer {
@@ -26,6 +27,7 @@ export class McpServer {
     private updateTaskUseCase: UpdateTaskUseCase,
     private moveTaskUseCase: MoveTaskUseCase,
     private updateTaskTimeUseCase: UpdateTaskTimeUseCase,
+    private deleteTaskUseCase: DeleteTaskUseCase,
     private getRecentActivityUseCase: GetRecentActivityUseCase,
     private onDataUpdated: () => void,
   ) {}
@@ -356,6 +358,26 @@ export class McpServer {
               type: "text",
               text: `Successfully added ${minutes} minutes to task ${taskId}`,
             },
+          ],
+        };
+      },
+    );
+
+    server.registerTool(
+      "delete_task",
+      {
+        title: "Delete Task",
+        description: "Permanently delete a task by its ID.",
+        inputSchema: {
+          taskId: z.string().describe("The ID of the task to delete"),
+        },
+      },
+      async ({ taskId }) => {
+        await this.deleteTaskUseCase.execute(taskId);
+        this.onDataUpdated();
+        return {
+          content: [
+            { type: "text", text: `Task ${taskId} deleted successfully` },
           ],
         };
       },

@@ -8,6 +8,7 @@ import { CreateTaskUseCase } from "../../core/useCases/task/CreateTaskUseCase";
 import { UpdateTaskUseCase } from "../../core/useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "../../core/useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "../../core/useCases/task/UpdateTaskTimeUseCase";
+import { DeleteTaskUseCase } from "../../core/useCases/kanban/DeleteTaskUseCase";
 import { GetRecentActivityUseCase } from "../../core/useCases/activity/GetRecentActivityUseCase";
 import { GetSettingsUseCase } from "../../core/useCases/settings/GetSettingsUseCase";
 import { UpdateSettingsUseCase } from "../../core/useCases/settings/UpdateSettingsUseCase";
@@ -22,6 +23,7 @@ export function setupKanbanIpcHandlers(
   updateTaskUseCase: UpdateTaskUseCase,
   moveTaskUseCase: MoveTaskUseCase,
   updateTaskTimeUseCase: UpdateTaskTimeUseCase,
+  deleteTaskUseCase: DeleteTaskUseCase,
   getRecentActivityUseCase: GetRecentActivityUseCase,
   getSettingsUseCase: GetSettingsUseCase,
   updateSettingsUseCase: UpdateSettingsUseCase,
@@ -102,6 +104,16 @@ export function setupKanbanIpcHandlers(
       return { success: true };
     } catch (error) {
       console.error("Failed to update task time (IPC):", error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle("delete-task", async (event, taskId) => {
+    try {
+      await deleteTaskUseCase.execute(taskId);
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to delete task (IPC):", error);
       throw error;
     }
   });

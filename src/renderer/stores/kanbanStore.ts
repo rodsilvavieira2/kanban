@@ -21,6 +21,7 @@ interface KanbanState {
     destinationIndex: number;
   }) => Promise<void>;
   updateTaskTime: (taskId: string, minutes: number) => Promise<void>;
+  deleteTask: (taskId: string) => Promise<void>;
   initUpdateListener: (projectId: string) => void;
 }
 
@@ -57,7 +58,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
         const { tasks, columns } = await kanbanApi.getProjectData(project.id);
         allTasks = [
           ...allTasks,
-          ...tasks.map((t) => ({ ...t, projectId: project.id })),
+          ...tasks.map((t: Task) => ({ ...t, projectId: project.id })),
         ];
 
         // Add columns that we don't already have
@@ -89,6 +90,7 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       updatedAt: new Date().toISOString(),
       order: previousTasks.length,
       ...taskData,
+      timeSpentMinutes: taskData.timeSpentMinutes ?? 0,
     };
 
     set((state) => ({ tasks: [...state.tasks, tempTask] }));
@@ -229,6 +231,26 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
         tasks: previousTasks,
         error:
           error instanceof Error ? error.message : "Failed to update task time",
+      });
+    }
+  },
+
+  deleteTask: async (taskId: string) => {
+    const previousTasks = get().tasks;
+
+    // Optimistic update
+    set((state) => ({
+      tasks: state.tasks.filter((t) => t.id !== taskId),
+    }));
+
+    try {
+      await kanbanApi.deleteTask(taskId);
+    } catch (error: unknown) {
+      console.error("Failed to delete task:", error);
+      set({
+        tasks: previousTasks,
+        error:
+          error instanceof Error ? error.message : "Failed to delete task",
       });
     }
   },

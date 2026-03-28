@@ -20,6 +20,7 @@ import { CreateTaskUseCase } from "./core/useCases/task/CreateTaskUseCase";
 import { UpdateTaskUseCase } from "./core/useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./core/useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "./core/useCases/task/UpdateTaskTimeUseCase";
+import { DeleteTaskUseCase } from "./core/useCases/kanban/DeleteTaskUseCase";
 import { GetRecentActivityUseCase } from "./core/useCases/activity/GetRecentActivityUseCase";
 import { GetSettingsUseCase } from "./core/useCases/settings/GetSettingsUseCase";
 import { UpdateSettingsUseCase } from "./core/useCases/settings/UpdateSettingsUseCase";
@@ -101,6 +102,7 @@ app.on("ready", async () => {
     activityLogRepository,
   );
   const updateTaskTimeUseCase = new UpdateTaskTimeUseCase(taskRepository, activityLogRepository);
+  const deleteTaskUseCase = new DeleteTaskUseCase(taskRepository, activityLogRepository);
   const getRecentActivityUseCase = new GetRecentActivityUseCase(
     activityLogRepository,
   );
@@ -122,6 +124,7 @@ app.on("ready", async () => {
     updateTaskUseCase,
     moveTaskUseCase,
     updateTaskTimeUseCase,
+    deleteTaskUseCase,
     getRecentActivityUseCase,
     getSettingsUseCase,
     updateSettingsUseCase,
@@ -138,6 +141,7 @@ app.on("ready", async () => {
     updateTaskUseCase,
     moveTaskUseCase,
     updateTaskTimeUseCase,
+    deleteTaskUseCase,
     getRecentActivityUseCase,
     () => {
       if (mainWindow && !mainWindow.isDestroyed()) {

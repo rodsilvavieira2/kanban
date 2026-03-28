@@ -13,6 +13,7 @@ const kanbanApi = {
     ipcRenderer.invoke("get-project-data", projectId),
   createTask: (data: Record<string, unknown>) =>
     ipcRenderer.invoke("create-task", data),
+  deleteTask: (taskId: string) => ipcRenderer.invoke("delete-task", taskId),
   updateTask: (request: { taskId: string; data: Record<string, unknown> }) =>
     ipcRenderer.invoke("update-task", request),
   moveTask: (request: Record<string, unknown>) =>
