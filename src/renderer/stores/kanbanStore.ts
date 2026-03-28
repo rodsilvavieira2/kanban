@@ -11,6 +11,7 @@ interface KanbanState {
   // Actions
   loadProjectData: (projectId: string) => Promise<void>;
   loadAllTasks: () => Promise<void>;
+  createColumn: (projectId: string, title: string) => Promise<void>;
   createTask: (projectId: string, taskData: Partial<Task>) => Promise<void>;
   updateTask: (taskId: string, taskData: Partial<Task>) => Promise<void>;
   moveTask: (request: {
@@ -73,6 +74,33 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       set({
         error: error instanceof Error ? error.message : "Failed to load tasks",
         isLoading: false,
+      });
+    }
+  },
+
+  createColumn: async (projectId: string, title: string) => {
+    const previousColumns = get().columns;
+    
+    // Optimistic update
+    const tempColumn: Column = {
+      id: `temp-col-${Date.now()}`,
+      projectId,
+      title,
+      order: previousColumns.length,
+      color: "new-column"
+    };
+
+    set((state) => ({ columns: [...state.columns, tempColumn] }));
+
+    try {
+      const newColumn = await kanbanApi.createColumn(projectId, title);
+      set((state) => ({
+        columns: state.columns.map((c) => (c.id === tempColumn.id ? newColumn : c)),
+      }));
+    } catch (error: unknown) {
+      set({
+        columns: previousColumns,
+        error: error instanceof Error ? error.message : "Failed to create column",
       });
     }
   },

@@ -10,6 +10,7 @@ import { GetProjectsUseCase } from "./useCases/project/GetProjectsUseCase";
 import { CreateProjectUseCase } from "./useCases/project/CreateProjectUseCase";
 import { DeleteProjectUseCase } from "./useCases/project/DeleteProjectUseCase";
 import { GetProjectDataUseCase } from "./useCases/project/GetProjectDataUseCase";
+import { CreateColumnUseCase } from "./useCases/column/CreateColumnUseCase";
 import { CreateTaskUseCase } from "./useCases/task/CreateTaskUseCase";
 import { UpdateTaskUseCase } from "./useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./useCases/task/MoveTaskUseCase";
@@ -23,6 +24,7 @@ export class McpServer {
     private createProjectUseCase: CreateProjectUseCase,
     private deleteProjectUseCase: DeleteProjectUseCase,
     private getProjectDataUseCase: GetProjectDataUseCase,
+    private createColumnUseCase: CreateColumnUseCase,
     private createTaskUseCase: CreateTaskUseCase,
     private updateTaskUseCase: UpdateTaskUseCase,
     private moveTaskUseCase: MoveTaskUseCase,
@@ -196,6 +198,32 @@ export class McpServer {
             {
               type: "text",
               text: JSON.stringify(projectData, null, 2),
+            },
+          ],
+        };
+      },
+    );
+
+    // ── Column tools ───────────────────────────────────────────────────────────
+
+    server.registerTool(
+      "create_column",
+      {
+        title: "Create Column",
+        description: "Create a new column in a project.",
+        inputSchema: {
+          projectId: z.string().describe("The ID of the project"),
+          title: z.string().describe("The title of the new column"),
+        },
+      },
+      async ({ projectId, title }) => {
+        const column = await this.createColumnUseCase.execute(projectId, title);
+        this.onDataUpdated();
+        return {
+          content: [
+            {
+              type: "text",
+              text: `Column created successfully: ${JSON.stringify(column, null, 2)}`,
             },
           ],
         };

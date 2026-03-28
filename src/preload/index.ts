@@ -11,6 +11,8 @@ const kanbanApi = {
   deleteProject: (id: string) => ipcRenderer.invoke("delete-project", id),
   getProjectData: (projectId: string) =>
     ipcRenderer.invoke("get-project-data", projectId),
+  createColumn: (projectId: string, title: string) =>
+    ipcRenderer.invoke("create-column", { projectId, title }),
   createTask: (data: Record<string, unknown>) =>
     ipcRenderer.invoke("create-task", data),
   deleteTask: (taskId: string) => ipcRenderer.invoke("delete-task", taskId),

@@ -21,6 +21,8 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ConfirmDeleteTaskDialog } from "./ConfirmDeleteTaskDialog";
+import { CreateColumnDialog } from "./CreateColumnDialog";
+
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
@@ -33,6 +35,7 @@ export function KanbanBoard() {
     initUpdateListener,
     columns,
     tasks,
+    createColumn,
   } = useKanbanStore();
 
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
@@ -40,6 +43,8 @@ export function KanbanBoard() {
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+
+  const [createColumnDialogOpen, setCreateColumnDialogOpen] = useState(false);
 
   useEffect(() => {
     if (projectId) {
@@ -94,6 +99,12 @@ export function KanbanBoard() {
     }
   };
 
+  const handleCreateColumn = async (title: string) => {
+    if (projectId) {
+      await createColumn(projectId, title);
+    }
+  };
+
   useEffect(() => {
     const handleClick = () => setOpenMenuTaskId(null);
     document.addEventListener("click", handleClick);
@@ -143,6 +154,11 @@ export function KanbanBoard() {
         isOpen={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={confirmDeleteTask}
+      />
+      <CreateColumnDialog
+        isOpen={createColumnDialogOpen}
+        onOpenChange={setCreateColumnDialogOpen}
+        onConfirm={handleCreateColumn}
       />
       <div className="kanban-header">
         <div className="kanban-header-left">
@@ -309,7 +325,7 @@ export function KanbanBoard() {
           })}
 
           <div className="add-column-placeholder">
-            <button className="add-column-btn">
+            <button className="add-column-btn" onClick={() => setCreateColumnDialogOpen(true)}>
               <Plus size={24} />
               <span>Add Column</span>
             </button>

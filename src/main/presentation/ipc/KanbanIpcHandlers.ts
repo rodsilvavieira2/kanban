@@ -1,5 +1,6 @@
 import { ipcMain, dialog } from "electron";
 import fs from "fs";
+import { CreateColumnUseCase } from "../../core/useCases/column/CreateColumnUseCase";
 import { GetProjectsUseCase } from "../../core/useCases/project/GetProjectsUseCase";
 import { CreateProjectUseCase } from "../../core/useCases/project/CreateProjectUseCase";
 import { DeleteProjectUseCase } from "../../core/useCases/project/DeleteProjectUseCase";
@@ -19,6 +20,7 @@ export function setupKanbanIpcHandlers(
   createProjectUseCase: CreateProjectUseCase,
   deleteProjectUseCase: DeleteProjectUseCase,
   getProjectDataUseCase: GetProjectDataUseCase,
+  createColumnUseCase: CreateColumnUseCase,
   createTaskUseCase: CreateTaskUseCase,
   updateTaskUseCase: UpdateTaskUseCase,
   moveTaskUseCase: MoveTaskUseCase,
@@ -64,6 +66,17 @@ export function setupKanbanIpcHandlers(
       return await getProjectDataUseCase.execute(projectId);
     } catch (error) {
       console.error("Failed to get project data (IPC):", error);
+      throw error;
+    }
+  });
+
+  // --- Column IPC Handlers ---
+
+  ipcMain.handle("create-column", async (event, { projectId, title }) => {
+    try {
+      return await createColumnUseCase.execute(projectId, title);
+    } catch (error) {
+      console.error("Failed to create column (IPC):", error);
       throw error;
     }
   });
