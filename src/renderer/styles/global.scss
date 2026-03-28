@@ -1494,7 +1494,8 @@ code,
   gap: 16px;
   cursor: grab;
   transition: all 0.15s ease;
-  max-height: 300px;
+  height: 400px;
+  flex-shrink: 0;
   overflow-y: auto;
 }
 
@@ -2705,7 +2706,10 @@ input:checked + .toggle-slider:before {
   font-size: 12px;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s,
+    background 0.15s;
   white-space: nowrap;
   outline: none;
 
@@ -2817,7 +2821,9 @@ input:checked + .toggle-slider:before {
   cursor: pointer;
   user-select: none;
   outline: none;
-  transition: background 0.1s, color 0.1s;
+  transition:
+    background 0.1s,
+    color 0.1s;
 
   &[data-highlighted] {
     background: rgba(255, 255, 255, 0.06);
@@ -2958,7 +2964,9 @@ input:checked + .toggle-slider:before {
   user-select: none;
   outline: none;
   position: relative;
-  transition: background 0.1s, color 0.1s;
+  transition:
+    background 0.1s,
+    color 0.1s;
 
   &[data-highlighted] {
     background: rgba(255, 255, 255, 0.06);
