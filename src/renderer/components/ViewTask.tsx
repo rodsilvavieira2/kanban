@@ -8,10 +8,9 @@ import React, {
 import { useNavigate, useParams } from "react-router-dom";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { TaskDetailsContent } from "./TaskDetailsContent";
-import { ArrowLeft, Edit2, Play } from "lucide-react";
+import { ArrowLeft, Edit2 } from "lucide-react";
 import { kanbanApi } from "../api";
 import { Task } from "../../shared/schemas/models";
-import { usePomodoroStore } from "../stores/pomodoroStore";
 
 function ViewTaskContent({
   promise,
@@ -21,7 +20,6 @@ function ViewTaskContent({
   const task = use(promise);
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId: string }>();
-  const { setSelectedTaskId } = usePomodoroStore();
 
   if (!task) return <div>Task not found</div>;
 
@@ -51,13 +49,7 @@ function ViewTaskContent({
         </button>
       </header>
 
-      <TaskDetailsContent
-        task={task}
-        onSelectForPomodoro={() => {
-          setSelectedTaskId(task.id);
-          navigate("/pomodoro");
-        }}
-      />
+      <TaskDetailsContent task={task} />
     </>
   );
 }
