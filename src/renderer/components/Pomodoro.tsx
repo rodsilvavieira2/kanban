@@ -1,25 +1,24 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { usePomodoroStore } from "../stores/pomodoroStore";
-import { useKanbanStore } from "../stores/kanbanStore";
-import { useSettingsStore } from "../stores/settingsStore";
-import { useProjectStore } from "../stores/projectStore";
-import { ProjectSelect } from "./ProjectSelect";
 import {
-  RotateCcw,
+  CheckCircle,
+  Coffee,
+  Edit2,
+  Eye,
+  Layers,
+  MoreVertical,
   Pause,
   Play,
-  Layers,
-  Coffee,
   RefreshCw,
-  Clock,
-  MoreVertical,
-  Eye,
-  Edit2,
-  CheckCircle,
+  RotateCcw,
 } from "lucide-react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { useNavigate } from "react-router-dom";
 import remarkGfm from "remark-gfm";
+import { useKanbanStore } from "../stores/kanbanStore";
+import { usePomodoroStore } from "../stores/pomodoroStore";
+import { useProjectStore } from "../stores/projectStore";
+import { useSettingsStore } from "../stores/settingsStore";
+import { ProjectSelect } from "./ProjectSelect";
 import { ViewTaskModal } from "./ViewTaskModal";
 
 export function Pomodoro() {
@@ -357,32 +356,26 @@ export function Pomodoro() {
                     }}
                   >
                     <div className="task-labels">
-                      <span className="task-label">TASK</span>
                       {task.timeSpentMinutes > 0 && (
                         <span className="task-label priority-low">
                           {task.timeSpentMinutes}m spent
                         </span>
                       )}
+                      <div className="task-meta">
+                        {selectedTaskId === task.id && (
+                          <span className="status-badge in-progress">
+                            SELECTED
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-                      <button
-                        className="btn-secondary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setViewTaskId(task.id);
-                        }}
-                        style={{
-                          padding: "2px 8px",
-                          fontSize: "11px",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px",
-                          height: "24px",
-                          borderRadius: "4px",
-                        }}
-                      >
-                        <Eye size={12} /> View Details
-                      </button>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "8px",
+                        alignItems: "center",
+                      }}
+                    >
                       <button
                         className="icon-button"
                         onClick={(e) => handleMenuClick(e, task.id)}
@@ -400,17 +393,6 @@ export function Pomodoro() {
                       </ReactMarkdown>
                     </div>
                   )}
-                  <div className="task-meta">
-                    <div className="task-meta-left">
-                      <span className="meta-item">
-                        <Clock size={12} strokeWidth={2} />{" "}
-                        {task.timeSpentMinutes}m
-                      </span>
-                    </div>
-                    {selectedTaskId === task.id && (
-                      <span className="status-badge in-progress">SELECTED</span>
-                    )}
-                  </div>
                 </div>
               ))}
             </div>

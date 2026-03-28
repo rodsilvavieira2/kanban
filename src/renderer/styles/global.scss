@@ -1494,6 +1494,8 @@ code,
   gap: 16px;
   cursor: grab;
   transition: all 0.15s ease;
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 .kanban-task-card:hover {
@@ -2411,6 +2413,9 @@ code,
   gap: 12px;
   transition: all 0.2s;
   cursor: pointer;
+  height: 400px;
+  flex-shrink: 0;
+  overflow-y: auto;
 }
 
 .pomodoro-task-card:hover {
