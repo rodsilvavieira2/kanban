@@ -7,8 +7,10 @@ interface KanbanState {
   tasks: Task[];
   isLoading: boolean;
   error: string | null;
+  collapsedColumns: Record<string, boolean>;
 
   // Actions
+  toggleColumnCollapse: (columnId: string) => void;
   loadProjectData: (projectId: string) => Promise<void>;
   loadAllTasks: () => Promise<void>;
   createColumn: (projectId: string, title: string) => Promise<void>;
@@ -32,6 +34,16 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
   tasks: [],
   isLoading: false,
   error: null,
+  collapsedColumns: {},
+
+  toggleColumnCollapse: (columnId: string) => {
+    set((state) => ({
+      collapsedColumns: {
+        ...state.collapsedColumns,
+        [columnId]: !state.collapsedColumns[columnId],
+      },
+    }));
+  },
 
   loadProjectData: async (projectId: string) => {
     set({ isLoading: true, error: null });

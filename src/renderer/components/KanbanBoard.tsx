@@ -17,7 +17,10 @@ import {
   Eye,
   Edit2,
   Trash,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
+import * as Collapsible from "@radix-ui/react-collapsible";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ConfirmDeleteTaskDialog } from "./ConfirmDeleteTaskDialog";
@@ -37,6 +40,8 @@ export function KanbanBoard() {
     columns,
     tasks,
     createColumn,
+    collapsedColumns,
+    toggleColumnCollapse,
   } = useKanbanStore();
 
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
@@ -206,16 +211,25 @@ export function KanbanBoard() {
                   .filter((task) => task.columnId === column.id)
                   .sort((a, b) => a.order - b.order);
 
+                const isCollapsed = collapsedColumns[column.id] || false;
+
                 return (
                   <Draggable key={column.id} draggableId={column.id} index={index}>
                     {(provided, snapshot) => (
-                      <div 
-                        className={`kanban-column ${snapshot.isDragging ? "dragging" : ""}`}
+                      <Collapsible.Root
+                        className={`kanban-column ${snapshot.isDragging ? "dragging" : ""} ${isCollapsed ? "collapsed" : ""}`}
                         ref={provided.innerRef}
                         {...provided.draggableProps}
+                        open={!isCollapsed}
+                        onOpenChange={() => toggleColumnCollapse(column.id)}
                       >
                         <div className="column-header" {...provided.dragHandleProps}>
                           <div className="column-title">
+                            <Collapsible.Trigger asChild>
+                              <button className="icon-button collapse-toggle">
+                                {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
+                              </button>
+                            </Collapsible.Trigger>
                             <span
                               className="column-color-dot"
                               style={{ backgroundColor: column.color || "#333" }}
@@ -228,14 +242,15 @@ export function KanbanBoard() {
                           </button>
                         </div>
 
-                <Droppable droppableId={column.id}>
-                  {(provided, snapshot) => (
-                    <div
-                      className={`column-tasks ${snapshot.isDraggingOver ? "dragging-over" : ""}`}
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                    >
-                      {columnTasks.map((task, index) => (
+                <Collapsible.Content className="column-content">
+                  <Droppable droppableId={column.id}>
+                    {(provided, snapshot) => (
+                      <div
+                        className={`column-tasks ${snapshot.isDraggingOver ? "dragging-over" : ""}`}
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                      >
+                        {columnTasks.map((task, index) => (
                         <Draggable
                           key={task.id}
                           draggableId={task.id}
@@ -340,7 +355,8 @@ export function KanbanBoard() {
                   <Plus size={16} />
                   Add Task
                 </button>
-              </div>
+              </Collapsible.Content>
+            </Collapsible.Root>
                     )}
                   </Draggable>
             );

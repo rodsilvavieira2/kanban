@@ -1434,6 +1434,48 @@ code,
   display: flex;
   flex-direction: column;
   max-height: 100%;
+  transition: width 0.3s ease, min-width 0.3s ease;
+}
+
+.kanban-column.collapsed {
+  width: 60px;
+  min-width: 60px;
+}
+
+.kanban-column.collapsed .column-header {
+  flex-direction: column;
+  padding: 16px 8px;
+  gap: 16px;
+}
+
+.kanban-column.collapsed .column-title {
+  flex-direction: column;
+  gap: 16px;
+}
+
+.kanban-column.collapsed .column-title h3 {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.kanban-column.collapsed .task-count {
+  margin-top: 8px;
+}
+
+.kanban-column.collapsed .column-content {
+  display: none;
+}
+
+.collapse-toggle {
+  padding: 4px;
+  margin-right: 4px;
+}
+
+.kanban-column.collapsed .collapse-toggle {
+  margin-right: 0;
+  margin-bottom: 8px;
 }
 
 .column-header {
