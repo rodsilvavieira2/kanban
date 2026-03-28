@@ -32,6 +32,7 @@ export function KanbanBoard() {
     isLoading,
     loadProjectData,
     moveTask,
+    moveColumn,
     initUpdateListener,
     columns,
     tasks,
@@ -57,7 +58,7 @@ export function KanbanBoard() {
   const project = projects.find((p) => p.id === projectId);
 
   const onDragEnd = (result: DropResult) => {
-    const { destination, source, draggableId } = result;
+    const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
 
@@ -65,6 +66,13 @@ export function KanbanBoard() {
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
+      return;
+    }
+
+    if (type === "column") {
+      if (projectId) {
+        moveColumn(projectId, source.index, destination.index);
+      }
       return;
     }
 
@@ -186,27 +194,39 @@ export function KanbanBoard() {
       </div>
 
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="kanban-columns-container">
-          {columns.map((column) => {
-            const columnTasks = tasks
-              .filter((task) => task.columnId === column.id)
-              .sort((a, b) => a.order - b.order);
+        <Droppable droppableId="board" type="column" direction="horizontal">
+          {(provided) => (
+            <div 
+              className="kanban-columns-container"
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              {[...columns].sort((a, b) => a.order - b.order).map((column, index) => {
+                const columnTasks = tasks
+                  .filter((task) => task.columnId === column.id)
+                  .sort((a, b) => a.order - b.order);
 
-            return (
-              <div className="kanban-column" key={column.id}>
-                <div className="column-header">
-                  <div className="column-title">
-                    <span
-                      className="column-color-dot"
-                      style={{ backgroundColor: column.color || "#333" }}
-                    ></span>
-                    <h3>{column.title}</h3>
-                    <span className="task-count">{columnTasks.length}</span>
-                  </div>
-                  <button className="icon-button">
-                    <MoreHorizontal size={16} />
-                  </button>
-                </div>
+                return (
+                  <Draggable key={column.id} draggableId={column.id} index={index}>
+                    {(provided, snapshot) => (
+                      <div 
+                        className={`kanban-column ${snapshot.isDragging ? "dragging" : ""}`}
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                      >
+                        <div className="column-header" {...provided.dragHandleProps}>
+                          <div className="column-title">
+                            <span
+                              className="column-color-dot"
+                              style={{ backgroundColor: column.color || "#333" }}
+                            ></span>
+                            <h3>{column.title}</h3>
+                            <span className="task-count">{columnTasks.length}</span>
+                          </div>
+                          <button className="icon-button">
+                            <MoreHorizontal size={16} />
+                          </button>
+                        </div>
 
                 <Droppable droppableId={column.id}>
                   {(provided, snapshot) => (
@@ -321,8 +341,11 @@ export function KanbanBoard() {
                   Add Task
                 </button>
               </div>
+                    )}
+                  </Draggable>
             );
           })}
+          {provided.placeholder}
 
           <div className="add-column-placeholder">
             <button className="add-column-btn" onClick={() => setCreateColumnDialogOpen(true)}>
@@ -331,6 +354,8 @@ export function KanbanBoard() {
             </button>
           </div>
         </div>
+          )}
+        </Droppable>
       </DragDropContext>
     </div>
   );

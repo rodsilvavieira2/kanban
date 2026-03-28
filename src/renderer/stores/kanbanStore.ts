@@ -12,6 +12,7 @@ interface KanbanState {
   loadProjectData: (projectId: string) => Promise<void>;
   loadAllTasks: () => Promise<void>;
   createColumn: (projectId: string, title: string) => Promise<void>;
+  moveColumn: (projectId: string, sourceIndex: number, destinationIndex: number) => Promise<void>;
   createTask: (projectId: string, taskData: Partial<Task>) => Promise<void>;
   updateTask: (taskId: string, taskData: Partial<Task>) => Promise<void>;
   moveTask: (request: {
@@ -101,6 +102,38 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       set({
         columns: previousColumns,
         error: error instanceof Error ? error.message : "Failed to create column",
+      });
+    }
+  },
+
+  moveColumn: async (projectId: string, sourceIndex: number, destinationIndex: number) => {
+    const previousColumns = get().columns;
+    
+    // Optimistic Update
+    const newColumns = [...previousColumns];
+    const projectColumns = newColumns.filter((c) => c.projectId === projectId).sort((a, b) => a.order - b.order);
+    
+    if (sourceIndex === destinationIndex) return;
+
+    const movedColumn = projectColumns.splice(sourceIndex, 1)[0];
+    projectColumns.splice(destinationIndex, 0, movedColumn);
+
+    projectColumns.forEach((col, index) => {
+      const originalIndex = newColumns.findIndex((c) => c.id === col.id);
+      if (originalIndex !== -1) {
+        newColumns[originalIndex] = { ...newColumns[originalIndex], order: index };
+      }
+    });
+
+    set({ columns: newColumns });
+
+    try {
+      await kanbanApi.moveColumn(projectId, sourceIndex, destinationIndex);
+    } catch (error: unknown) {
+      console.error("Failed to move column:", error);
+      set({
+        columns: previousColumns,
+        error: error instanceof Error ? error.message : "Failed to move column",
       });
     }
   },

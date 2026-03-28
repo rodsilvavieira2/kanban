@@ -11,6 +11,7 @@ import { CreateProjectUseCase } from "./useCases/project/CreateProjectUseCase";
 import { DeleteProjectUseCase } from "./useCases/project/DeleteProjectUseCase";
 import { GetProjectDataUseCase } from "./useCases/project/GetProjectDataUseCase";
 import { CreateColumnUseCase } from "./useCases/column/CreateColumnUseCase";
+import { MoveColumnUseCase } from "./useCases/column/MoveColumnUseCase";
 import { CreateTaskUseCase } from "./useCases/task/CreateTaskUseCase";
 import { UpdateTaskUseCase } from "./useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./useCases/task/MoveTaskUseCase";
@@ -25,6 +26,7 @@ export class McpServer {
     private deleteProjectUseCase: DeleteProjectUseCase,
     private getProjectDataUseCase: GetProjectDataUseCase,
     private createColumnUseCase: CreateColumnUseCase,
+    private moveColumnUseCase: MoveColumnUseCase,
     private createTaskUseCase: CreateTaskUseCase,
     private updateTaskUseCase: UpdateTaskUseCase,
     private moveTaskUseCase: MoveTaskUseCase,
@@ -226,6 +228,26 @@ export class McpServer {
               text: `Column created successfully: ${JSON.stringify(column, null, 2)}`,
             },
           ],
+        };
+      },
+    );
+
+    server.registerTool(
+      "move_column",
+      {
+        title: "Move Column",
+        description: "Reorder a column within a project. Use index 0 for the first column.",
+        inputSchema: {
+          projectId: z.string().describe("The ID of the project"),
+          sourceIndex: z.number().int().min(0).describe("Current zero-based position of the column"),
+          destinationIndex: z.number().int().min(0).describe("Target zero-based position for the column"),
+        },
+      },
+      async (moveRequest) => {
+        await this.moveColumnUseCase.execute(moveRequest);
+        this.onDataUpdated();
+        return {
+          content: [{ type: "text", text: "Column moved successfully" }],
         };
       },
     );

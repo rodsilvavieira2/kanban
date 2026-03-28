@@ -13,6 +13,8 @@ const kanbanApi = {
     ipcRenderer.invoke("get-project-data", projectId),
   createColumn: (projectId: string, title: string) =>
     ipcRenderer.invoke("create-column", { projectId, title }),
+  moveColumn: (projectId: string, sourceIndex: number, destinationIndex: number) =>
+    ipcRenderer.invoke("move-column", { projectId, sourceIndex, destinationIndex }),
   createTask: (data: Record<string, unknown>) =>
     ipcRenderer.invoke("create-task", data),
   deleteTask: (taskId: string) => ipcRenderer.invoke("delete-task", taskId),
