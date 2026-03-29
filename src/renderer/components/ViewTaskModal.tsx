@@ -21,7 +21,7 @@ export function ViewTaskModal({ task, onClose }: ViewTaskModalProps) {
         className="modal-content"
         onClick={(e) => e.stopPropagation()}
         style={{
-          width: "800px",
+          width: "85%",
           maxWidth: "90vw",
           maxHeight: "90vh",
           overflowY: "auto",

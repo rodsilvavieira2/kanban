@@ -106,7 +106,8 @@ export function ViewTask() {
       className="view-task-container"
       style={{
         padding: "24px",
-        maxWidth: "800px",
+        width: "100%",
+        maxWidth: "85%",
         margin: "0 auto",
         height: "100%",
         overflowY: "auto",
