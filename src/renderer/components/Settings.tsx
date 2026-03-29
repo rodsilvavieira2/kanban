@@ -311,11 +311,13 @@ export function Settings() {
                   style={{ marginTop: "16px" }}
                 >
                   <RadixSelect
-                    value="Kanban Board"
-                    onValueChange={() => {}}
+                    value={settings.boardViewMode || "kanban"}
+                    onValueChange={(val) =>
+                      updateSetting("boardViewMode", val)
+                    }
                     options={[
-                      { value: "Kanban Board", label: "Kanban Board" },
-                      { value: "List View", label: "List View" },
+                      { value: "kanban", label: "Kanban Board" },
+                      { value: "table", label: "Table View" },
                     ]}
                     ariaLabel="Default Board View"
                   />

@@ -8,6 +8,7 @@ import {
 } from "@hello-pangea/dnd";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { useProjectStore } from "../stores/projectStore";
+import { useSettingsStore } from "../stores/settingsStore";
 import {
   Plus,
   MoreHorizontal,
@@ -19,6 +20,8 @@ import {
   Trash,
   ChevronDown,
   ChevronRight,
+  LayoutGrid,
+  List,
 } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
@@ -28,12 +31,14 @@ import { ConfirmDeleteTaskDialog } from "./ConfirmDeleteTaskDialog";
 import { CreateColumnDialog } from "./CreateColumnDialog";
 import { EditColumnDialog } from "./EditColumnDialog";
 import { ConfirmDeleteColumnDialog } from "./ConfirmDeleteColumnDialog";
+import { KanbanTableView } from "./KanbanTableView";
 
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
 
   const { projects, loadProjects } = useProjectStore();
+  const { settings } = useSettingsStore();
   const {
     isLoading,
     loadProjectData,
@@ -48,6 +53,16 @@ export function KanbanBoard() {
     collapsedColumns,
     toggleColumnCollapse,
   } = useKanbanStore();
+
+  const [viewMode, setViewMode] = useState<"kanban" | "table">(
+    (settings.boardViewMode as "kanban" | "table") || "kanban",
+  );
+
+  useEffect(() => {
+    if (settings.boardViewMode) {
+      setViewMode(settings.boardViewMode as "kanban" | "table");
+    }
+  }, [settings.boardViewMode]);
 
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
@@ -212,6 +227,22 @@ export function KanbanBoard() {
           <h2>{project?.name || "Project Board"}</h2>
         </div>
         <div className="kanban-header-right">
+          <div className="view-mode-toggle">
+            <button
+              className={`toggle-btn ${viewMode === "kanban" ? "active" : ""}`}
+              onClick={() => setViewMode("kanban")}
+              title="Kanban View"
+            >
+              <LayoutGrid size={16} />
+            </button>
+            <button
+              className={`toggle-btn ${viewMode === "table" ? "active" : ""}`}
+              onClick={() => setViewMode("table")}
+              title="Table View"
+            >
+              <List size={16} />
+            </button>
+          </div>
           <div className="search-bar">
             <Search size={16} />
             <input type="text" placeholder="Search tasks..." />
@@ -226,207 +257,244 @@ export function KanbanBoard() {
         </div>
       </div>
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="board" type="column" direction="horizontal">
-          {(provided) => (
-            <div 
-              className="kanban-columns-container"
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              {[...columns].sort((a, b) => a.order - b.order).map((column, index) => {
-                const columnTasks = tasks
-                  .filter((task) => task.columnId === column.id)
-                  .sort((a, b) => a.order - b.order);
+      {viewMode === "kanban" ? (
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="board" type="column" direction="horizontal">
+            {(provided) => (
+              <div
+                className="kanban-columns-container"
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {[...columns]
+                  .sort((a, b) => a.order - b.order)
+                  .map((column, index) => {
+                    const columnTasks = tasks
+                      .filter((task) => task.columnId === column.id)
+                      .sort((a, b) => a.order - b.order);
 
-                const isCollapsed = collapsedColumns[column.id] || false;
+                    const isCollapsed = collapsedColumns[column.id] || false;
 
-                return (
-                  <Draggable key={column.id} draggableId={column.id} index={index}>
-                    {(provided, snapshot) => (
-                      <Collapsible.Root
-                        className={`kanban-column ${snapshot.isDragging ? "dragging" : ""} ${isCollapsed ? "collapsed" : ""}`}
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        open={!isCollapsed}
-                        onOpenChange={() => toggleColumnCollapse(column.id)}
+                    return (
+                      <Draggable
+                        key={column.id}
+                        draggableId={column.id}
+                        index={index}
                       >
-                        <div className="column-header" {...provided.dragHandleProps}>
-                          <div className="column-title">
-                            <Collapsible.Trigger asChild>
-                              <button className="icon-button collapse-toggle">
-                                {isCollapsed ? <ChevronRight size={16} /> : <ChevronDown size={16} />}
-                              </button>
-                            </Collapsible.Trigger>
-                            <span
-                              className="column-color-dot"
-                              style={{ backgroundColor: column.color || "#333" }}
-                            ></span>
-                            <h3>{column.title}</h3>
-                            <span className="task-count">{columnTasks.length}</span>
-                          </div>
-                          <DropdownMenu.Root>
-                            <DropdownMenu.Trigger asChild>
-                              <button className="icon-button">
-                                <MoreHorizontal size={16} />
-                              </button>
-                            </DropdownMenu.Trigger>
-                            <DropdownMenu.Portal>
-                              <DropdownMenu.Content className="dropdown-menu-content" sideOffset={5}>
-                                <DropdownMenu.Item
-                                  className="dropdown-item"
-                                  onClick={() => {
-                                    setColumnToEdit(column.id);
-                                    setEditColumnDialogOpen(true);
-                                  }}
-                                >
-                                  <Edit2 size={16} /> Edit Name
-                                </DropdownMenu.Item>
-                                <DropdownMenu.Item
-                                  className="dropdown-item delete"
-                                  onClick={() => {
-                                    setColumnToDelete(column.id);
-                                    setDeleteColumnDialogOpen(true);
-                                  }}
-                                >
-                                  <Trash size={16} /> Delete Column
-                                </DropdownMenu.Item>
-                              </DropdownMenu.Content>
-                            </DropdownMenu.Portal>
-                          </DropdownMenu.Root>
-                        </div>
-
-                        <Collapsible.Content className="column-content">
-                          <Droppable droppableId={column.id}>
-                            {(provided, snapshot) => (
-                              <div
-                                className={`column-tasks ${snapshot.isDraggingOver ? "dragging-over" : ""}`}
-                                {...provided.droppableProps}
-                                ref={provided.innerRef}
-                              >
-                                {columnTasks.map((task, index) => (
-                                  <Draggable
-                                    key={task.id}
-                                    draggableId={task.id}
-                                    index={index}
-                                  >
-                                    {(provided, snapshot) => (
-                                      <div
-                                        className={`kanban-task-card ${snapshot.isDragging ? "dragging" : ""}`}
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        onClick={() =>
-                                          navigate(
-                                            `/projects/${projectId}/tasks/${task.id}/view`,
-                                          )
-                                        }
-                                      >
-                                        <div
-                                          style={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "flex-start",
-                                          }}
-                                        >
-                                          <h4
-                                            className="task-title"
-                                            style={{ margin: 0 }}
-                                          >
-                                            {task.title}
-                                          </h4>
-                                          <button
-                                            className="icon-button"
-                                            onClick={(e) => handleMenuClick(e, task.id)}
-                                            style={{ padding: 0 }}
-                                          >
-                                            <MoreVertical size={16} />
-                                          </button>
-                                        </div>
-                                        {task.description && (
-                                          <div className="task-description-preview text-accents-5 text-sm mt-1 markdown-preview">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                              {task.description}
-                                            </ReactMarkdown>
-                                          </div>
-                                        )}
-
-                                        {task.tags && task.tags.length > 0 && (
-                                          <div
-                                            className="task-tags-preview mt-2"
-                                            style={{
-                                              display: "flex",
-                                              gap: "4px",
-                                              flexWrap: "wrap",
-                                            }}
-                                          >
-                                            {task.tags.map((tag) => (
-                                              <span
-                                                key={tag}
-                                                className="tag-chip text-xs"
-                                                style={{
-                                                  backgroundColor: "#333",
-                                                  padding: "2px 6px",
-                                                  borderRadius: "4px",
-                                                  color: "#fff",
-                                                  fontSize: "10px",
-                                                }}
-                                              >
-                                                {tag}
-                                              </span>
-                                            ))}
-                                          </div>
-                                        )}
-
-                                        <div className="task-meta mt-3">
-                                          <div className="task-meta-right">
-                                            {task.dueDate && (
-                                              <span className="task-date text-xs text-accents-5">
-                                                {new Date(
-                                                  task.dueDate,
-                                                ).toLocaleDateString()}
-                                              </span>
-                                            )}
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </Draggable>
-                                ))}
-                                {provided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
-
-                          <button
-                            className="add-task-btn"
-                            onClick={() =>
-                              navigate(`/projects/${projectId}/tasks/new`, {
-                                state: { columnId: column.id },
-                              })
-                            }
+                        {(provided, snapshot) => (
+                          <Collapsible.Root
+                            className={`kanban-column ${snapshot.isDragging ? "dragging" : ""} ${isCollapsed ? "collapsed" : ""}`}
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            open={!isCollapsed}
+                            onOpenChange={() => toggleColumnCollapse(column.id)}
                           >
-                            <Plus size={16} />
-                            Add Task
-                          </button>
-                        </Collapsible.Content>
-                      </Collapsible.Root>
-                    )}
-                  </Draggable>
-                );
-              })}
-              {provided.placeholder}
+                            <div
+                              className="column-header"
+                              {...provided.dragHandleProps}
+                            >
+                              <div className="column-title">
+                                <Collapsible.Trigger asChild>
+                                  <button className="icon-button collapse-toggle">
+                                    {isCollapsed ? (
+                                      <ChevronRight size={16} />
+                                    ) : (
+                                      <ChevronDown size={16} />
+                                    )}
+                                  </button>
+                                </Collapsible.Trigger>
+                                <span
+                                  className="column-color-dot"
+                                  style={{
+                                    backgroundColor: column.color || "#333",
+                                  }}
+                                ></span>
+                                <h3>{column.title}</h3>
+                                <span className="task-count">
+                                  {columnTasks.length}
+                                </span>
+                              </div>
+                              <DropdownMenu.Root>
+                                <DropdownMenu.Trigger asChild>
+                                  <button className="icon-button">
+                                    <MoreHorizontal size={16} />
+                                  </button>
+                                </DropdownMenu.Trigger>
+                                <DropdownMenu.Portal>
+                                  <DropdownMenu.Content
+                                    className="dropdown-menu-content"
+                                    sideOffset={5}
+                                  >
+                                    <DropdownMenu.Item
+                                      className="dropdown-item"
+                                      onClick={() => {
+                                        setColumnToEdit(column.id);
+                                        setEditColumnDialogOpen(true);
+                                      }}
+                                    >
+                                      <Edit2 size={16} /> Edit Name
+                                    </DropdownMenu.Item>
+                                    <DropdownMenu.Item
+                                      className="dropdown-item delete"
+                                      onClick={() => {
+                                        setColumnToDelete(column.id);
+                                        setDeleteColumnDialogOpen(true);
+                                      }}
+                                    >
+                                      <Trash size={16} /> Delete Column
+                                    </DropdownMenu.Item>
+                                  </DropdownMenu.Content>
+                                </DropdownMenu.Portal>
+                              </DropdownMenu.Root>
+                            </div>
 
-              <div className="add-column-placeholder">
-                <button className="add-column-btn" onClick={() => setCreateColumnDialogOpen(true)}>
-                  <Plus size={24} />
-                  <span>Add Column</span>
-                </button>
+                            <Collapsible.Content className="column-content">
+                              <Droppable droppableId={column.id}>
+                                {(provided, snapshot) => (
+                                  <div
+                                    className={`column-tasks ${snapshot.isDraggingOver ? "dragging-over" : ""}`}
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                  >
+                                    {columnTasks.map((task, index) => (
+                                      <Draggable
+                                        key={task.id}
+                                        draggableId={task.id}
+                                        index={index}
+                                      >
+                                        {(provided, snapshot) => (
+                                          <div
+                                            className={`kanban-task-card ${snapshot.isDragging ? "dragging" : ""}`}
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            {...provided.dragHandleProps}
+                                            onClick={() =>
+                                              navigate(
+                                                `/projects/${projectId}/tasks/${task.id}/view`,
+                                              )
+                                            }
+                                          >
+                                            <div
+                                              style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "flex-start",
+                                              }}
+                                            >
+                                              <h4
+                                                className="task-title"
+                                                style={{ margin: 0 }}
+                                              >
+                                                {task.title}
+                                              </h4>
+                                              <button
+                                                className="icon-button"
+                                                onClick={(e) =>
+                                                  handleMenuClick(e, task.id)
+                                                }
+                                                style={{ padding: 0 }}
+                                              >
+                                                <MoreVertical size={16} />
+                                              </button>
+                                            </div>
+                                            {task.description && (
+                                              <div className="task-description-preview text-accents-5 text-sm mt-1 markdown-preview">
+                                                <ReactMarkdown
+                                                  remarkPlugins={[remarkGfm]}
+                                                >
+                                                  {task.description}
+                                                </ReactMarkdown>
+                                              </div>
+                                            )}
+
+                                            {task.tags &&
+                                              task.tags.length > 0 && (
+                                                <div
+                                                  className="task-tags-preview mt-2"
+                                                  style={{
+                                                    display: "flex",
+                                                    gap: "4px",
+                                                    flexWrap: "wrap",
+                                                  }}
+                                                >
+                                                  {task.tags.map((tag) => (
+                                                    <span
+                                                      key={tag}
+                                                      className="tag-chip text-xs"
+                                                      style={{
+                                                        backgroundColor: "#333",
+                                                        padding: "2px 6px",
+                                                        borderRadius: "4px",
+                                                        color: "#fff",
+                                                        fontSize: "10px",
+                                                      }}
+                                                    >
+                                                      {tag}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              )}
+
+                                            <div className="task-meta mt-3">
+                                              <div className="task-meta-right">
+                                                {task.dueDate && (
+                                                  <span className="task-date text-xs text-accents-5">
+                                                    {new Date(
+                                                      task.dueDate,
+                                                    ).toLocaleDateString()}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+
+                              <button
+                                className="add-task-btn"
+                                onClick={() =>
+                                  navigate(`/projects/${projectId}/tasks/new`, {
+                                    state: { columnId: column.id },
+                                  })
+                                }
+                              >
+                                <Plus size={16} />
+                                Add Task
+                              </button>
+                            </Collapsible.Content>
+                          </Collapsible.Root>
+                        )}
+                      </Draggable>
+                    );
+                  })}
+                {provided.placeholder}
+
+                <div className="add-column-placeholder">
+                  <button
+                    className="add-column-btn"
+                    onClick={() => setCreateColumnDialogOpen(true)}
+                  >
+                    <Plus size={24} />
+                    <span>Add Column</span>
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+            )}
+          </Droppable>
+        </DragDropContext>
+      ) : (
+        <KanbanTableView
+          onDeleteTask={(taskId) => {
+            setTaskToDelete(taskId);
+            setDeleteDialogOpen(true);
+          }}
+        />
+      )}
     </div>
   );
 }

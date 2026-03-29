@@ -2,7 +2,9 @@ import { create } from "zustand";
 import { kanbanApi } from "../api";
 
 interface SettingsState {
-  settings: Record<string, string>;
+  settings: Record<string, string> & {
+    boardViewMode: "kanban" | "table";
+  };
   isLoading: boolean;
   error: string | null;
 
@@ -10,6 +12,7 @@ interface SettingsState {
   loadSettings: () => Promise<void>;
   updateSetting: (key: string, value: string) => Promise<void>;
   updateSettings: (newSettings: Record<string, string>) => Promise<void>;
+  setBoardViewMode: (mode: "kanban" | "table") => Promise<void>;
 }
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
@@ -21,6 +24,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     theme: "system",
     colorScheme: "Base16 Default",
     notificationsEnabled: "true",
+    boardViewMode: "kanban",
   },
   isLoading: false,
   error: null,
@@ -30,7 +34,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     try {
       const dbSettings = await kanbanApi.getSettings();
       set((state) => ({
-        settings: { ...state.settings, ...dbSettings },
+        settings: { ...state.settings, ...dbSettings } as SettingsState["settings"],
         isLoading: false,
       }));
     } catch (error: unknown) {
@@ -47,7 +51,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const newSettings = { ...currentSettings, [key]: value };
 
     // Optimistic UI update
-    set({ settings: newSettings });
+    set({ settings: newSettings as SettingsState["settings"] });
 
     try {
       await kanbanApi.updateSettings({ [key]: value });
@@ -67,7 +71,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     const mergedSettings = { ...currentSettings, ...newSettings };
 
     // Optimistic UI update
-    set({ settings: mergedSettings });
+    set({ settings: mergedSettings as SettingsState["settings"] });
 
     try {
       await kanbanApi.updateSettings(newSettings);
@@ -80,5 +84,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
           error instanceof Error ? error.message : "Failed to update settings",
       });
     }
+  },
+
+  setBoardViewMode: async (mode: "kanban" | "table") => {
+    await get().updateSetting("boardViewMode", mode);
   },
 }));
