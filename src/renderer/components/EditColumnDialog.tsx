@@ -1,40 +1,44 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useKanbanStore } from "../stores/kanbanStore";
 
-interface CreateColumnDialogProps {
+interface EditColumnDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (title: string) => void;
+  onConfirm: (columnId: string, title: string) => void;
+  columnId: string | null;
 }
 
-export function CreateColumnDialog({
+export function EditColumnDialog({
   isOpen,
   onOpenChange,
   onConfirm,
-}: CreateColumnDialogProps) {
+  columnId,
+}: EditColumnDialogProps) {
   const [title, setTitle] = useState("");
+  const columns = useKanbanStore((state) => state.columns);
+
+  useEffect(() => {
+    if (columnId) {
+      const column = columns.find((c) => c.id === columnId);
+      if (column) setTitle(column.title);
+    }
+  }, [columnId, columns]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim()) {
-      onConfirm(title.trim());
-      setTitle("");
+    if (columnId && title.trim()) {
+      onConfirm(columnId, title.trim());
       onOpenChange(false);
     }
   };
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open) setTitle("");
-    onOpenChange(open);
-  };
-
   return (
-    <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="modal-overlay" />
         <Dialog.Content
           className="modal-content"
-          aria-describedby={undefined}
           style={{
             position: "fixed",
             top: "50%",
@@ -45,25 +49,8 @@ export function CreateColumnDialog({
         >
           <div className="modal-header">
             <Dialog.Title className="modal-title" asChild>
-              <h2>Add New Column</h2>
+              <h2>Edit Column</h2>
             </Dialog.Title>
-            <Dialog.Close asChild>
-              <button className="icon-button" aria-label="Close">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </Dialog.Close>
           </div>
 
           <form onSubmit={handleSubmit}>
@@ -76,7 +63,6 @@ export function CreateColumnDialog({
                   className="form-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Backlog, Review, QA"
                   autoFocus
                   required
                 />
@@ -94,7 +80,7 @@ export function CreateColumnDialog({
                 className="btn-primary"
                 disabled={!title.trim()}
               >
-                Create Column
+                Save Changes
               </button>
             </div>
           </form>

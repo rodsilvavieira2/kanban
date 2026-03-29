@@ -14,6 +14,8 @@ interface KanbanState {
   loadProjectData: (projectId: string) => Promise<void>;
   loadAllTasks: () => Promise<void>;
   createColumn: (projectId: string, title: string) => Promise<void>;
+  editColumn: (columnId: string, title: string) => Promise<void>;
+  deleteColumn: (columnId: string) => Promise<void>;
   moveColumn: (projectId: string, sourceIndex: number, destinationIndex: number) => Promise<void>;
   createTask: (projectId: string, taskData: Partial<Task>) => Promise<void>;
   updateTask: (taskId: string, taskData: Partial<Task>) => Promise<void>;
@@ -114,6 +116,47 @@ export const useKanbanStore = create<KanbanState>((set, get) => ({
       set({
         columns: previousColumns,
         error: error instanceof Error ? error.message : "Failed to create column",
+      });
+    }
+  },
+
+  editColumn: async (columnId: string, title: string) => {
+    const previousColumns = get().columns;
+
+    // Optimistic update
+    set((state) => ({
+      columns: state.columns.map((c) =>
+        c.id === columnId ? { ...c, title } : c,
+      ),
+    }));
+
+    try {
+      await kanbanApi.editColumn(columnId, title);
+    } catch (error: unknown) {
+      set({
+        columns: previousColumns,
+        error: error instanceof Error ? error.message : "Failed to edit column",
+      });
+    }
+  },
+
+  deleteColumn: async (columnId: string) => {
+    const previousColumns = get().columns;
+    const previousTasks = get().tasks;
+
+    // Optimistic update
+    set((state) => ({
+      columns: state.columns.filter((c) => c.id !== columnId),
+      tasks: state.tasks.filter((t) => t.columnId !== columnId),
+    }));
+
+    try {
+      await kanbanApi.deleteColumn(columnId);
+    } catch (error: unknown) {
+      set({
+        columns: previousColumns,
+        tasks: previousTasks,
+        error: error instanceof Error ? error.message : "Failed to delete column",
       });
     }
   },

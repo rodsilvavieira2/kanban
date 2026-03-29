@@ -46,6 +46,11 @@ export class SQLiteColumnRepository implements IColumnRepository {
     return col;
   }
 
+  async update(id: string, title: string): Promise<void> {
+    const stmt = this.db.prepare("UPDATE columns SET title = ? WHERE id = ?");
+    stmt.run(title, id);
+  }
+
   async delete(id: string): Promise<void> {
     const stmt = this.db.prepare("DELETE FROM columns WHERE id = ?");
     stmt.run(id);

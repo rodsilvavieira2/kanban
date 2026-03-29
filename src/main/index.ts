@@ -17,6 +17,8 @@ import { DeleteProjectUseCase } from "./core/useCases/project/DeleteProjectUseCa
 import { GetProjectDataUseCase } from "./core/useCases/project/GetProjectDataUseCase";
 import { InitializeProjectColumnsUseCase } from "./core/useCases/column/InitializeProjectColumnsUseCase";
 import { CreateColumnUseCase } from "./core/useCases/column/CreateColumnUseCase";
+import { EditColumnUseCase } from "./core/useCases/column/EditColumnUseCase";
+import { DeleteColumnUseCase } from "./core/useCases/column/DeleteColumnUseCase";
 import { MoveColumnUseCase } from "./core/useCases/column/MoveColumnUseCase";
 import { CreateTaskUseCase } from "./core/useCases/task/CreateTaskUseCase";
 import { UpdateTaskUseCase } from "./core/useCases/task/UpdateTaskUseCase";
@@ -92,6 +94,8 @@ app.on("ready", async () => {
     taskRepository,
   );
   const createColumnUseCase = new CreateColumnUseCase(columnRepository);
+  const editColumnUseCase = new EditColumnUseCase(columnRepository);
+  const deleteColumnUseCase = new DeleteColumnUseCase(columnRepository);
   const moveColumnUseCase = new MoveColumnUseCase(columnRepository);
   const createTaskUseCase = new CreateTaskUseCase(
     taskRepository,
@@ -125,6 +129,8 @@ app.on("ready", async () => {
     deleteProjectUseCase,
     getProjectDataUseCase,
     createColumnUseCase,
+    editColumnUseCase,
+    deleteColumnUseCase,
     moveColumnUseCase,
     createTaskUseCase,
     updateTaskUseCase,
@@ -144,6 +150,8 @@ app.on("ready", async () => {
     deleteProjectUseCase,
     getProjectDataUseCase,
     createColumnUseCase,
+    editColumnUseCase,
+    deleteColumnUseCase,
     moveColumnUseCase,
     createTaskUseCase,
     updateTaskUseCase,

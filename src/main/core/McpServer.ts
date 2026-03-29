@@ -17,6 +17,8 @@ import { UpdateTaskUseCase } from "./useCases/task/UpdateTaskUseCase";
 import { MoveTaskUseCase } from "./useCases/task/MoveTaskUseCase";
 import { UpdateTaskTimeUseCase } from "./useCases/task/UpdateTaskTimeUseCase";
 import { DeleteTaskUseCase } from "./useCases/kanban/DeleteTaskUseCase";
+import { EditColumnUseCase } from "./useCases/column/EditColumnUseCase";
+import { DeleteColumnUseCase } from "./useCases/column/DeleteColumnUseCase";
 import { GetRecentActivityUseCase } from "./useCases/activity/GetRecentActivityUseCase";
 
 export class McpServer {
@@ -26,6 +28,8 @@ export class McpServer {
     private deleteProjectUseCase: DeleteProjectUseCase,
     private getProjectDataUseCase: GetProjectDataUseCase,
     private createColumnUseCase: CreateColumnUseCase,
+    private editColumnUseCase: EditColumnUseCase,
+    private deleteColumnUseCase: DeleteColumnUseCase,
     private moveColumnUseCase: MoveColumnUseCase,
     private createTaskUseCase: CreateTaskUseCase,
     private updateTaskUseCase: UpdateTaskUseCase,
@@ -228,6 +232,43 @@ export class McpServer {
               text: `Column created successfully: ${JSON.stringify(column, null, 2)}`,
             },
           ],
+        };
+      },
+    );
+
+    server.registerTool(
+      "edit_column",
+      {
+        title: "Edit Column",
+        description: "Edit the title of an existing column.",
+        inputSchema: {
+          columnId: z.string().describe("The ID of the column to edit"),
+          title: z.string().describe("The new title for the column"),
+        },
+      },
+      async ({ columnId, title }) => {
+        await this.editColumnUseCase.execute(columnId, title);
+        this.onDataUpdated();
+        return {
+          content: [{ type: "text", text: "Column updated successfully" }],
+        };
+      },
+    );
+
+    server.registerTool(
+      "delete_column",
+      {
+        title: "Delete Column",
+        description: "Permanently delete a column and its tasks.",
+        inputSchema: {
+          columnId: z.string().describe("The ID of the column to delete"),
+        },
+      },
+      async ({ columnId }) => {
+        await this.deleteColumnUseCase.execute(columnId);
+        this.onDataUpdated();
+        return {
+          content: [{ type: "text", text: "Column deleted successfully" }],
         };
       },
     );

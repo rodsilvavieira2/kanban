@@ -70,7 +70,7 @@ const getActionClass = (action: string) => {
 function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
   const activities = use(promise);
 
-  if (activities.length === 0) {
+  if (!activities || activities.length === 0) {
     return (
       <div
         className="empty-state"

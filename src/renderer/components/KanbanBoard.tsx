@@ -21,10 +21,13 @@ import {
   ChevronRight,
 } from "lucide-react";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { ConfirmDeleteTaskDialog } from "./ConfirmDeleteTaskDialog";
 import { CreateColumnDialog } from "./CreateColumnDialog";
+import { EditColumnDialog } from "./EditColumnDialog";
+import { ConfirmDeleteColumnDialog } from "./ConfirmDeleteColumnDialog";
 
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -40,6 +43,8 @@ export function KanbanBoard() {
     columns,
     tasks,
     createColumn,
+    editColumn,
+    deleteColumn,
     collapsedColumns,
     toggleColumnCollapse,
   } = useKanbanStore();
@@ -51,6 +56,10 @@ export function KanbanBoard() {
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
 
   const [createColumnDialogOpen, setCreateColumnDialogOpen] = useState(false);
+  const [editColumnDialogOpen, setEditColumnDialogOpen] = useState(false);
+  const [columnToEdit, setColumnToEdit] = useState<string | null>(null);
+  const [deleteColumnDialogOpen, setDeleteColumnDialogOpen] = useState(false);
+  const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (projectId) {
@@ -118,6 +127,14 @@ export function KanbanBoard() {
     }
   };
 
+  const handleEditColumn = async (columnId: string, title: string) => {
+    await editColumn(columnId, title);
+  };
+
+  const handleDeleteColumn = async (columnId: string) => {
+    await deleteColumn(columnId);
+  };
+
   useEffect(() => {
     const handleClick = () => setOpenMenuTaskId(null);
     document.addEventListener("click", handleClick);
@@ -172,6 +189,17 @@ export function KanbanBoard() {
         isOpen={createColumnDialogOpen}
         onOpenChange={setCreateColumnDialogOpen}
         onConfirm={handleCreateColumn}
+      />
+      <EditColumnDialog
+        isOpen={editColumnDialogOpen}
+        onOpenChange={setEditColumnDialogOpen}
+        onConfirm={handleEditColumn}
+        columnId={columnToEdit}
+      />
+      <ConfirmDeleteColumnDialog
+        isOpen={deleteColumnDialogOpen}
+        onOpenChange={setDeleteColumnDialogOpen}
+        onConfirm={() => columnToDelete && handleDeleteColumn(columnToDelete)}
       />
       <div className="kanban-header">
         <div className="kanban-header-left">
@@ -237,139 +265,165 @@ export function KanbanBoard() {
                             <h3>{column.title}</h3>
                             <span className="task-count">{columnTasks.length}</span>
                           </div>
-                          <button className="icon-button">
-                            <MoreHorizontal size={16} />
-                          </button>
-                        </div>
-
-                <Collapsible.Content className="column-content">
-                  <Droppable droppableId={column.id}>
-                    {(provided, snapshot) => (
-                      <div
-                        className={`column-tasks ${snapshot.isDraggingOver ? "dragging-over" : ""}`}
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                      >
-                        {columnTasks.map((task, index) => (
-                        <Draggable
-                          key={task.id}
-                          draggableId={task.id}
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              className={`kanban-task-card ${snapshot.isDragging ? "dragging" : ""}`}
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              onClick={() =>
-                                navigate(
-                                  `/projects/${projectId}/tasks/${task.id}/view`,
-                                )
-                              }
-                            >
-                              <div
-                                style={{
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                  alignItems: "flex-start",
-                                }}
-                              >
-                                <h4
-                                  className="task-title"
-                                  style={{ margin: 0 }}
-                                >
-                                  {task.title}
-                                </h4>
-                                <button
-                                  className="icon-button"
-                                  onClick={(e) => handleMenuClick(e, task.id)}
-                                  style={{ padding: 0 }}
-                                >
-                                  <MoreVertical size={16} />
-                                </button>
-                              </div>
-                              {task.description && (
-                                <div className="task-description-preview text-accents-5 text-sm mt-1 markdown-preview">
-                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                    {task.description}
-                                  </ReactMarkdown>
-                                </div>
-                              )}
-
-                              {task.tags && task.tags.length > 0 && (
-                                <div
-                                  className="task-tags-preview mt-2"
-                                  style={{
-                                    display: "flex",
-                                    gap: "4px",
-                                    flexWrap: "wrap",
+                          <DropdownMenu.Root>
+                            <DropdownMenu.Trigger asChild>
+                              <button className="icon-button">
+                                <MoreHorizontal size={16} />
+                              </button>
+                            </DropdownMenu.Trigger>
+                            <DropdownMenu.Portal>
+                              <DropdownMenu.Content className="dropdown-menu-content" sideOffset={5}>
+                                <DropdownMenu.Item
+                                  className="dropdown-item"
+                                  onClick={() => {
+                                    setColumnToEdit(column.id);
+                                    setEditColumnDialogOpen(true);
                                   }}
                                 >
-                                  {task.tags.map((tag) => (
-                                    <span
-                                      key={tag}
-                                      className="tag-chip text-xs"
-                                      style={{
-                                        backgroundColor: "#333",
-                                        padding: "2px 6px",
-                                        borderRadius: "4px",
-                                        color: "#fff",
-                                        fontSize: "10px",
-                                      }}
-                                    >
-                                      {tag}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
+                                  <Edit2 size={16} /> Edit Name
+                                </DropdownMenu.Item>
+                                <DropdownMenu.Item
+                                  className="dropdown-item delete"
+                                  onClick={() => {
+                                    setColumnToDelete(column.id);
+                                    setDeleteColumnDialogOpen(true);
+                                  }}
+                                >
+                                  <Trash size={16} /> Delete Column
+                                </DropdownMenu.Item>
+                              </DropdownMenu.Content>
+                            </DropdownMenu.Portal>
+                          </DropdownMenu.Root>
+                        </div>
 
-                              <div className="task-meta mt-3">
-                                <div className="task-meta-right">
-                                  {task.dueDate && (
-                                    <span className="task-date text-xs text-accents-5">
-                                      {new Date(
-                                        task.dueDate,
-                                      ).toLocaleDateString()}
-                                    </span>
-                                  )}
-                                </div>
+                        <Collapsible.Content className="column-content">
+                          <Droppable droppableId={column.id}>
+                            {(provided, snapshot) => (
+                              <div
+                                className={`column-tasks ${snapshot.isDraggingOver ? "dragging-over" : ""}`}
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                              >
+                                {columnTasks.map((task, index) => (
+                                  <Draggable
+                                    key={task.id}
+                                    draggableId={task.id}
+                                    index={index}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <div
+                                        className={`kanban-task-card ${snapshot.isDragging ? "dragging" : ""}`}
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        onClick={() =>
+                                          navigate(
+                                            `/projects/${projectId}/tasks/${task.id}/view`,
+                                          )
+                                        }
+                                      >
+                                        <div
+                                          style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "flex-start",
+                                          }}
+                                        >
+                                          <h4
+                                            className="task-title"
+                                            style={{ margin: 0 }}
+                                          >
+                                            {task.title}
+                                          </h4>
+                                          <button
+                                            className="icon-button"
+                                            onClick={(e) => handleMenuClick(e, task.id)}
+                                            style={{ padding: 0 }}
+                                          >
+                                            <MoreVertical size={16} />
+                                          </button>
+                                        </div>
+                                        {task.description && (
+                                          <div className="task-description-preview text-accents-5 text-sm mt-1 markdown-preview">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                              {task.description}
+                                            </ReactMarkdown>
+                                          </div>
+                                        )}
+
+                                        {task.tags && task.tags.length > 0 && (
+                                          <div
+                                            className="task-tags-preview mt-2"
+                                            style={{
+                                              display: "flex",
+                                              gap: "4px",
+                                              flexWrap: "wrap",
+                                            }}
+                                          >
+                                            {task.tags.map((tag) => (
+                                              <span
+                                                key={tag}
+                                                className="tag-chip text-xs"
+                                                style={{
+                                                  backgroundColor: "#333",
+                                                  padding: "2px 6px",
+                                                  borderRadius: "4px",
+                                                  color: "#fff",
+                                                  fontSize: "10px",
+                                                }}
+                                              >
+                                                {tag}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        )}
+
+                                        <div className="task-meta mt-3">
+                                          <div className="task-meta-right">
+                                            {task.dueDate && (
+                                              <span className="task-date text-xs text-accents-5">
+                                                {new Date(
+                                                  task.dueDate,
+                                                ).toLocaleDateString()}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
                               </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
+                            )}
+                          </Droppable>
 
-                <button
-                  className="add-task-btn"
-                  onClick={() =>
-                    navigate(`/projects/${projectId}/tasks/new`, {
-                      state: { columnId: column.id },
-                    })
-                  }
-                >
-                  <Plus size={16} />
-                  Add Task
-                </button>
-              </Collapsible.Content>
-            </Collapsible.Root>
+                          <button
+                            className="add-task-btn"
+                            onClick={() =>
+                              navigate(`/projects/${projectId}/tasks/new`, {
+                                state: { columnId: column.id },
+                              })
+                            }
+                          >
+                            <Plus size={16} />
+                            Add Task
+                          </button>
+                        </Collapsible.Content>
+                      </Collapsible.Root>
                     )}
                   </Draggable>
-            );
-          })}
-          {provided.placeholder}
+                );
+              })}
+              {provided.placeholder}
 
-          <div className="add-column-placeholder">
-            <button className="add-column-btn" onClick={() => setCreateColumnDialogOpen(true)}>
-              <Plus size={24} />
-              <span>Add Column</span>
-            </button>
-          </div>
-        </div>
+              <div className="add-column-placeholder">
+                <button className="add-column-btn" onClick={() => setCreateColumnDialogOpen(true)}>
+                  <Plus size={24} />
+                  <span>Add Column</span>
+                </button>
+              </div>
+            </div>
           )}
         </Droppable>
       </DragDropContext>
