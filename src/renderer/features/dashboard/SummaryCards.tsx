@@ -1,7 +1,9 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useKanbanStore } from "../../stores/kanbanStore";
 
 export function SummaryCards() {
+  const { t } = useTranslation();
   const { tasks, columns, loadAllTasks, isLoading } = useKanbanStore();
 
   useEffect(() => {
@@ -31,9 +33,9 @@ export function SummaryCards() {
 
   const CARDS = [
     {
-      label: "Total Tasks",
+      label: t("dashboard.cards.total_tasks"),
       value: totalTasks,
-      trend: isLoading ? "Loading…" : `${totalTasks} across all projects`,
+      trend: isLoading ? t("common.loading") : t("dashboard.cards.total_tasks_desc", { count: totalTasks }),
       trendType: "neutral" as const,
       icon: (
         <svg
@@ -53,12 +55,12 @@ export function SummaryCards() {
       ),
     },
     {
-      label: "In Progress",
+      label: t("dashboard.cards.in_progress"),
       value: inProgressTasks,
       trend:
         totalTasks > 0
-          ? `${Math.round((inProgressTasks / totalTasks) * 100)}% of total`
-          : "No tasks yet",
+          ? t("dashboard.cards.in_progress_desc", { percent: Math.round((inProgressTasks / totalTasks) * 100) })
+          : t("dashboard.cards.no_tasks"),
       trendType: "neutral" as const,
       icon: (
         <svg
@@ -77,12 +79,12 @@ export function SummaryCards() {
       ),
     },
     {
-      label: "Completed",
+      label: t("dashboard.cards.completed"),
       value: completedTasks,
       trend:
         totalTasks > 0
-          ? `${Math.round((completedTasks / totalTasks) * 100)}% completion rate`
-          : "No tasks yet",
+          ? t("dashboard.cards.completed_desc", { percent: Math.round((completedTasks / totalTasks) * 100) })
+          : t("dashboard.cards.no_tasks"),
       trendType: "positive" as const,
       icon: (
         <svg

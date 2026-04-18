@@ -1,5 +1,6 @@
 import React, { useActionState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useProjectStore } from "../stores/projectStore";
 
 interface CreateProjectModalProps {
@@ -11,6 +12,7 @@ export function CreateProjectModal({
   isOpen,
   onClose,
 }: CreateProjectModalProps) {
+  const { t } = useTranslation();
   const createProject = useProjectStore((state) => state.createProject);
   const navigate = useNavigate();
 
@@ -64,7 +66,7 @@ export function CreateProjectModal({
                 <path d="M2 12l10 5 10-5"></path>
               </svg>
             </div>
-            <h2>Create New Project</h2>
+            <h2>{t("projects.create_modal.title")}</h2>
           </div>
           <button type="button" className="icon-button" onClick={onClose}>
             <svg
@@ -85,11 +87,11 @@ export function CreateProjectModal({
 
         <div className="modal-body">
           <div className="form-group">
-            <label>Project Name</label>
+            <label>{t("projects.create_modal.name_label")}</label>
             <input
               type="text"
               name="name"
-              placeholder="e.g. Mobile App Development"
+              placeholder={t("projects.create_modal.name_placeholder")}
               className="form-input"
               autoFocus
               required
@@ -97,10 +99,10 @@ export function CreateProjectModal({
           </div>
 
           <div className="form-group">
-            <label>Description</label>
+            <label>{t("projects.create_modal.desc_label")}</label>
             <textarea
               name="description"
-              placeholder="What's this project about? Define goals and scope..."
+              placeholder={t("projects.create_modal.desc_placeholder")}
               className="form-textarea"
             ></textarea>
           </div>
@@ -108,10 +110,10 @@ export function CreateProjectModal({
 
         <div className="modal-footer">
           <button type="button" className="btn-secondary" onClick={onClose}>
-            Cancel
+            {t("common.cancel")}
           </button>
           <button type="submit" className="btn-primary" disabled={isPending}>
-            {isPending ? "Creating…" : "Create Project"}
+            {isPending ? t("projects.create_modal.creating") : t("projects.create_modal.create")}
           </button>
         </div>
       </form>

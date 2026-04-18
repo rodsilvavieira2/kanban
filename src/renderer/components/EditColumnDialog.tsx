@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useTranslation } from "react-i18next";
 import { useKanbanStore } from "../stores/kanbanStore";
 
 interface EditColumnDialogProps {
@@ -15,6 +16,7 @@ export function EditColumnDialog({
   onConfirm,
   columnId,
 }: EditColumnDialogProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
   const columns = useKanbanStore((state) => state.columns);
 
@@ -49,14 +51,14 @@ export function EditColumnDialog({
         >
           <div className="modal-header">
             <Dialog.Title className="modal-title" asChild>
-              <h2>Edit Column</h2>
+              <h2>{t("columns.edit_title")}</h2>
             </Dialog.Title>
           </div>
 
           <form onSubmit={handleSubmit}>
             <div className="modal-body">
               <div className="form-group">
-                <label htmlFor="column-title">Column Title</label>
+                <label htmlFor="column-title">{t("columns.label")}</label>
                 <input
                   id="column-title"
                   type="text"
@@ -72,7 +74,7 @@ export function EditColumnDialog({
             <div className="modal-footer">
               <Dialog.Close asChild>
                 <button type="button" className="btn-secondary">
-                  Cancel
+                  {t("common.cancel")}
                 </button>
               </Dialog.Close>
               <button
@@ -80,7 +82,7 @@ export function EditColumnDialog({
                 className="btn-primary"
                 disabled={!title.trim()}
               >
-                Save Changes
+                {t("common.save")}
               </button>
             </div>
           </form>

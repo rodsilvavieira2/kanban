@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 
@@ -54,6 +55,7 @@ function calcCompletionPercent(
 }
 
 export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
+  const { t } = useTranslation();
   const { tasks, columns } = useKanbanStore();
   const { projects, loadProjects } = useProjectStore();
   const { settings } = useSettingsStore();
@@ -106,7 +108,7 @@ export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
 
   return (
     <div className="priority-breakdown">
-      <h3>Project Status</h3>
+      <h3>{t("dashboard.status.title")}</h3>
 
       {projects.length === 0 ? (
         <div
@@ -126,10 +128,10 @@ export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <h3>No projects yet</h3>
-          <p>Create a project to start tracking your status.</p>
+          <h3>{t("dashboard.status.no_projects")}</h3>
+          <p>{t("dashboard.status.no_projects_desc")}</p>
           <button className="btn-primary" onClick={openModal}>
-            Create your first project
+            {t("dashboard.status.create_first")}
           </button>
         </div>
       ) : total === 0 ? (
@@ -150,8 +152,8 @@ export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <h3>No tasks yet</h3>
-          <p>Add tasks to your project to start tracking progress.</p>
+          <h3>{t("dashboard.status.no_tasks")}</h3>
+          <p>{t("dashboard.status.no_tasks_desc")}</p>
         </div>
       ) : (
         <div className="priority-chart-container">
@@ -159,7 +161,7 @@ export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
             <Doughnut data={chartData} options={chartOptions} />
             <div className="donut-center-text">
               <span className="donut-number">{completionPercent}%</span>
-              <span className="donut-label">COMPLETE</span>
+              <span className="donut-label">{t("dashboard.status.complete")}</span>
             </div>
           </div>
           <div className="priority-legend">
@@ -181,7 +183,7 @@ export function PriorityBreakdown({ openModal }: { openModal: () => void }) {
 
       {total > 0 && topProjects.length > 0 && (
         <div className="top-projects-section">
-          <h4 className="top-projects-title">Top active projects</h4>
+          <h4 className="top-projects-title">{t("dashboard.status.top_active")}</h4>
           {topProjects.map((project) => (
             <div key={project.id} className="top-project-item">
               <div className="top-project-header">

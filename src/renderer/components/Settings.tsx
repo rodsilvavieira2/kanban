@@ -1,5 +1,6 @@
 import React from "react";
 import * as Select from "@radix-ui/react-select";
+import { useTranslation } from "react-i18next";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 import { useSettingsStore } from "../stores/settingsStore";
 import { kanbanApi } from "../api";
@@ -75,9 +76,11 @@ function RadixSelect({
 }
 
 export function Settings() {
+  const { t, i18n } = useTranslation();
   const {
     setFocusTime,
     setBreakTime,
+    setLongBreakTime,
     setTotalRounds,
     setNotificationsEnabled,
   } = usePomodoroStore();
@@ -125,6 +128,12 @@ export function Settings() {
     updateSetting("shortBreakTime", val.toString());
   };
 
+  const handleLongBreakTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value) || 1;
+    setLongBreakTime(val);
+    updateSetting("longBreakTime", val.toString());
+  };
+
   const handleTotalRoundsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseInt(e.target.value) || 1;
     setTotalRounds(val);
@@ -145,40 +154,40 @@ export function Settings() {
         <div className="settings-content-wrapper">
           {/* Header */}
           <div className="settings-page-header">
-            <h2>Settings</h2>
-            <p>Personalize your Kanban workspace and manage local data.</p>
+            <h2>{t("settings.title")}</h2>
+            <p>{t("settings.description")}</p>
           </div>
 
           {/* Section - General Settings */}
           <div className="settings-section">
             <div className="settings-section-header">
               <Sliders size={20} color="var(--accent-color)" strokeWidth={2} />
-              <h3>General Settings</h3>
+              <h3>{t("settings.general.title")}</h3>
             </div>
             <div className="settings-card">
               <div className="settings-card-row">
                 <div className="settings-card-info">
-                  <h4>App Theme</h4>
-                  <p>Choose between light and dark mode.</p>
+                  <h4>{t("settings.general.theme")}</h4>
+                  <p>{t("settings.general.theme_desc")}</p>
                 </div>
                 <div className="settings-card-actions">
                   <RadixSelect
                     value={settings.theme || "system"}
                     onValueChange={(val) => updateSetting("theme", val)}
                     options={[
-                      { value: "dark", label: "Dark Mode" },
-                      { value: "light", label: "Light Mode" },
-                      { value: "system", label: "System Default" },
+                      { value: "dark", label: t("settings.general.theme_dark") },
+                      { value: "light", label: t("settings.general.theme_light") },
+                      { value: "system", label: t("settings.general.theme_system") },
                     ]}
-                    ariaLabel="App Theme"
+                    ariaLabel={t("settings.general.theme")}
                   />
                 </div>
               </div>
               <div className="settings-divider"></div>
               <div className="settings-card-row">
                 <div className="settings-card-info">
-                  <h4>Color Scheme</h4>
-                  <p>Choose your preferred color palette.</p>
+                  <h4>{t("settings.general.color_scheme")}</h4>
+                  <p>{t("settings.general.color_scheme_desc")}</p>
                 </div>
                 <div className="settings-card-actions">
                   <RadixSelect
@@ -188,26 +197,26 @@ export function Settings() {
                       value: t.name,
                       label: t.name,
                     }))}
-                    ariaLabel="Color Scheme"
+                    ariaLabel={t("settings.general.color_scheme")}
                   />
                 </div>
               </div>
               <div className="settings-divider"></div>
               <div className="settings-card-row">
                 <div className="settings-card-info">
-                  <h4>Language Selection</h4>
-                  <p>Choose your preferred language.</p>
+                  <h4>{t("settings.general.language")}</h4>
+                  <p>{t("settings.general.language_desc")}</p>
                 </div>
                 <div className="settings-card-actions">
                   <RadixSelect
-                    value="English"
-                    onValueChange={() => {}}
+                    value={i18n.language.split("-")[0]}
+                    onValueChange={(val) => i18n.changeLanguage(val)}
                     options={[
-                      { value: "English", label: "English" },
-                      { value: "Spanish", label: "Spanish" },
-                      { value: "Portuguese", label: "Portuguese" },
+                      { value: "en", label: "English" },
+                      { value: "es", label: "Español" },
+                      { value: "pt", label: "Português" },
                     ]}
-                    ariaLabel="Language Selection"
+                    ariaLabel={t("settings.general.language")}
                   />
                 </div>
               </div>
@@ -218,13 +227,13 @@ export function Settings() {
           <div className="settings-section">
             <div className="settings-section-header">
               <Clock size={20} color="var(--accent-color)" strokeWidth={2} />
-              <h3>Pomodoro Configuration</h3>
+              <h3>{t("settings.pomodoro.title")}</h3>
             </div>
             <div className="settings-card">
               <div className="settings-card-row">
                 <div className="settings-card-info">
-                  <h4>Focus Duration</h4>
-                  <p>Set the length of your focus sessions (in minutes).</p>
+                  <h4>{t("settings.pomodoro.focus_duration")}</h4>
+                  <p>{t("settings.pomodoro.focus_duration_desc")}</p>
                 </div>
                 <div className="settings-card-actions">
                   <input
@@ -241,8 +250,8 @@ export function Settings() {
               <div className="settings-divider"></div>
               <div className="settings-card-row">
                 <div className="settings-card-info">
-                  <h4>Break Duration</h4>
-                  <p>Set the length of your break periods (in minutes).</p>
+                  <h4>{t("settings.pomodoro.short_break_duration")}</h4>
+                  <p>{t("settings.pomodoro.short_break_duration_desc")}</p>
                 </div>
                 <div className="settings-card-actions">
                   <input
@@ -259,8 +268,26 @@ export function Settings() {
               <div className="settings-divider"></div>
               <div className="settings-card-row">
                 <div className="settings-card-info">
-                  <h4>Target Rounds</h4>
-                  <p>Set the number of rounds for a full focus cycle.</p>
+                  <h4>{t("settings.pomodoro.long_break_duration")}</h4>
+                  <p>{t("settings.pomodoro.long_break_duration_desc")}</p>
+                </div>
+                <div className="settings-card-actions">
+                  <input
+                    type="number"
+                    className="form-input"
+                    style={{ width: "80px" }}
+                    value={settings.longBreakTime || "15"}
+                    onChange={handleLongBreakTimeChange}
+                    min="1"
+                    max="60"
+                  />
+                </div>
+              </div>
+              <div className="settings-divider"></div>
+              <div className="settings-card-row">
+                <div className="settings-card-info">
+                  <h4>{t("settings.pomodoro.target_rounds")}</h4>
+                  <p>{t("settings.pomodoro.target_rounds_desc")}</p>
                 </div>
                 <div className="settings-card-actions">
                   <input
@@ -277,8 +304,8 @@ export function Settings() {
               <div className="settings-divider"></div>
               <div className="settings-card-row">
                 <div className="settings-card-info">
-                  <h4>Desktop Notifications</h4>
-                  <p>Receive an alert when a session ends.</p>
+                  <h4>{t("settings.pomodoro.notifications")}</h4>
+                  <p>{t("settings.pomodoro.notifications_desc")}</p>
                 </div>
                 <div className="settings-card-actions">
                   <label className="toggle-switch">
@@ -298,13 +325,13 @@ export function Settings() {
           <div className="settings-section">
             <div className="settings-section-header">
               <Layout size={20} color="var(--accent-color)" strokeWidth={2} />
-              <h3>Board Management</h3>
+              <h3>{t("settings.board.title")}</h3>
             </div>
             <div className="settings-card">
               <div className="settings-card-block">
                 <div className="settings-card-info">
-                  <h4>Default Board View</h4>
-                  <p>Set the default view when opening a project.</p>
+                  <h4>{t("settings.board.default_view")}</h4>
+                  <p>{t("settings.board.default_view_desc")}</p>
                 </div>
                 <div
                   className="settings-card-actions"
@@ -316,10 +343,10 @@ export function Settings() {
                       updateSetting("boardViewMode", val)
                     }
                     options={[
-                      { value: "kanban", label: "Kanban Board" },
-                      { value: "table", label: "Table View" },
+                      { value: "kanban", label: t("settings.board.kanban") },
+                      { value: "table", label: t("settings.board.table") },
                     ]}
-                    ariaLabel="Default Board View"
+                    ariaLabel={t("settings.board.default_view")}
                   />
                 </div>
               </div>
@@ -330,14 +357,14 @@ export function Settings() {
           <div className="settings-section">
             <div className="settings-section-header">
               <Database size={20} color="var(--accent-color)" strokeWidth={2} />
-              <h3>Data Management</h3>
+              <h3>{t("settings.data.title")}</h3>
             </div>
 
             <div className="settings-card">
               <div className="settings-card-block">
                 <div className="settings-card-info">
-                  <h4>Export Data</h4>
-                  <p>Download a copy of your workspace data as JSON.</p>
+                  <h4>{t("settings.data.export")}</h4>
+                  <p>{t("settings.data.export_desc")}</p>
                 </div>
                 <div
                   className="settings-actions-row"
@@ -350,16 +377,16 @@ export function Settings() {
                   >
                     <Download size={16} strokeWidth={2} />
                     {exportStatus === "loading"
-                      ? "Exporting…"
+                      ? t("settings.data.exporting")
                       : exportStatus === "success"
-                        ? "Exported!"
+                        ? t("settings.data.exported")
                         : exportStatus === "error"
-                          ? "Export Failed"
-                          : "Export Data"}
+                          ? t("settings.data.export_failed")
+                          : t("settings.data.export")}
                   </button>
                   <button className="btn-secondary" disabled>
                     <Upload size={16} strokeWidth={2} />
-                    Import Data
+                    {t("settings.data.import")}
                   </button>
                 </div>
               </div>
@@ -372,14 +399,11 @@ export function Settings() {
                     <AlertTriangle size={20} strokeWidth={2} />
                   </div>
                   <div className="danger-info">
-                    <h4>Danger Zone</h4>
-                    <p>
-                      Resetting all tasks will permanently delete everything
-                      from your local database. This action cannot be undone.
-                    </p>
+                    <h4>{t("settings.data.danger_zone")}</h4>
+                    <p>{t("settings.data.reset_desc")}</p>
                   </div>
                 </div>
-                <button className="btn-danger">Reset Workspace</button>
+                <button className="btn-danger">{t("settings.data.reset_workspace")}</button>
               </div>
             </div>
           </div>

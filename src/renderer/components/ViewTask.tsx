@@ -6,6 +6,7 @@ import React, {
   startTransition,
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { TaskDetailsContent } from "./TaskDetailsContent";
 import { ArrowLeft, Edit2 } from "lucide-react";
@@ -19,9 +20,10 @@ function ViewTaskContent({
 }) {
   const task = use(promise);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { projectId } = useParams<{ projectId: string }>();
 
-  if (!task) return <div>Task not found</div>;
+  if (!task) return <div>{t("tasks.not_found")}</div>;
 
   return (
     <>
@@ -37,7 +39,7 @@ function ViewTaskContent({
           className="btn-secondary"
           onClick={() => navigate(`/projects/${projectId}`)}
         >
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t("tasks.view.back")}
         </button>
         <button
           className="btn-primary"
@@ -45,7 +47,7 @@ function ViewTaskContent({
             navigate(`/projects/${projectId}/tasks/${task.id}/edit`)
           }
         >
-          <Edit2 size={16} /> Edit Task
+          <Edit2 size={16} /> {t("tasks.view.edit_task")}
         </button>
       </header>
 
@@ -55,6 +57,7 @@ function ViewTaskContent({
 }
 
 export function ViewTask() {
+  const { t } = useTranslation();
   const { projectId, taskId } = useParams<{
     projectId: string;
     taskId: string;
@@ -113,7 +116,7 @@ export function ViewTask() {
         overflowY: "auto",
       }}
     >
-      <Suspense fallback={<div>Loading task...</div>}>
+      <Suspense fallback={<div>{t("tasks.loading")}</div>}>
         <ViewTaskContent promise={taskPromise} />
       </Suspense>
     </div>

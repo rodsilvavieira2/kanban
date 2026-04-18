@@ -1,5 +1,6 @@
 import React from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmDeleteColumnDialogProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ export function ConfirmDeleteColumnDialog({
   onOpenChange,
   onConfirm,
 }: ConfirmDeleteColumnDialogProps) {
+  const { t } = useTranslation();
   return (
     <Dialog.Root open={isOpen} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -28,20 +30,20 @@ export function ConfirmDeleteColumnDialog({
         >
           <div className="modal-header">
             <Dialog.Title className="modal-title" asChild>
-              <h2>Delete Column</h2>
+              <h2>{t("columns.delete_title")}</h2>
             </Dialog.Title>
           </div>
 
           <div className="modal-body">
             <p className="confirm-message">
-              Are you sure you want to delete this column? All tasks within this column will also be deleted. This action cannot be undone.
+              {t("columns.delete_message")}
             </p>
           </div>
 
           <div className="modal-footer">
             <Dialog.Close asChild>
               <button type="button" className="btn-secondary">
-                Cancel
+                {t("common.cancel")}
               </button>
             </Dialog.Close>
             <button
@@ -52,7 +54,7 @@ export function ConfirmDeleteColumnDialog({
                 onOpenChange(false);
               }}
             >
-              Delete Column
+              {t("common.delete")}
             </button>
           </div>
         </Dialog.Content>

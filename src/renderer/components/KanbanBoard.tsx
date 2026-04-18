@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   DragDropContext,
   Droppable,
@@ -36,6 +37,7 @@ import { KanbanTableView } from "./KanbanTableView";
 export function KanbanBoard() {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const { projects, loadProjects } = useProjectStore();
   const { settings } = useSettingsStore();
@@ -75,6 +77,8 @@ export function KanbanBoard() {
   const [columnToEdit, setColumnToEdit] = useState<string | null>(null);
   const [deleteColumnDialogOpen, setDeleteColumnDialogOpen] = useState(false);
   const [columnToDelete, setColumnToDelete] = useState<string | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (projectId) {
@@ -224,7 +228,7 @@ export function KanbanBoard() {
           >
             <ArrowLeft size={20} />
           </button>
-          <h2>{project?.name || "Project Board"}</h2>
+          <h2>{project?.name || t("common.project_board")}</h2>
         </div>
         <div className="kanban-header-right">
           <div className="view-mode-toggle">
@@ -245,14 +249,19 @@ export function KanbanBoard() {
           </div>
           <div className="search-bar">
             <Search size={16} />
-            <input type="text" placeholder="Search tasks..." />
+            <input
+              type="text"
+              placeholder={t("common.search")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
           <button
             className="btn-primary"
             onClick={() => navigate(`/projects/${projectId}/tasks/new`)}
           >
             <Plus size={16} />
-            New Task
+            {t("common.new_task")}
           </button>
         </div>
       </div>
@@ -270,7 +279,16 @@ export function KanbanBoard() {
                   .sort((a, b) => a.order - b.order)
                   .map((column, index) => {
                     const columnTasks = tasks
-                      .filter((task) => task.columnId === column.id)
+                      .filter(
+                        (task) =>
+                          task.columnId === column.id &&
+                          (task.title
+                            .toLowerCase()
+                            .includes(searchQuery.toLowerCase()) ||
+                            task.description
+                              ?.toLowerCase()
+                              .includes(searchQuery.toLowerCase())),
+                      )
                       .sort((a, b) => a.order - b.order);
 
                     const isCollapsed = collapsedColumns[column.id] || false;
@@ -332,7 +350,7 @@ export function KanbanBoard() {
                                         setEditColumnDialogOpen(true);
                                       }}
                                     >
-                                      <Edit2 size={16} /> Edit Name
+                                      <Edit2 size={16} /> {t("common.edit_name")}
                                     </DropdownMenu.Item>
                                     <DropdownMenu.Item
                                       className="dropdown-item delete"
@@ -341,7 +359,7 @@ export function KanbanBoard() {
                                         setDeleteColumnDialogOpen(true);
                                       }}
                                     >
-                                      <Trash size={16} /> Delete Column
+                                      <Trash size={16} /> {t("common.delete_column")}
                                     </DropdownMenu.Item>
                                   </DropdownMenu.Content>
                                 </DropdownMenu.Portal>
@@ -464,7 +482,7 @@ export function KanbanBoard() {
                                 }
                               >
                                 <Plus size={16} />
-                                Add Task
+                                {t("common.add_task")}
                               </button>
                             </Collapsible.Content>
                           </Collapsible.Root>
@@ -480,7 +498,7 @@ export function KanbanBoard() {
                     onClick={() => setCreateColumnDialogOpen(true)}
                   >
                     <Plus size={24} />
-                    <span>Add Column</span>
+                    <span>{t("common.add_column")}</span>
                   </button>
                 </div>
               </div>
@@ -489,6 +507,7 @@ export function KanbanBoard() {
         </DragDropContext>
       ) : (
         <KanbanTableView
+          initialSearchQuery={searchQuery}
           onDeleteTask={(taskId) => {
             setTaskToDelete(taskId);
             setDeleteDialogOpen(true);

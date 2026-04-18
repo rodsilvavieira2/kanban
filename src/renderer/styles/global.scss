@@ -1631,12 +1631,22 @@ code,
 .kanban-column.collapsed .column-header {
   flex-direction: column;
   padding: 16px 8px;
-  gap: 16px;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .kanban-column.collapsed .column-title {
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+}
+
+.kanban-column.collapsed .column-color-dot {
+  display: none;
 }
 
 .kanban-column.collapsed .column-title h3 {
@@ -1647,7 +1657,7 @@ code,
 }
 
 .kanban-column.collapsed .task-count {
-  margin-top: 8px;
+  margin-top: 0;
 }
 
 .kanban-column.collapsed .column-content {
@@ -1660,8 +1670,15 @@ code,
 }
 
 .kanban-column.collapsed .collapse-toggle {
-  margin-right: 0;
-  margin-bottom: 8px;
+  position: absolute;
+  top: 16px;
+  margin: 0;
+}
+
+.kanban-column.collapsed .column-header > .icon-button:not(.collapse-toggle) {
+  position: absolute;
+  bottom: 16px;
+  margin: 0;
 }
 
 .column-header {

@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useProjectStore } from "../stores/projectStore";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 export function ProjectsList() {
+  const { t } = useTranslation();
   const { projects, isLoading, loadProjects } = useProjectStore();
   const navigate = useNavigate();
   const { openModal } = useOutletContext<{ openModal: () => void }>();
@@ -74,9 +76,9 @@ export function ProjectsList() {
     const project = projects.find((p) => p.id === id);
     setConfirmConfig({
       isOpen: true,
-      title: "Delete Project",
-      message: `Are you sure you want to delete "${project?.name || "this project"}"? This will permanently remove the project, its columns, and all tasks. This action cannot be undone.`,
-      confirmLabel: "Delete",
+      title: t("projects.delete_confirm.title"),
+      message: t("projects.delete_confirm.message", { name: project?.name || "this project" }),
+      confirmLabel: t("common.delete"),
       onConfirm: async () => {
         try {
           await deleteProject(id);
@@ -128,7 +130,7 @@ export function ProjectsList() {
     return (
       <main className="main-content">
         <div className="top-header">
-          <h1>Projects</h1>
+          <h1>{t("projects.title")}</h1>
         </div>
         <div className="empty-state">
           <p style={{ color: "var(--text-secondary)" }}>Loading projects…</p>
@@ -141,7 +143,7 @@ export function ProjectsList() {
     return (
       <main className="main-content">
         <div className="top-header">
-          <h1>Projects</h1>
+          <h1>{t("projects.title")}</h1>
         </div>
 
         <div className="empty-state">
@@ -207,7 +209,7 @@ export function ProjectsList() {
               <path d="M2 12l10 5 10-5"></path>
             </svg>
           </div>
-          <h1>Projects</h1>
+          <h1>{t("projects.title")}</h1>
         </div>
         <div className="projects-header-actions">
           <div className="search-bar">
@@ -226,7 +228,7 @@ export function ProjectsList() {
             </svg>
             <input
               type="text"
-              placeholder="Search projects..."
+              placeholder={t("projects.search_placeholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -245,7 +247,7 @@ export function ProjectsList() {
               <line x1="12" y1="5" x2="12" y2="19"></line>
               <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
-            New Project
+            {t("projects.new_project")}
           </button>
         </div>
       </div>
@@ -270,7 +272,7 @@ export function ProjectsList() {
             </div>
             <div className="summary-card-info">
               <span className="summary-value">{activeCount}</span>
-              <span className="summary-label">Active Projects</span>
+              <span className="summary-label">{t("projects.active_projects")}</span>
             </div>
           </div>
           <div className="project-summary-card">
@@ -291,7 +293,7 @@ export function ProjectsList() {
             </div>
             <div className="summary-card-info">
               <span className="summary-value">{completedCount}</span>
-              <span className="summary-label">Completed</span>
+              <span className="summary-label">{t("projects.completed")}</span>
             </div>
           </div>
           <div className="project-summary-card">
@@ -313,14 +315,14 @@ export function ProjectsList() {
             </div>
             <div className="summary-card-info">
               <span className="summary-value">{totalCount}</span>
-              <span className="summary-label">Total Projects</span>
+              <span className="summary-label">{t("projects.total_projects")}</span>
             </div>
           </div>
         </div>
 
         <div className="projects-list-container">
           <div className="projects-list-header">
-            <h3>All Projects</h3>
+            <h3>{t("projects.all_projects")}</h3>
             <div className="projects-list-filters">
               <div className="options-dropdown-container" ref={filterRef}>
                 <button
@@ -339,11 +341,11 @@ export function ProjectsList() {
                   >
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                   </svg>
-                  {filterStatus === "All" ? "Filter" : filterStatus}
+                  {filterStatus === "All" ? t("projects.filter") : filterStatus}
                 </button>
                 {isFilterOpen && (
                   <div className="options-dropdown filter-dropdown">
-                    <div className="dropdown-label">Filter by Status</div>
+                    <div className="dropdown-label">{t("projects.filter_by_status")}</div>
                     <button
                       className={`dropdown-item ${filterStatus === "All" ? "active" : ""}`}
                       onClick={() => {
@@ -351,7 +353,7 @@ export function ProjectsList() {
                         setIsFilterOpen(false);
                       }}
                     >
-                      All Statuses
+                      {t("common.all_statuses")}
                     </button>
                     <button
                       className={`dropdown-item ${filterStatus === "Planning" ? "active" : ""}`}
@@ -360,7 +362,7 @@ export function ProjectsList() {
                         setIsFilterOpen(false);
                       }}
                     >
-                      Planning
+                      {t("common.planning")}
                     </button>
                     <button
                       className={`dropdown-item ${filterStatus === "In Progress" ? "active" : ""}`}
@@ -369,7 +371,7 @@ export function ProjectsList() {
                         setIsFilterOpen(false);
                       }}
                     >
-                      In Progress
+                      {t("common.in_progress")}
                     </button>
                     <button
                       className={`dropdown-item ${filterStatus === "Completed" ? "active" : ""}`}
@@ -378,7 +380,7 @@ export function ProjectsList() {
                         setIsFilterOpen(false);
                       }}
                     >
-                      Completed
+                      {t("common.completed")}
                     </button>
                   </div>
                 )}
@@ -402,11 +404,11 @@ export function ProjectsList() {
                     <line x1="12" y1="5" x2="12" y2="19"></line>
                     <polyline points="19 12 12 19 5 12"></polyline>
                   </svg>
-                  Sort: {sortOption === "name" ? "Name" : "Date"}
+                  Sort: {sortOption === "name" ? t("projects.sort_by_name") : t("projects.sort_by_date")}
                 </button>
                 {isSortOpen && (
                   <div className="options-dropdown sort-dropdown">
-                    <div className="dropdown-label">Sort by</div>
+                    <div className="dropdown-label">{t("projects.sort_by")}</div>
                     <button
                       className={`dropdown-item ${sortOption === "name" ? "active" : ""}`}
                       onClick={() => {
@@ -414,7 +416,7 @@ export function ProjectsList() {
                         setIsSortOpen(false);
                       }}
                     >
-                      Project Name (A-Z)
+                      {t("projects.name_az")}
                     </button>
                     <button
                       className={`dropdown-item ${sortOption === "createdAt" ? "active" : ""}`}
@@ -423,7 +425,7 @@ export function ProjectsList() {
                         setIsSortOpen(false);
                       }}
                     >
-                      Creation Date (Newest)
+                      {t("projects.date_newest")}
                     </button>
                   </div>
                 )}
@@ -433,18 +435,18 @@ export function ProjectsList() {
 
           <div className="projects-table">
             <div className="projects-table-head">
-              <div className="table-cell col-name">Project Name</div>
-              <div className="table-cell col-status">Status</div>
-              <div className="table-cell col-progress">Progress</div>
-              <div className="table-cell col-due">Due Date</div>
-              <div className="table-cell col-tasks">Tasks</div>
+              <div className="table-cell col-name">{t("projects.table.name")}</div>
+              <div className="table-cell col-status">{t("projects.table.status")}</div>
+              <div className="table-cell col-progress">{t("projects.table.progress")}</div>
+              <div className="table-cell col-due">{t("projects.table.due_date")}</div>
+              <div className="table-cell col-tasks">{t("projects.table.tasks")}</div>
               <div className="table-cell col-actions"></div>
             </div>
 
             <div className="projects-table-body">
               {filteredAndSortedProjects.length === 0 ? (
                 <div className="no-results">
-                  <p>No projects match your criteria.</p>
+                  <p>{t("projects.table.no_results")}</p>
                 </div>
               ) : (
                 filteredAndSortedProjects.map((project) => (
@@ -478,7 +480,10 @@ export function ProjectsList() {
                       <span
                         className={`status-badge ${(project.status || "planning").toLowerCase().replace(" ", "-")}`}
                       >
-                        {project.status || "Planning"}
+                        {project.status === "Planning" ? t("common.planning") :
+                         project.status === "In Progress" ? t("common.in_progress") :
+                         project.status === "Completed" ? t("common.completed") :
+                         (project.status || t("common.planning"))}
                       </span>
                     </div>
                     <div className="table-cell col-progress">
@@ -580,8 +585,7 @@ export function ProjectsList() {
 
           <div className="projects-pagination">
             <span className="pagination-info">
-              Showing <b>{filteredAndSortedProjects.length}</b> of{" "}
-              <b>{projects.length}</b> projects
+              {t("projects.pagination.showing", { count: filteredAndSortedProjects.length, total: projects.length })}
             </span>
             <div className="pagination-controls">
               <button className="pagination-btn disabled">

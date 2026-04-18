@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 import { useKanbanStore } from "../stores/kanbanStore";
@@ -23,6 +24,7 @@ import { ViewTaskModal } from "./ViewTaskModal";
 
 export function Pomodoro() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const {
     selectedTaskId,
     setSelectedTaskId,
@@ -31,6 +33,7 @@ export function Pomodoro() {
     isActive,
     roundsCompleted,
     isBreak,
+    isLongBreak,
     toggleTimer,
     resetCurrentSession,
     resetRounds,
@@ -42,6 +45,7 @@ export function Pomodoro() {
   const { settings } = useSettingsStore();
   const focusTime = parseInt(settings.focusTime) || 25;
   const breakTime = parseInt(settings.shortBreakTime) || 5;
+  const longBreakTime = parseInt(settings.longBreakTime) || 15;
   const totalRounds = parseInt(settings.totalRounds) || 4;
 
   const { tasks, isLoading, loadAllTasks } = useKanbanStore();
@@ -63,17 +67,20 @@ export function Pomodoro() {
   // the first render of this mount cycle, so we skip the sync.
   const prevFocusTimeRef = useRef<number | null>(null);
   const prevBreakTimeRef = useRef<number | null>(null);
+  const prevLongBreakTimeRef = useRef<number | null>(null);
   useEffect(() => {
     if (
       prevFocusTimeRef.current !== null &&
       (focusTime !== prevFocusTimeRef.current ||
-        breakTime !== prevBreakTimeRef.current)
+        breakTime !== prevBreakTimeRef.current ||
+        longBreakTime !== prevLongBreakTimeRef.current)
     ) {
       syncSettingsIfPaused();
     }
     prevFocusTimeRef.current = focusTime;
     prevBreakTimeRef.current = breakTime;
-  }, [focusTime, breakTime, syncSettingsIfPaused]);
+    prevLongBreakTimeRef.current = longBreakTime;
+  }, [focusTime, breakTime, longBreakTime, syncSettingsIfPaused]);
 
   const filteredTasks = useMemo(() => {
     if (selectedProjectId === "all") return tasks;
@@ -184,9 +191,9 @@ export function Pomodoro() {
               <polyline points="12 6 12 12 16 14"></polyline>
             </svg>
           </div>
-          <h3>No projects or tasks to focus on</h3>
+          <h3>{t("pomodoro.no_projects_tasks")}</h3>
           <p>
-            Create a project and add tasks to start your first focus session.
+            {t("pomodoro.create_project_hint")}
           </p>
         </div>
       ) : (
@@ -195,21 +202,21 @@ export function Pomodoro() {
             <div className="focus-header">
               <div className="rounds-container">
                 <span className="rounds-label mono">
-                  ROUND {roundsCompleted + 1} / {totalRounds}
+                  {t("pomodoro.round")} {Math.min(roundsCompleted + 1, totalRounds)} / {totalRounds}
                 </span>
                 <button
                   className="reset-rounds-btn"
                   onClick={resetRounds}
-                  title="Reset Rounds"
+                  title={t("pomodoro.reset")}
                 >
                   <RotateCcw size={12} strokeWidth={2} />
                 </button>
               </div>
-              <h2>{isBreak ? "Break" : "Focus Session"}</h2>
+              <h2>{isBreak ? (isLongBreak ? t("pomodoro.long_break") : t("pomodoro.short_break")) : t("pomodoro.focus_session")}</h2>
               <p>
                 {selectedTask
-                  ? `Working on: ${selectedTask.title}`
-                  : "Select a task to start focused work"}
+                  ? t("pomodoro.working_on", { task: selectedTask.title })
+                  : t("pomodoro.select_task")}
               </p>
             </div>
 
@@ -268,19 +275,19 @@ export function Pomodoro() {
                 {isActive ? (
                   <>
                     <Pause size={18} strokeWidth={2} />
-                    Pause {isBreak ? "Break" : "Focus"}
+                    {t("pomodoro.pause")} {isBreak ? (isLongBreak ? t("pomodoro.long_break") : t("pomodoro.short_break")) : t("pomodoro.focus")}
                   </>
                 ) : (
                   <>
                     <Play size={18} fill="currentColor" />
-                    Start {isBreak ? "Break" : "Focus"}
+                    {t("pomodoro.start")} {isBreak ? (isLongBreak ? t("pomodoro.long_break") : t("pomodoro.short_break")) : t("pomodoro.focus")}
                   </>
                 )}
               </button>
               <div className="secondary-controls">
                 <button className="btn-secondary" onClick={resetCurrentSession}>
                   <RotateCcw size={16} strokeWidth={2} />
-                  Reset
+                  {t("pomodoro.reset")}
                 </button>
                 {isBreak ? (
                   <button
@@ -288,7 +295,7 @@ export function Pomodoro() {
                     onClick={() => startFocus()}
                   >
                     <Layers size={16} strokeWidth={2} />
-                    Focus
+                    {t("pomodoro.focus")}
                   </button>
                 ) : (
                   <button
@@ -296,7 +303,7 @@ export function Pomodoro() {
                     onClick={() => startBreak()}
                   >
                     <Coffee size={16} strokeWidth={2} />
-                    Break
+                    {roundsCompleted >= totalRounds ? t("pomodoro.long_break") : t("pomodoro.break")}
                   </button>
                 )}
               </div>
@@ -305,7 +312,7 @@ export function Pomodoro() {
 
           <div className="tasks-panel">
             <div className="tasks-panel-header">
-              <h3>Kanban Tasks</h3>
+              <h3>{t("pomodoro.kanban_tasks")}</h3>
               <div
                 className="header-actions"
                 style={{ display: "flex", gap: "8px", alignItems: "center" }}
@@ -332,7 +339,7 @@ export function Pomodoro() {
             <div className="tasks-list">
               {filteredTasks.length === 0 && !isLoading && (
                 <p className="text-center text-accents-5 py-8">
-                  No tasks found. Create some in a project first!
+                  {t("common.no_tasks")}
                 </p>
               )}
               {filteredTasks.map((task) => (
@@ -358,13 +365,13 @@ export function Pomodoro() {
                     <div className="task-labels">
                       {task.timeSpentMinutes > 0 && (
                         <span className="task-label priority-low">
-                          {task.timeSpentMinutes}m spent
+                          {task.timeSpentMinutes}m {t("pomodoro.spent")}
                         </span>
                       )}
                       <div className="task-meta">
                         {selectedTaskId === task.id && (
                           <span className="status-badge in-progress">
-                            SELECTED
+                            {t("pomodoro.selected")}
                           </span>
                         )}
                       </div>

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useTranslation } from "react-i18next";
 
 interface CreateColumnDialogProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ export function CreateColumnDialog({
   onOpenChange,
   onConfirm,
 }: CreateColumnDialogProps) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -45,7 +47,7 @@ export function CreateColumnDialog({
         >
           <div className="modal-header">
             <Dialog.Title className="modal-title" asChild>
-              <h2>Add New Column</h2>
+              <h2>{t("columns.add_title")}</h2>
             </Dialog.Title>
             <Dialog.Close asChild>
               <button className="icon-button" aria-label="Close">
@@ -69,14 +71,14 @@ export function CreateColumnDialog({
           <form onSubmit={handleSubmit}>
             <div className="modal-body">
               <div className="form-group">
-                <label htmlFor="column-title">Column Title</label>
+                <label htmlFor="column-title">{t("columns.label")}</label>
                 <input
                   id="column-title"
                   type="text"
                   className="form-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Backlog, Review, QA"
+                  placeholder={t("columns.placeholder")}
                   autoFocus
                   required
                 />
@@ -86,7 +88,7 @@ export function CreateColumnDialog({
             <div className="modal-footer">
               <Dialog.Close asChild>
                 <button type="button" className="btn-secondary">
-                  Cancel
+                  {t("common.cancel")}
                 </button>
               </Dialog.Close>
               <button
@@ -94,7 +96,7 @@ export function CreateColumnDialog({
                 className="btn-primary"
                 disabled={!title.trim()}
               >
-                Create Column
+                {t("columns.add_title")}
               </button>
             </div>
           </form>

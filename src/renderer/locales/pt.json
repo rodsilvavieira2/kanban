@@ -1,0 +1,222 @@
+{
+  "common": {
+    "search": "Pesquisar tarefas...",
+    "new_task": "Nova Tarefa",
+    "view_details": "Ver Detalhes",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "cancel": "Cancelar",
+    "confirm": "Confirmar",
+    "save": "Salvar",
+    "loading": "Carregando...",
+    "no_tasks": "Nenhuma tarefa encontrada.",
+    "add_task": "Adicionar Tarefa",
+    "add_column": "Adicionar Coluna",
+    "edit_name": "Editar Nome",
+    "delete_column": "Excluir Coluna",
+    "project_board": "Quadro do Projeto",
+    "status": "Status",
+    "tag": "Tag",
+    "due_date": "Data de Entrega",
+    "any_date": "Qualquer Data",
+    "overdue": "Atrasado",
+    "due_today": "Vence Hoje",
+    "due_soon": "Vence Logo (7 dias)",
+    "clear_filters": "Limpar Filtros",
+    "task_name": "Nome da Tarefa",
+    "tags": "Tags",
+    "time_spent": "Tempo Gasto",
+    "all_statuses": "Todos os Status",
+    "all_tags": "Todas as Tags",
+    "planning": "Planejamento",
+    "in_progress": "Em Andamento",
+    "completed": "Concluído"
+  },
+  "pomodoro": {
+    "focus_session": "Sessão de Foco",
+    "short_break": "Pausa Curta",
+    "long_break": "Pausa Longa",
+    "round": "RODADA",
+    "start": "Iniciar",
+    "pause": "Pausar",
+    "start_focus": "Iniciar Foco",
+    "pause_focus": "Pausar Foco",
+    "start_break": "Iniciar Pausa",
+    "pause_break": "Pausar Pausa",
+    "reset": "Resetar",
+    "focus": "Foco",
+    "break": "Pausa",
+    "working_on": "Trabalhando em: {{task}}",
+    "select_task": "Selecione uma tarefa para iniciar",
+    "no_projects_tasks": "Nenhum projeto ou tarefa para focar",
+    "create_project_hint": "Crie um projeto e adicione tarefas para iniciar sua primeira sessão.",
+    "kanban_tasks": "Tarefas Kanban",
+    "selected": "SELECIONADO",
+    "spent": "gastos"
+  },
+  "settings": {
+    "title": "Configurações",
+    "description": "Personalize seu Kanban e gerencie dados locais.",
+    "general": {
+      "title": "Configurações Gerais",
+      "theme": "Tema do App",
+      "theme_desc": "Escolha entre modo claro ou escuro.",
+      "theme_dark": "Modo Escuro",
+      "theme_light": "Modo Claro",
+      "theme_system": "Padrão do Sistema",
+      "color_scheme": "Esquema de Cores",
+      "color_scheme_desc": "Escolha sua paleta de cores preferida.",
+      "language": "Idioma",
+      "language_desc": "Escolha seu idioma preferido."
+    },
+    "pomodoro": {
+      "title": "Configuração Pomodoro",
+      "focus_duration": "Duração do Foco",
+      "focus_duration_desc": "Duração das sessões de foco (minutos).",
+      "short_break_duration": "Duração da Pausa",
+      "short_break_duration_desc": "Duração das pausas curtas (minutos).",
+      "long_break_duration": "Duração da Pausa Longa",
+      "long_break_duration_desc": "Duração das pausas longas (minutos).",
+      "target_rounds": "Objetivo de Rodadas",
+      "target_rounds_desc": "Número de rodadas para um ciclo completo.",
+      "notifications": "Notificações Desktop",
+      "notifications_desc": "Receber alerta quando a sessão terminar."
+    },
+    "board": {
+      "title": "Gerenciamento do Quadro",
+      "default_view": "Visualização Padrão",
+      "default_view_desc": "Defina a visão padrão ao abrir um projeto.",
+      "kanban": "Quadro Kanban",
+      "table": "Visão de Tabela"
+    },
+    "data": {
+      "title": "Gerenciamento de Dados",
+      "export": "Exportar Dados",
+      "export_desc": "Baixar uma cópia dos seus dados como JSON.",
+      "exporting": "Exportando...",
+      "exported": "Exportado!",
+      "export_failed": "Exportação Falhou",
+      "import": "Importar Dados",
+      "danger_zone": "Zona de Perigo",
+      "reset_workspace": "Resetar Workspace",
+      "reset_desc": "Resetar todas as tarefas excluirá permanentemente tudo do banco de dados local."
+    }
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "pomodoro": "Pomodoro",
+    "projects": "Projetos",
+    "settings": "Configurações"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "activity": {
+      "title": "Atividade Recente",
+      "loading": "Carregando atividades...",
+      "no_activity": "Nenhuma atividade ainda",
+      "no_activity_desc": "Comece a trabalhar nos seus projetos para ver seu histórico aqui.",
+      "just_now": "Agora mesmo",
+      "minutes_ago": "{{count}}m atrás",
+      "hours_ago": "{{count}}h atrás",
+      "days_ago": "{{count}}d atrás"
+    },
+    "status": {
+      "title": "Status do Projeto",
+      "no_projects": "Nenhum projeto ainda",
+      "no_projects_desc": "Crie um projeto para começar a acompanhar seu status.",
+      "create_first": "Crie seu primeiro projeto",
+      "no_tasks": "Nenhuma tarefa ainda",
+      "no_tasks_desc": "Adicione tarefas ao seu projeto para começar a acompanhar o progresso.",
+      "complete": "CONCLUÍDO",
+      "top_active": "Principais projetos ativos"
+    },
+    "cards": {
+      "total_tasks": "Total de Tarefas",
+      "total_tasks_desc": "{{count}} em todos os projetos",
+      "in_progress": "Em Andamento",
+      "in_progress_desc": "{{percent}}% do total",
+      "completed": "Concluídas",
+      "completed_desc": "{{percent}}% de taxa de conclusão",
+      "no_tasks": "Nenhuma tarefa ainda"
+    }
+  },
+  "projects": {
+    "title": "Projetos",
+    "loading": "Carregando projetos...",
+    "no_projects": "Nenhum projeto ainda",
+    "no_projects_desc": "Organize suas tarefas e otimize seu fluxo de trabalho criando seu primeiro projeto hoje.",
+    "create_first": "Criar Seu Primeiro Projeto",
+    "new_project": "Novo Projeto",
+    "active_projects": "Projetos Ativos",
+    "completed": "Concluídos",
+    "total_projects": "Total de Projetos",
+    "all_projects": "Todos os Projetos",
+    "filter": "Filtrar",
+    "filter_by_status": "Filtrar por Status",
+    "sort": "Ordenar",
+    "sort_by": "Ordenar por",
+    "sort_by_name": "Nome",
+    "sort_by_date": "Data",
+    "name_az": "Nome do Projeto (A-Z)",
+    "date_newest": "Data de Criação (Mais Novo)",
+    "search_placeholder": "Pesquisar projetos...",
+    "table": {
+      "name": "Nome do Projeto",
+      "status": "Status",
+      "progress": "Progresso",
+      "due_date": "Data",
+      "tasks": "Tarefas",
+      "no_results": "Nenhum projeto corresponde aos seus critérios."
+    },
+    "pagination": {
+      "showing": "Mostrando <b>{{count}}</b> de <b>{{total}}</b> projetos"
+    },
+    "create_modal": {
+      "title": "Criar Novo Projeto",
+      "name_label": "Nome do Projeto",
+      "name_placeholder": "ex: Desenvolvimento App Mobile",
+      "desc_label": "Descrição",
+      "desc_placeholder": "Sobre o que é este projeto? Defina objetivos e escopo...",
+      "creating": "Criando...",
+      "create": "Criar Projeto"
+    },
+    "delete_confirm": {
+      "title": "Excluir Projeto",
+      "message": "Tem certeza que deseja excluir \"{{name}}\"? Isso removerá permanentemente o projeto, suas colunas e todas as tarefas. Esta ação não pode ser desfeita."
+    }
+  },
+  "tasks": {
+    "create_title": "Criar Nova Tarefa",
+    "create_desc": "Adicione uma nova tarefa ao seu workspace",
+    "edit_title": "Editar Tarefa",
+    "edit_desc": "Modifique os detalhes da tarefa",
+    "loading": "Carregando tarefa...",
+    "not_found": "Tarefa não encontrada",
+    "saving": "Salvando...",
+    "save_changes": "Salvar Alterações",
+    "general_info": "Informações Gerais",
+    "name_placeholder": "Nome da Tarefa",
+    "desc_label": "Descrição",
+    "markdown_supported": "Markdown suportado",
+    "desc_placeholder": "Descreva esta tarefa... **negrito**, _itálico_, `código`, - listas",
+    "column_label": "Coluna",
+    "due_date_label": "Data de Entrega",
+    "tags_label": "Tags",
+    "tags_placeholder": "Selecione ou crie tags...",
+    "create_tag": "Criar \"{{tag}}\"",
+    "view": {
+      "back": "Voltar",
+      "edit_task": "Editar Tarefa",
+      "select_continue": "Selecionar e Continuar",
+      "no_description": "Nenhuma descrição fornecida."
+    }
+  },
+  "columns": {
+    "add_title": "Adicionar Nova Coluna",
+    "edit_title": "Editar Coluna",
+    "label": "Título da Coluna",
+    "placeholder": "ex: Backlog, Revisão, QA",
+    "delete_title": "Excluir Coluna",
+    "delete_message": "Tem certeza que deseja excluir esta coluna? Todas as tarefas dentro desta coluna também serão excluídas. Esta ação não pode ser desfeita."
+  }
+}

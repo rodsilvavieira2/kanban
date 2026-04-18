@@ -1,9 +1,10 @@
 import { useEffect, useState, use, Suspense, startTransition } from "react";
+import { useTranslation } from "react-i18next";
 import { ActivityLog } from "../../../shared/schemas/models";
 import { kanbanApi } from "../../api";
 
-const getRelativeTime = (isoString?: string) => {
-  if (!isoString) return "Unknown time";
+const getRelativeTime = (isoString: string | undefined, t: any) => {
+  if (!isoString) return t("dashboard.activity.unknown_time") || "Unknown time";
   const date = new Date(isoString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -11,10 +12,10 @@ const getRelativeTime = (isoString?: string) => {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return "Just now";
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  return `${diffDays}d ago`;
+  if (diffMins < 1) return t("dashboard.activity.just_now");
+  if (diffMins < 60) return t("dashboard.activity.minutes_ago", { count: diffMins });
+  if (diffHours < 24) return t("dashboard.activity.hours_ago", { count: diffHours });
+  return t("dashboard.activity.days_ago", { count: diffDays });
 };
 
 const getIcon = (action: string) => {
@@ -69,6 +70,7 @@ const getActionClass = (action: string) => {
 
 function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
   const activities = use(promise);
+  const { t } = useTranslation();
 
   if (!activities || activities.length === 0) {
     return (
@@ -89,8 +91,8 @@ function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
         </div>
-        <h3>No activity yet</h3>
-        <p>Start working on your projects to see your history here.</p>
+        <h3>{t("dashboard.activity.no_activity")}</h3>
+        <p>{t("dashboard.activity.no_activity_desc")}</p>
       </div>
     );
   }
@@ -113,7 +115,7 @@ function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
                 )}
               </p>
               <span className="time">
-                {getRelativeTime(activity.createdAt)}
+                {getRelativeTime(activity.createdAt, t)}
               </span>
             </div>
           </div>
@@ -124,6 +126,7 @@ function ActivityFeedContent({ promise }: { promise: Promise<ActivityLog[]> }) {
 }
 
 export function ActivityFeed() {
+  const { t } = useTranslation();
   const [activitiesPromise, setActivitiesPromise] = useState(() =>
     kanbanApi.getRecentActivity(10),
   );
@@ -146,9 +149,9 @@ export function ActivityFeed() {
 
   return (
     <div className="activity-feed">
-      <h3>Recent Activity</h3>
+      <h3>{t("dashboard.activity.title")}</h3>
       <Suspense
-        fallback={<p className="text-accents-5 text-sm">Loading activity...</p>}
+        fallback={<p className="text-accents-5 text-sm">{t("dashboard.activity.loading")}</p>}
       >
         <ActivityFeedContent promise={activitiesPromise} />
       </Suspense>

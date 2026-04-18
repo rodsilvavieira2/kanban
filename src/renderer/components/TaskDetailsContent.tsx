@@ -2,6 +2,7 @@ import React from "react";
 import { Clock, Calendar, Tag, Play } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useTranslation } from "react-i18next";
 import { Task } from "../../shared/schemas/models";
 import { usePomodoroStore } from "../stores/pomodoroStore";
 
@@ -14,6 +15,7 @@ export function TaskDetailsContent({
   task,
   onSelectForPomodoro,
 }: TaskDetailsContentProps) {
+  const { t } = useTranslation();
   const { isActive } = usePomodoroStore();
 
   return (
@@ -41,7 +43,7 @@ export function TaskDetailsContent({
             }}
             title={isActive ? "Cannot change task while session is active" : ""}
           >
-            <Play size={16} fill="currentColor" /> Select & Continue
+            <Play size={16} fill="currentColor" /> {t("tasks.view.select_continue")}
           </button>
         )}
       </div>
@@ -61,7 +63,7 @@ export function TaskDetailsContent({
           </span>
         )}
         <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-          <Clock size={14} /> {task.timeSpentMinutes}m spent
+          <Clock size={14} /> {task.timeSpentMinutes}m {t("pomodoro.spent")}
         </span>
       </div>
 
@@ -89,7 +91,7 @@ export function TaskDetailsContent({
 
       <div className="markdown-content">
         <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {task.description || "*No description provided.*"}
+          {task.description || `*${t("tasks.view.no_description")}*`}
         </ReactMarkdown>
       </div>
     </div>

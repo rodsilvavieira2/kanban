@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -15,13 +16,17 @@ export function ConfirmDialog({
   isOpen,
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   onConfirm,
   onCancel,
   variant = "primary",
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
   if (!isOpen) return null;
+
+  const displayConfirmLabel = confirmLabel || t("common.confirm") || "Confirm";
+  const displayCancelLabel = cancelLabel || t("common.cancel") || "Cancel";
 
   return (
     <div className="modal-overlay">
@@ -53,13 +58,13 @@ export function ConfirmDialog({
 
         <div className="modal-footer">
           <button className="btn-secondary" onClick={onCancel}>
-            {cancelLabel}
+            {displayCancelLabel}
           </button>
           <button
             className={variant === "danger" ? "btn-danger" : "btn-primary"}
             onClick={onConfirm}
           >
-            {confirmLabel}
+            {displayConfirmLabel}
           </button>
         </div>
       </div>

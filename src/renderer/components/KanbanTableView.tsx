@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useKanbanStore } from "../stores/kanbanStore";
 import {
   Calendar,
@@ -16,15 +17,20 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 interface KanbanTableViewProps {
   onDeleteTask?: (taskId: string) => void;
+  initialSearchQuery?: string;
 }
 
-export function KanbanTableView({ onDeleteTask }: KanbanTableViewProps) {
+export function KanbanTableView({
+  onDeleteTask,
+  initialSearchQuery = "",
+}: KanbanTableViewProps) {
   const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { tasks, columns, moveTask } = useKanbanStore();
 
   // Filter states
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [tagFilter, setTagFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
@@ -141,7 +147,7 @@ export function KanbanTableView({ onDeleteTask }: KanbanTableViewProps) {
             <Search size={16} className="search-icon" />
             <input
               type="text"
-              placeholder="Search tasks..."
+              placeholder={t("common.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="filter-input"
@@ -375,7 +381,7 @@ export function KanbanTableView({ onDeleteTask }: KanbanTableViewProps) {
                             )
                           }
                         >
-                          <Eye size={16} /> View Details
+                          <Eye size={16} /> {t("common.view_details")}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                           className="dropdown-item"
@@ -385,13 +391,13 @@ export function KanbanTableView({ onDeleteTask }: KanbanTableViewProps) {
                             )
                           }
                         >
-                          <Edit2 size={16} /> Edit
+                          <Edit2 size={16} /> {t("common.edit")}
                         </DropdownMenu.Item>
                         <DropdownMenu.Item
                           className="dropdown-item delete"
                           onClick={() => onDeleteTask?.(task.id)}
                         >
-                          <Trash size={16} /> Delete
+                          <Trash size={16} /> {t("common.delete")}
                         </DropdownMenu.Item>
                       </DropdownMenu.Content>
                     </DropdownMenu.Portal>

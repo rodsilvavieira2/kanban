@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useActionState } from "react";
 import * as Select from "@radix-ui/react-select";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useKanbanStore } from "../stores/kanbanStore";
 import { ArrowLeft, X, ChevronDown, ChevronUp, Check } from "lucide-react";
 
@@ -73,6 +74,7 @@ function RadixSelect({
 
 export function CreateTask() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { projectId } = useParams<{ projectId: string }>();
   const location = useLocation();
   const stateColumnId = location.state?.columnId;
@@ -189,8 +191,8 @@ export function CreateTask() {
         <form action={formAction}>
           <div className="create-task-page-header">
             <div className="title-section">
-              <h1>Create New Task</h1>
-              <p>Add a new task to your workspace</p>
+              <h1>{t("tasks.create_title")}</h1>
+              <p>{t("tasks.create_desc")}</p>
             </div>
             <div className="header-actions">
               <button
@@ -199,14 +201,14 @@ export function CreateTask() {
                 type="button"
                 disabled={isPending}
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 className="btn-primary"
                 type="submit"
                 disabled={isPending}
               >
-                {isPending ? "Creating..." : "Create Task"}
+                {isPending ? t("common.loading") : t("tasks.create_title")}
               </button>
             </div>
           </div>
@@ -215,7 +217,7 @@ export function CreateTask() {
             <div className="form-main-column">
               <div className="form-section-card">
                 <div className="form-section-header">
-                  <h3>General Info</h3>
+                  <h3>{t("tasks.general_info")}</h3>
                   {state?.error && (
                     <span
                       className="error-text"
@@ -235,22 +237,22 @@ export function CreateTask() {
                       name="title"
                       type="text"
                       className="form-input large-input"
-                      placeholder="Task Name"
+                      placeholder={t("tasks.name_placeholder")}
                       required
                       disabled={isPending}
                     />
                   </div>
                   <div className="form-group">
-                    <label>Description <span className="form-label-hint">Markdown supported</span></label>
+                    <label>{t("tasks.desc_label")} <span className="form-label-hint">{t("tasks.markdown_supported")}</span></label>
                     <textarea
                       name="description"
                       className="form-textarea"
-                      placeholder="Describe this task... **bold**, _italic_, `code`, - lists"
+                      placeholder={t("tasks.desc_placeholder")}
                       disabled={isPending}
                     ></textarea>
                   </div>
                   <div className="form-group">
-                    <label>Column</label>
+                    <label>{t("tasks.column_label")}</label>
                     <RadixSelect
                       name="columnId"
                       key={columns.length ? "loaded" : "loading"}
@@ -268,7 +270,7 @@ export function CreateTask() {
                     />
                   </div>
                   <div className="form-group">
-                    <label>Due Date</label>
+                    <label>{t("tasks.due_date_label")}</label>
                     <input
                       name="dueDate"
                       type="date"
@@ -277,7 +279,7 @@ export function CreateTask() {
                     />
                   </div>
                   <div className="form-group" ref={dropdownRef}>
-                    <label>Tags</label>
+                    <label>{t("tasks.tags_label")}</label>
                     <div className="tag-system-container">
                       <div className="tag-input-wrapper">
                         {selectedTags.map((tag) => (
@@ -299,7 +301,7 @@ export function CreateTask() {
                           className="tag-bare-input"
                           placeholder={
                             selectedTags.length === 0
-                              ? "Select or create tags..."
+                              ? t("tasks.tags_placeholder")
                               : ""
                           }
                           value={tagInput}
@@ -333,7 +335,7 @@ export function CreateTask() {
                                   className="tag-option create-option"
                                   onClick={() => addTag(tagInput)}
                                 >
-                                  Create "<span>{tagInput}</span>"
+                                  {t("tasks.create_tag", { tag: tagInput })}
                                 </div>
                               )}
                           </div>

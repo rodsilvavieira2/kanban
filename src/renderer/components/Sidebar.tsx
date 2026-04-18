@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Grid, Layers, Clock, Settings } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   currentView: "dashboard" | "projects" | "pomodoro" | "settings";
@@ -9,6 +10,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ currentView, onViewChange }: SidebarProps) {
+  const { t } = useTranslation();
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -24,21 +27,21 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
           onClick={() => onViewChange("dashboard")}
         >
           <Grid size={18} strokeWidth={1.5} />
-          Dashboard
+          {t("sidebar.dashboard")}
         </a>
         <a
           className={`nav-item ${currentView === "projects" ? "active" : ""}`}
           onClick={() => onViewChange("projects")}
         >
           <Layers size={18} strokeWidth={1.5} />
-          Projects
+          {t("sidebar.projects")}
         </a>
         <a
           className={`nav-item ${currentView === "pomodoro" ? "active" : ""}`}
           onClick={() => onViewChange("pomodoro")}
         >
           <Clock size={18} strokeWidth={1.5} />
-          Pomodoro
+          {t("sidebar.pomodoro")}
         </a>
       </nav>
 
@@ -49,7 +52,7 @@ export function Sidebar({ currentView, onViewChange }: SidebarProps) {
           onClick={() => onViewChange("settings")}
         >
           <Settings size={18} strokeWidth={1.5} />
-          Settings
+          {t("sidebar.settings")}
         </button>
       </div>
     </aside>
